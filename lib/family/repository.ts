@@ -1,0 +1,2225 @@
+import 'server-only';
+
+import { randomUUID } from 'node:crypto';
+import { and, desc, eq, inArray, isNull } from 'drizzle-orm';
+import { db } from '@/lib/db/drizzle';
+import { processRunExtraction } from '@/lib/ai/pipeline';
+import type { CanonicalExtractionBundle } from '@/lib/ai/extraction-schema';
+import { TAXONOMY } from '@/lib/ai/taxonomy';
+import { isFamilyEduDemoMode } from '@/lib/family/config';
+import { deleteFamilyArtifact } from '@/lib/family/storage';
+import {
+  readFamilyMockState,
+  updateFamilyMockState,
+} from '@/lib/family/mock-store';
+import { purgeReminderEvents } from '@/lib/notifications/reminders';
+import {
+  recordRunCostArtifact,
+  removeRunCostArtifacts,
+} from '@/lib/observability/cost-tracking';
+import {
+  recordRunErrorEvent,
+  recordRunLifecycleEvent,
+  removeRunObservabilityArtifacts,
+} from '@/lib/observability/telemetry';
+import type {
+  FamilyMockState,
+  IncomingUploadFile,
+  PageQualityFlags,
+  StoredActivity,
+  StoredChild,
+  StoredErrorLabel,
+  StoredItemError,
+  StoredProblemItem,
+  StoredReport,
+  StoredRun,
+  StoredShareLink,
+  StoredUpload,
+} from '@/lib/family/types';
+import { buildReportsFromExtraction } from '@/lib/family/reporting';
+import {
+  activityLogs,
+  analysisRuns,
+  children,
+  errorLabels,
+  itemErrors,
+  pages,
+  problemItems,
+  reports,
+  shareLinks,
+  uploadFiles,
+  uploads,
+} from '@/lib/db/schema';
+
+const FAMILY_EDU_DEMO_MODE = isFamilyEduDemoMode();
+
+function nowIso() {
+  return new Date().toISOString();
+}
+
+function cloneQualityFlags(flags: PageQualityFlags): PageQualityFlags {
+  return {
+    blurry: Boolean(flags.blurry),
+    rotated: Boolean(flags.rotated),
+    dark: Boolean(flags.dark),
+    lowContrast: Boolean(flags.lowContrast),
+    width: typeof flags.width === 'number' ? flags.width : undefined,
+    height: typeof flags.height === 'number' ? flags.height : undefined,
+  };
+}
+
+function summarizeQuality(flags: PageQualityFlags) {
+  const issues = [flags.blurry, flags.rotated, flags.dark, flags.lowContrast].filter(Boolean).length;
+  return Math.max(35, 100 - issues * 18);
+}
+
+function logMockActivity(state: FamilyMockState, userId: number, action: string, detail: string) {
+  const record: StoredActivity = {
+    id: state.meta.nextIds.activity++,
+    userId,
+    action,
+    detail,
+    timestamp: nowIso(),
+  };
+  state.activityLogs.unshift(record);
+}
+
+async function deleteArtifactsByPath(storagePaths: Array<string | null | undefined>) {
+  const uniquePaths = Array.from(
+    new Set(
+      storagePaths
+        .filter((storagePath): storagePath is string => typeof storagePath === 'string')
+        .filter(Boolean)
+    )
+  );
+
+  for (const storagePath of uniquePaths) {
+    await deleteFamilyArtifact(storagePath);
+  }
+}
+
+async function recordRunTelemetryTransition(args: {
+  previousStatus: string;
+  previousStage: string;
+  run: StoredRun;
+  message: string;
+  metadata?: Record<string, unknown>;
+}) {
+  if (
+    args.previousStatus === args.run.status &&
+    args.previousStage === args.run.stage
+  ) {
+    return;
+  }
+
+  await recordRunLifecycleEvent({
+    runId: args.run.id,
+    userId: args.run.userId,
+    childId: args.run.childId,
+    uploadId: args.run.uploadId,
+    eventType: 'state_transition',
+    status: args.run.status,
+    stage: args.run.stage,
+    message: args.message,
+    metadata: {
+      previousStatus: args.previousStatus,
+      previousStage: args.previousStage,
+      ...(args.metadata || {}),
+    },
+  });
+}
+
+async function recordRunCompletionArtifacts(args: {
+  run: StoredRun;
+  bundle: CanonicalExtractionBundle;
+  engine: 'openai' | 'mathpix';
+}) {
+  await recordRunLifecycleEvent({
+    runId: args.run.id,
+    userId: args.run.userId,
+    childId: args.run.childId,
+    uploadId: args.run.uploadId,
+    eventType: args.run.status === 'needs_review' ? 'needs_review' : 'completed',
+    status: args.run.status,
+    stage: args.run.stage,
+    message: args.run.statusMessage,
+    metadata: {
+      confidence: args.run.overallConfidence,
+      reviewReason: args.run.needsReviewReason,
+      engine: args.engine,
+    },
+  });
+
+  await recordRunCostArtifact({
+    runId: args.run.id,
+    userId: args.run.userId,
+    engine: args.engine,
+    pageCount: args.bundle.pages.length,
+    labeledItemCount: args.bundle.labeledItems.length,
+    status: args.run.status === 'needs_review' ? 'needs_review' : 'done',
+    metadata: {
+      confidence: args.run.overallConfidence,
+      reviewReason: args.run.needsReviewReason,
+    },
+  });
+}
+
+async function deleteDemoUploadCascade(state: FamilyMockState, userId: number, uploadId: number) {
+  const upload = state.uploads.find((item) => item.userId === userId && item.id === uploadId);
+  if (!upload) {
+    return null;
+  }
+
+  const runIds = state.runs
+    .filter((run) => run.userId === userId && run.uploadId === uploadId)
+    .map((run) => run.id);
+  const reportIds = state.reports
+    .filter((report) => runIds.includes(report.runId))
+    .map((report) => report.id);
+  const pageStoragePaths = state.pages
+    .filter((page) => page.uploadId === uploadId)
+    .map((page) => page.storagePath);
+  const fileStoragePaths = state.uploadFiles
+    .filter((file) => file.uploadId === uploadId)
+    .map((file) => file.storagePath);
+
+  for (const runId of runIds) {
+    removeDemoExtractionArtifacts(state, runId);
+  }
+
+  state.shareLinks = state.shareLinks.filter((link) => !reportIds.includes(link.reportId));
+  state.runs = state.runs.filter((run) => !runIds.includes(run.id));
+  state.pages = state.pages.filter((page) => page.uploadId !== uploadId);
+  state.uploadFiles = state.uploadFiles.filter((file) => file.uploadId !== uploadId);
+  state.uploads = state.uploads.filter((item) => item.id !== uploadId);
+
+  await deleteArtifactsByPath([...pageStoragePaths, ...fileStoragePaths]);
+  await purgeReminderEvents({
+    userId,
+    reportIds,
+    childIds: [upload.childId],
+  });
+  await removeRunObservabilityArtifacts(runIds);
+  await removeRunCostArtifacts(runIds);
+
+  logMockActivity(
+    state,
+    userId,
+    'DELETE_UPLOAD',
+    `Deleted upload ${uploadId} and removed ${runIds.length} linked run(s).`
+  );
+
+  return {
+    uploadId,
+    childId: upload.childId,
+    runIds,
+    reportIds,
+  };
+}
+
+async function deleteDemoReportRecord(state: FamilyMockState, userId: number, reportId: number) {
+  const report = state.reports.find((item) => item.id === reportId);
+  if (!report) {
+    return null;
+  }
+
+  const run = state.runs.find((item) => item.id === report.runId && item.userId === userId);
+  if (!run) {
+    return null;
+  }
+
+  state.shareLinks = state.shareLinks.filter((item) => item.reportId !== reportId);
+  state.reports = state.reports.filter((item) => item.id !== reportId);
+  await purgeReminderEvents({
+    userId,
+    reportIds: [reportId],
+    childIds: [run.childId],
+  });
+
+  logMockActivity(
+    state,
+    userId,
+    'DELETE_REPORT',
+    `Deleted report ${reportId} for run ${run.id}.`
+  );
+
+  return {
+    reportId,
+    runId: run.id,
+    childId: run.childId,
+  };
+}
+
+function removeDemoExtractionArtifacts(state: FamilyMockState, runId: number) {
+  const itemIds = state.problemItems
+    .filter((item) => item.runId === runId)
+    .map((item) => item.id);
+
+  if (itemIds.length > 0) {
+    state.itemErrors = state.itemErrors.filter((itemError) => !itemIds.includes(itemError.itemId));
+  }
+
+  state.problemItems = state.problemItems.filter((item) => item.runId !== runId);
+  state.reports = state.reports.filter((report) => report.runId !== runId);
+}
+
+function getOrCreateDemoErrorLabel(state: FamilyMockState, code: string): StoredErrorLabel | null {
+  const existing = state.errorLabels.find((label) => label.code === code);
+  if (existing) {
+    return existing;
+  }
+
+  const taxonomy = TAXONOMY.find((item) => item.code === code);
+  if (!taxonomy) {
+    return null;
+  }
+
+  const label: StoredErrorLabel = {
+    id: state.meta.nextIds.errorLabel++,
+    code: taxonomy.code,
+    displayName: taxonomy.displayName,
+    description: taxonomy.description,
+    createdAt: nowIso(),
+  };
+  state.errorLabels.push(label);
+  return label;
+}
+
+function buildBundleFromDemoState(
+  state: FamilyMockState,
+  run: StoredRun
+): CanonicalExtractionBundle | null {
+  const runItems = state.problemItems.filter((item) => item.runId === run.id);
+  if (runItems.length === 0) {
+    return null;
+  }
+
+  const pageMap = new Map(state.pages.map((page) => [page.id, page] as const));
+  const labelMap = new Map(state.errorLabels.map((label) => [label.id, label] as const));
+
+  const pagesById = new Map<
+    number,
+    {
+      pageId: number;
+      pageNo: number;
+      sourceName: string;
+      detectedLanguage: string;
+      pageConfidence: number;
+      qualityFlags: {
+        blurry: boolean;
+        rotated: boolean;
+        dark: boolean;
+        lowContrast: boolean;
+      };
+      items: Array<{
+        problemNo: string;
+        problemText: string;
+        studentWork: string;
+        teacherMark: 'correct' | 'wrong' | 'partial' | 'unknown';
+        modelIsCorrect: boolean | null;
+        itemConfidence: number;
+        evidenceAnchor: {
+          pageId: number;
+          pageNo: number;
+          problemNo: string;
+          previewLabel: string;
+        };
+      }>;
+    }
+  >();
+
+  const labeledItems = runItems.map((item) => {
+    const page = pageMap.get(item.pageId);
+    const linkedErrors = state.itemErrors.filter((itemError) => itemError.itemId === item.id);
+    const labels = linkedErrors
+      .map((linkedError) => {
+        const label = labelMap.get(linkedError.labelId);
+        if (!label) {
+          return null;
+        }
+        return {
+          code: label.code,
+          severity: linkedError.severity,
+          labelConfidence: linkedError.confidence,
+        };
+      })
+      .filter((label): label is NonNullable<typeof label> => Boolean(label));
+
+    if (page) {
+      const existingPage = pagesById.get(page.id);
+      const pagePayload = {
+        problemNo: item.problemNo,
+        problemText: item.problemText,
+        studentWork: item.studentWork,
+        teacherMark: item.teacherMark,
+        modelIsCorrect: item.modelIsCorrect,
+        itemConfidence: item.itemConfidence,
+        evidenceAnchor: {
+          pageId: page.id,
+          pageNo: item.evidenceAnchor.pageNo,
+          problemNo: item.evidenceAnchor.problemNo,
+          previewLabel: item.evidenceAnchor.previewLabel,
+        },
+      };
+
+      if (existingPage) {
+        existingPage.items.push(pagePayload);
+      } else {
+        pagesById.set(page.id, {
+          pageId: page.id,
+          pageNo: page.pageNumber,
+          sourceName: page.sourceName,
+          detectedLanguage: 'en',
+          pageConfidence: Number((Math.max(0.38, page.qualityScore / 100)).toFixed(2)),
+          qualityFlags: {
+            blurry: page.qualityFlags.blurry,
+            rotated: page.qualityFlags.rotated,
+            dark: page.qualityFlags.dark,
+            lowContrast: page.qualityFlags.lowContrast,
+          },
+          items: [pagePayload],
+        });
+      }
+    }
+
+    return {
+      problemNo: item.problemNo,
+      problemText: item.problemText,
+      studentWork: item.studentWork,
+      teacherMark: item.teacherMark,
+      modelIsCorrect: item.modelIsCorrect,
+      itemConfidence: item.itemConfidence,
+      evidenceAnchor: {
+        pageId: item.pageId,
+        pageNo: item.evidenceAnchor.pageNo,
+        problemNo: item.evidenceAnchor.problemNo,
+        previewLabel: item.evidenceAnchor.previewLabel,
+      },
+      labels,
+      rationale:
+        linkedErrors[0]?.rationale ||
+        'The extracted work pattern needs a focused practice response rather than a direct answer.',
+    };
+  });
+
+  return {
+    runId: run.id,
+    engine: 'demo',
+    modelVersion: 'demo-persisted',
+    pages: Array.from(pagesById.values()).sort((left, right) => left.pageNo - right.pageNo),
+    labeledItems,
+    overallConfidence: run.overallConfidence ?? 0.5,
+    requiresReview: run.status === 'needs_review',
+    reviewReason: run.needsReviewReason,
+  };
+}
+
+async function persistDemoExtractionBundle(
+  state: FamilyMockState,
+  run: StoredRun,
+  bundle: CanonicalExtractionBundle
+) {
+  removeDemoExtractionArtifacts(state, run.id);
+
+  const now = nowIso();
+
+  for (const item of bundle.labeledItems) {
+    const storedItem: StoredProblemItem = {
+      id: state.meta.nextIds.problemItem++,
+      runId: run.id,
+      pageId: item.evidenceAnchor.pageId,
+      problemNo: item.problemNo,
+      problemText: item.problemText,
+      studentWork: item.studentWork,
+      teacherMark: item.teacherMark,
+      modelIsCorrect: item.modelIsCorrect,
+      itemConfidence: item.itemConfidence,
+      evidenceAnchor: {
+        pageNo: item.evidenceAnchor.pageNo,
+        problemNo: item.evidenceAnchor.problemNo,
+        previewLabel: item.evidenceAnchor.previewLabel,
+      },
+      createdAt: now,
+    };
+    state.problemItems.push(storedItem);
+
+    for (const label of item.labels) {
+      const storedLabel = getOrCreateDemoErrorLabel(state, label.code);
+      if (!storedLabel) {
+        continue;
+      }
+
+      const itemError: StoredItemError = {
+        id: state.meta.nextIds.itemError++,
+        itemId: storedItem.id,
+        labelId: storedLabel.id,
+        severity: label.severity,
+        rationale: item.rationale,
+        confidence: label.labelConfidence,
+        createdAt: now,
+      };
+      state.itemErrors.push(itemError);
+    }
+  }
+
+  const child = state.children.find((item) => item.id === run.childId);
+  const upload = state.uploads.find((item) => item.id === run.uploadId);
+  if (!child || !upload) {
+    return null;
+  }
+
+  const reportPayload = buildReportsFromExtraction({
+    bundle,
+    child,
+    upload,
+  });
+
+  const report: StoredReport = {
+    id: state.meta.nextIds.report++,
+    runId: run.id,
+    parentReportJson: reportPayload.parentReportJson,
+    studentReportJson: reportPayload.studentReportJson,
+    tutorReportJson: reportPayload.tutorReportJson,
+    createdAt: now,
+    updatedAt: now,
+  };
+  state.reports.push(report);
+  return report;
+}
+
+async function finalizeDemoRunWithExtraction(
+  state: FamilyMockState,
+  run: StoredRun,
+  options?: {
+    preferMathpix?: boolean;
+    force?: boolean;
+    reviewOverride?: string | null;
+  }
+  ) {
+    if (!options?.force) {
+      const existingBundle = buildBundleFromDemoState(state, run);
+      const existingReport = state.reports.find((report) => report.runId === run.id) || null;
+      if (existingBundle && existingReport) {
+        return {
+          bundle: existingBundle,
+          report: existingReport,
+        };
+      }
+    }
+
+  const pageRecords = state.pages.filter((page) => page.uploadId === run.uploadId);
+  const bundle = await processRunExtraction({
+    runId: run.id,
+    pages: pageRecords.map((page) => ({
+      id: page.id,
+      pageNumber: page.pageNumber,
+      previewLabel: page.previewLabel,
+      sourceName: page.sourceName,
+      storagePath: page.storagePath,
+      qualityFlags: {
+        blurry: page.qualityFlags.blurry,
+        rotated: page.qualityFlags.rotated,
+        dark: page.qualityFlags.dark,
+        lowContrast: page.qualityFlags.lowContrast,
+      },
+    })),
+    preferMathpix: options?.preferMathpix,
+  });
+
+  const reviewReason = options?.reviewOverride || bundle.reviewReason;
+  run.overallConfidence = bundle.overallConfidence;
+  run.progressPercent = 100;
+  run.finishedAt = nowIso();
+  run.updatedAt = nowIso();
+
+  if (reviewReason) {
+    run.status = 'needs_review';
+    run.stage = 'review';
+    run.statusMessage = 'Needs review before the full report is released.';
+    run.needsReviewReason = reviewReason;
+  } else {
+    run.status = 'done';
+    run.stage = 'done';
+    run.statusMessage = 'Diagnosis generated successfully.';
+    run.needsReviewReason = null;
+  }
+
+  const report = await persistDemoExtractionBundle(state, run, {
+    ...bundle,
+    requiresReview: Boolean(reviewReason),
+    reviewReason,
+  });
+
+  await recordRunCompletionArtifacts({
+    run,
+    bundle: {
+      ...bundle,
+      requiresReview: Boolean(reviewReason),
+      reviewReason,
+    },
+    engine: options?.preferMathpix ? 'mathpix' : 'openai',
+  });
+
+    return {
+      bundle: {
+        ...bundle,
+        requiresReview: Boolean(reviewReason),
+        reviewReason,
+      },
+      report,
+    };
+  }
+
+function getDemoRunWithReport(state: FamilyMockState, runId: number) {
+  const run = state.runs.find((item) => item.id === runId);
+  if (!run) {
+    return null;
+  }
+
+  const report = state.reports.find((item) => item.runId === run.id) || null;
+  const upload = state.uploads.find((item) => item.id === run.uploadId) || null;
+  const child = state.children.find((item) => item.id === run.childId) || null;
+  const pageRecords = state.pages.filter((item) => item.uploadId === run.uploadId);
+
+  return {
+    ...run,
+    reportId: report?.id ?? null,
+    upload,
+    child,
+    pageRecords,
+  };
+}
+
+function getForcedReviewReason(
+  notes: string | null | undefined,
+  pageRecords: Array<{ isBlurry: boolean; isRotated: boolean; isDark: boolean }>
+) {
+  const normalizedNotes = (notes || '').toLowerCase();
+  const qualityIssueCount = pageRecords.filter(
+    (page) => page.isBlurry || page.isRotated || page.isDark
+  ).length;
+
+  if (normalizedNotes.includes('review')) {
+    return 'This upload was explicitly flagged for manual review before release.';
+  }
+
+  if (qualityIssueCount >= Math.max(2, Math.ceil(pageRecords.length * 0.35))) {
+    return 'Several pages were dark, blurry, or rotated and need manual review.';
+  }
+
+  return null;
+}
+
+async function syncDemoRunState(state: FamilyMockState, runId: number) {
+  const run = state.runs.find((item) => item.id === runId);
+  if (!run) {
+    return null;
+  }
+
+  const previousStatus = run.status;
+  const previousStage = run.stage;
+
+  if (run.status === 'done' || run.status === 'failed' || run.status === 'needs_review') {
+    if (
+      (run.status === 'done' || run.status === 'needs_review') &&
+      !state.problemItems.some((item) => item.runId === run.id)
+    ) {
+      const upload = state.uploads.find((item) => item.id === run.uploadId);
+      const pageRecords = state.pages.filter((item) => item.uploadId === run.uploadId);
+      const reviewOverride =
+        run.status === 'needs_review'
+          ? run.needsReviewReason ||
+            getForcedReviewReason(upload?.notes, pageRecords) ||
+            'This run needs manual review before release.'
+          : null;
+
+      if (upload) {
+        await finalizeDemoRunWithExtraction(state, run, {
+          force: true,
+          reviewOverride,
+          preferMathpix: upload.notes.toLowerCase().includes('mathpix'),
+        });
+      }
+    }
+
+    return getDemoRunWithReport(state, runId);
+  }
+
+  const upload = state.uploads.find((item) => item.id === run.uploadId);
+  const pageRecords = state.pages.filter((item) => item.uploadId === run.uploadId);
+  const qualityIssueCount = pageRecords.filter(
+    (page) => page.isBlurry || page.isRotated || page.isDark
+  ).length;
+  const elapsedMs = Date.now() - new Date(run.createdAt).getTime();
+  const elapsedSeconds = Math.floor(elapsedMs / 1000);
+
+  if (upload?.notes.toLowerCase().includes('timeout')) {
+    run.status = 'failed';
+    run.stage = 'failed';
+    run.progressPercent = 100;
+    run.errorMessage =
+      'This run exceeded the expected time window. Please retry or contact support.';
+    run.statusMessage = 'Analysis timed out before the diagnosis could finish.';
+    run.finishedAt = nowIso();
+    run.updatedAt = nowIso();
+    await recordRunTelemetryTransition({
+      previousStatus,
+      previousStage,
+      run,
+      message: run.statusMessage,
+      metadata: {
+        reason: 'timeout',
+      },
+    });
+    await recordRunErrorEvent({
+      runId: run.id,
+      userId: run.userId,
+      errorType: 'timeout',
+      message: run.errorMessage || run.statusMessage,
+      metadata: {
+        uploadId: run.uploadId,
+        childId: run.childId,
+      },
+    });
+    return getDemoRunWithReport(state, runId);
+  }
+
+  if (upload?.notes.toLowerCase().includes('fail')) {
+    run.status = 'failed';
+    run.stage = 'failed';
+    run.progressPercent = 100;
+    run.errorMessage = 'The run was intentionally forced into failure mode for retry testing.';
+    run.statusMessage = 'Analysis failed. Please retry or contact support.';
+    run.finishedAt = nowIso();
+    run.updatedAt = nowIso();
+    await recordRunTelemetryTransition({
+      previousStatus,
+      previousStage,
+      run,
+      message: run.statusMessage,
+      metadata: {
+        reason: 'forced_failure',
+      },
+    });
+    await recordRunErrorEvent({
+      runId: run.id,
+      userId: run.userId,
+      errorType: 'forced_failure',
+      message: run.errorMessage || run.statusMessage,
+      metadata: {
+        uploadId: run.uploadId,
+        childId: run.childId,
+      },
+    });
+    return getDemoRunWithReport(state, runId);
+  }
+
+  if (elapsedSeconds < 2) {
+    run.status = 'queued';
+    run.stage = 'queued';
+    run.progressPercent = 12;
+    run.statusMessage = 'Queued for preprocessing.';
+  } else if (elapsedSeconds < 5) {
+    run.status = 'running';
+    run.stage = 'preprocessing';
+    run.progressPercent = 36;
+    run.statusMessage = 'Checking page quality, count, and source metadata.';
+    run.startedAt = run.startedAt || nowIso();
+  } else if (elapsedSeconds < 8) {
+    run.status = 'running';
+    run.stage = 'extracting';
+    run.progressPercent = 68;
+    run.statusMessage = 'Extracting item-level evidence anchors from each page.';
+  } else if (elapsedSeconds < 11) {
+    run.status = 'running';
+    run.stage = 'composing';
+    run.progressPercent = 86;
+    run.statusMessage = 'Composing diagnosis, evidence, and next steps.';
+  } else {
+    const forcedReviewReason = getForcedReviewReason(upload?.notes, pageRecords);
+
+    await finalizeDemoRunWithExtraction(state, run, {
+      reviewOverride: forcedReviewReason,
+      preferMathpix: upload?.notes.toLowerCase().includes('mathpix'),
+    });
+  }
+
+  run.updatedAt = nowIso();
+  await recordRunTelemetryTransition({
+    previousStatus,
+    previousStage,
+    run,
+    message: run.statusMessage,
+    metadata: {
+      qualityIssueCount,
+      elapsedSeconds,
+    },
+  });
+
+  return getDemoRunWithReport(state, runId);
+}
+
+export async function listChildrenForUser(userId: number) {
+  if (FAMILY_EDU_DEMO_MODE) {
+    const state = await readFamilyMockState();
+    return state.children
+      .filter((child) => child.userId === userId && !child.deletedAt)
+      .sort((left, right) => right.updatedAt.localeCompare(left.updatedAt));
+  }
+
+  return db
+    .select()
+    .from(children)
+    .where(and(eq(children.userId, userId), isNull(children.deletedAt)))
+    .orderBy(desc(children.updatedAt));
+}
+
+export async function getChildForUser(userId: number, childId: number) {
+  if (FAMILY_EDU_DEMO_MODE) {
+    const state = await readFamilyMockState();
+    return (
+      state.children.find(
+        (child) => child.userId === userId && child.id === childId && !child.deletedAt
+      ) || null
+    );
+  }
+
+  const result = await db
+    .select()
+    .from(children)
+    .where(
+      and(
+        eq(children.userId, userId),
+        eq(children.id, childId),
+        isNull(children.deletedAt)
+      )
+    )
+    .limit(1);
+
+  return result[0] || null;
+}
+
+export async function createChildForUser(
+  userId: number,
+  input: { nickname: string; grade: string; curriculum: string }
+) {
+  if (FAMILY_EDU_DEMO_MODE) {
+    return updateFamilyMockState((state) => {
+      const child: StoredChild = {
+        id: state.meta.nextIds.child++,
+        userId,
+        nickname: input.nickname,
+        grade: input.grade,
+        curriculum: input.curriculum,
+        createdAt: nowIso(),
+        updatedAt: nowIso(),
+        deletedAt: null,
+      };
+      state.children.push(child);
+      logMockActivity(state, userId, 'CREATE_CHILD', `Created child profile ${child.nickname}.`);
+      return child;
+    });
+  }
+
+  const [createdChild] = await db
+    .insert(children)
+    .values({
+      userId,
+      nickname: input.nickname,
+      grade: input.grade,
+      curriculum: input.curriculum,
+    })
+    .returning();
+
+  return createdChild;
+}
+
+export async function updateChildForUser(
+  userId: number,
+  childId: number,
+  input: { nickname: string; grade: string; curriculum: string }
+) {
+  if (FAMILY_EDU_DEMO_MODE) {
+    return updateFamilyMockState((state) => {
+      const child = state.children.find(
+        (item) => item.userId === userId && item.id === childId && !item.deletedAt
+      );
+      if (!child) {
+        return null;
+      }
+
+      child.nickname = input.nickname;
+      child.grade = input.grade;
+      child.curriculum = input.curriculum;
+      child.updatedAt = nowIso();
+      logMockActivity(state, userId, 'UPDATE_CHILD', `Updated child profile ${child.nickname}.`);
+      return child;
+    });
+  }
+
+  const [updatedChild] = await db
+    .update(children)
+    .set({
+      nickname: input.nickname,
+      grade: input.grade,
+      curriculum: input.curriculum,
+      updatedAt: new Date(),
+    })
+    .where(and(eq(children.userId, userId), eq(children.id, childId)))
+    .returning();
+
+  return updatedChild || null;
+}
+
+export async function archiveChildForUser(userId: number, childId: number) {
+  if (FAMILY_EDU_DEMO_MODE) {
+    return updateFamilyMockState(async (state) => {
+      const child = state.children.find(
+        (item) => item.userId === userId && item.id === childId && !item.deletedAt
+      );
+      if (!child) {
+        return null;
+      }
+
+      child.deletedAt = nowIso();
+      child.updatedAt = nowIso();
+      const childUploadIds = state.uploads
+        .filter((upload) => upload.userId === userId && upload.childId === child.id)
+        .map((upload) => upload.id);
+      for (const uploadId of childUploadIds) {
+        await deleteDemoUploadCascade(state, userId, uploadId);
+      }
+      await purgeReminderEvents({
+        userId,
+        childIds: [child.id],
+      });
+      logMockActivity(state, userId, 'ARCHIVE_CHILD', `Archived child profile ${child.nickname}.`);
+      return child;
+    });
+  }
+
+  const childUploads = await db
+    .select({ id: uploads.id })
+    .from(uploads)
+    .where(and(eq(uploads.userId, userId), eq(uploads.childId, childId)));
+
+  for (const uploadRecord of childUploads) {
+    await deleteUploadForUser(userId, uploadRecord.id);
+  }
+
+  const [archivedChild] = await db
+    .update(children)
+    .set({
+      deletedAt: new Date(),
+      updatedAt: new Date(),
+    })
+    .where(and(eq(children.userId, userId), eq(children.id, childId)))
+    .returning();
+
+  return archivedChild || null;
+}
+
+export async function listUploadsForChild(userId: number, childId: number) {
+  if (FAMILY_EDU_DEMO_MODE) {
+    const state = await readFamilyMockState();
+    return state.uploads
+      .filter((upload) => upload.userId === userId && upload.childId === childId)
+      .sort((left, right) => right.createdAt.localeCompare(left.createdAt));
+  }
+
+  return db
+    .select()
+    .from(uploads)
+    .where(and(eq(uploads.userId, userId), eq(uploads.childId, childId)))
+    .orderBy(desc(uploads.createdAt));
+}
+
+export async function getUploadForUser(userId: number, uploadId: number) {
+  if (FAMILY_EDU_DEMO_MODE) {
+    const state = await readFamilyMockState();
+    const upload = state.uploads.find((item) => item.userId === userId && item.id === uploadId);
+    if (!upload) {
+      return null;
+    }
+
+    return {
+      upload,
+      files: state.uploadFiles.filter((item) => item.uploadId === upload.id),
+      pages: state.pages.filter((item) => item.uploadId === upload.id),
+    };
+  }
+
+  const [upload] = await db
+    .select()
+    .from(uploads)
+    .where(and(eq(uploads.userId, userId), eq(uploads.id, uploadId)))
+    .limit(1);
+
+  if (!upload) {
+    return null;
+  }
+
+  return {
+    upload,
+    files: await db.select().from(uploadFiles).where(eq(uploadFiles.uploadId, upload.id)),
+    pages: await db.select().from(pages).where(eq(pages.uploadId, upload.id)),
+  };
+}
+
+export async function deleteUploadForUser(userId: number, uploadId: number) {
+  if (FAMILY_EDU_DEMO_MODE) {
+    return updateFamilyMockState((state) => deleteDemoUploadCascade(state, userId, uploadId));
+  }
+
+  const uploadRecord = await getUploadForUser(userId, uploadId);
+  if (!uploadRecord) {
+    return null;
+  }
+
+  const runRows = await db
+    .select({ id: analysisRuns.id })
+    .from(analysisRuns)
+    .where(and(eq(analysisRuns.userId, userId), eq(analysisRuns.uploadId, uploadId)));
+  const runIds = runRows.map((run) => run.id);
+  const reportRows =
+    runIds.length > 0
+      ? await db
+          .select({ id: reports.id })
+          .from(reports)
+          .where(inArray(reports.runId, runIds))
+      : [];
+  const reportIds = reportRows.map((report) => report.id);
+
+  if (reportIds.length > 0) {
+    await db.delete(shareLinks).where(inArray(shareLinks.reportId, reportIds));
+    await db.delete(reports).where(inArray(reports.id, reportIds));
+  }
+
+  if (runIds.length > 0) {
+    const itemRows = await db
+      .select({ id: problemItems.id })
+      .from(problemItems)
+      .where(inArray(problemItems.runId, runIds));
+    if (itemRows.length > 0) {
+      await db.delete(itemErrors).where(inArray(itemErrors.itemId, itemRows.map((item) => item.id)));
+      await db.delete(problemItems).where(inArray(problemItems.id, itemRows.map((item) => item.id)));
+    }
+    await db.delete(analysisRuns).where(inArray(analysisRuns.id, runIds));
+  }
+
+  await db.delete(pages).where(eq(pages.uploadId, uploadId));
+  await db.delete(uploadFiles).where(eq(uploadFiles.uploadId, uploadId));
+  await db.delete(uploads).where(and(eq(uploads.id, uploadId), eq(uploads.userId, userId)));
+
+  await deleteArtifactsByPath([
+    ...uploadRecord.files.map((file) => file.storagePath),
+    ...uploadRecord.pages.map((page) => page.storagePath),
+  ]);
+  await purgeReminderEvents({
+    userId,
+    reportIds,
+    childIds: [uploadRecord.upload.childId],
+  });
+  await removeRunObservabilityArtifacts(runIds);
+  await removeRunCostArtifacts(runIds);
+
+  return {
+    uploadId,
+    childId: uploadRecord.upload.childId,
+    runIds,
+    reportIds,
+  };
+}
+
+export async function deleteReportForUser(userId: number, reportId: number) {
+  if (FAMILY_EDU_DEMO_MODE) {
+    return updateFamilyMockState((state) => deleteDemoReportRecord(state, userId, reportId));
+  }
+
+  const reportRecord = await getReportForUser(userId, reportId);
+  if (!reportRecord) {
+    return null;
+  }
+
+  const runId = Number((reportRecord as any).runId ?? (reportRecord as any).run?.id ?? 0);
+  const childId = Number((reportRecord as any).childId ?? (reportRecord as any).run?.childId ?? 0);
+
+  await db.delete(shareLinks).where(eq(shareLinks.reportId, reportId));
+  await db.delete(reports).where(eq(reports.id, reportId));
+  await purgeReminderEvents({
+    userId,
+    reportIds: [reportId],
+    childIds: childId > 0 ? [childId] : [],
+  });
+
+  return {
+    reportId,
+    runId: runId > 0 ? runId : null,
+    childId: childId > 0 ? childId : null,
+  };
+}
+
+export async function listRecentRunsForUser(userId: number, limit = 5) {
+  if (FAMILY_EDU_DEMO_MODE) {
+    const state = await readFamilyMockState();
+    return state.runs
+      .filter((run) => run.userId === userId)
+      .sort((left, right) => right.createdAt.localeCompare(left.createdAt))
+      .slice(0, limit)
+      .map((run) => {
+        const child = state.children.find((item) => item.id === run.childId);
+        return {
+          ...run,
+          childNickname: child?.nickname || 'Unknown child',
+        };
+      });
+  }
+
+  const rows = await db
+    .select({
+      id: analysisRuns.id,
+      userId: analysisRuns.userId,
+      childId: analysisRuns.childId,
+      uploadId: analysisRuns.uploadId,
+      status: analysisRuns.status,
+      stage: analysisRuns.stage,
+      progressPercent: analysisRuns.progressPercent,
+      estimatedMinutes: analysisRuns.estimatedMinutes,
+      statusMessage: analysisRuns.statusMessage,
+      needsReviewReason: analysisRuns.needsReviewReason,
+      errorMessage: analysisRuns.errorMessage,
+      startedAt: analysisRuns.startedAt,
+      finishedAt: analysisRuns.finishedAt,
+      createdAt: analysisRuns.createdAt,
+      updatedAt: analysisRuns.updatedAt,
+      childNickname: children.nickname,
+    })
+    .from(analysisRuns)
+    .innerJoin(children, eq(analysisRuns.childId, children.id))
+    .where(eq(analysisRuns.userId, userId))
+    .orderBy(desc(analysisRuns.createdAt))
+    .limit(limit);
+
+  return rows;
+}
+
+export async function createUploadForUser(
+  userId: number,
+  input: {
+    childId: number;
+    sourceType: StoredUpload['sourceType'];
+    notes: string;
+    files: IncomingUploadFile[];
+  }
+) {
+  const totalPages = input.files.reduce((sum, file) => sum + file.pageCount, 0);
+
+  if (FAMILY_EDU_DEMO_MODE) {
+    return updateFamilyMockState((state) => {
+      const upload: StoredUpload = {
+        id: state.meta.nextIds.upload++,
+        userId,
+        childId: input.childId,
+        sourceType: input.sourceType,
+        notes: input.notes,
+        totalPages,
+        status: 'draft',
+        createdAt: nowIso(),
+        updatedAt: nowIso(),
+        submittedAt: null,
+      };
+
+      state.uploads.push(upload);
+
+      let runningPageNumber = 1;
+      for (const file of input.files) {
+        const uploadFileId = state.meta.nextIds.uploadFile++;
+        state.uploadFiles.push({
+          id: uploadFileId,
+          uploadId: upload.id,
+          originalName: file.originalName,
+          mimeType: file.mimeType,
+          sizeBytes: file.sizeBytes,
+          storagePath: file.storagePath,
+          pageCount: file.pageCount,
+          previewKind: file.previewKind,
+          createdAt: nowIso(),
+        });
+
+        for (const pageDraft of file.pages) {
+          const qualityFlags = cloneQualityFlags(pageDraft.qualityFlags);
+          state.pages.push({
+            id: state.meta.nextIds.page++,
+            uploadId: upload.id,
+            uploadFileId,
+            pageNumber: runningPageNumber++,
+            sourceName: file.originalName,
+            storagePath: pageDraft.storagePath,
+            previewLabel: pageDraft.previewLabel,
+            isBlurry: qualityFlags.blurry,
+            isRotated: qualityFlags.rotated,
+            isDark: qualityFlags.dark,
+            qualityScore: summarizeQuality(qualityFlags),
+            qualityFlags,
+            createdAt: nowIso(),
+          });
+        }
+      }
+
+      logMockActivity(
+        state,
+        userId,
+        'CREATE_UPLOAD',
+        `Created upload ${upload.id} with ${upload.totalPages} pages.`
+      );
+
+      return {
+        upload,
+        pages: state.pages.filter((page) => page.uploadId === upload.id),
+      };
+    });
+  }
+
+  const [upload] = await db
+    .insert(uploads)
+    .values({
+      userId,
+      childId: input.childId,
+      sourceType: input.sourceType,
+      notes: input.notes,
+      totalPages,
+      status: 'draft',
+    })
+    .returning();
+
+  const createdFiles = [];
+  let runningPageNumber = 1;
+
+  for (const file of input.files) {
+    const [createdFile] = await db
+      .insert(uploadFiles)
+      .values({
+        uploadId: upload.id,
+        originalName: file.originalName,
+        mimeType: file.mimeType,
+        sizeBytes: file.sizeBytes,
+        storagePath: file.storagePath,
+        pageCount: file.pageCount,
+        previewKind: file.previewKind,
+      })
+      .returning();
+
+    createdFiles.push(createdFile);
+
+    for (const pageDraft of file.pages) {
+      const qualityFlags = cloneQualityFlags(pageDraft.qualityFlags);
+      await db.insert(pages).values({
+        uploadId: upload.id,
+        uploadFileId: createdFile.id,
+        pageNumber: runningPageNumber++,
+        sourceName: file.originalName,
+        storagePath: pageDraft.storagePath,
+        previewLabel: pageDraft.previewLabel,
+        isBlurry: qualityFlags.blurry,
+        isRotated: qualityFlags.rotated,
+        isDark: qualityFlags.dark,
+        qualityScore: summarizeQuality(qualityFlags),
+        qualityFlags,
+      });
+    }
+  }
+
+  return {
+    upload,
+    pages: await db.select().from(pages).where(eq(pages.uploadId, upload.id)),
+    createdFiles,
+  };
+}
+
+export async function submitUploadForUser(userId: number, uploadId: number) {
+  if (FAMILY_EDU_DEMO_MODE) {
+    return updateFamilyMockState(async (state) => {
+      const upload = state.uploads.find((item) => item.userId === userId && item.id === uploadId);
+      if (!upload) {
+        return null;
+      }
+
+      upload.status = 'submitted';
+      upload.submittedAt = nowIso();
+      upload.updatedAt = nowIso();
+
+      const run: StoredRun = {
+        id: state.meta.nextIds.run++,
+        userId,
+        childId: upload.childId,
+        uploadId: upload.id,
+        status: 'queued',
+        stage: 'queued',
+        progressPercent: 0,
+        estimatedMinutes: 4,
+        statusMessage: 'Queued for preprocessing.',
+        overallConfidence: null,
+        needsReviewReason: null,
+        errorMessage: null,
+        startedAt: null,
+        finishedAt: null,
+        createdAt: nowIso(),
+        updatedAt: nowIso(),
+      };
+
+      state.runs.push(run);
+      logMockActivity(
+        state,
+        userId,
+        'SUBMIT_UPLOAD',
+        `Submitted upload ${upload.id} and created run ${run.id}.`
+      );
+
+      await recordRunLifecycleEvent({
+        runId: run.id,
+        userId,
+        childId: run.childId,
+        uploadId: run.uploadId,
+        eventType: 'queued',
+        status: run.status,
+        stage: run.stage,
+        message: run.statusMessage,
+        metadata: {
+          sourceType: upload.sourceType,
+          totalPages: upload.totalPages,
+        },
+      });
+
+      return syncDemoRunState(state, run.id);
+    });
+  }
+
+  const [run] = await db
+    .insert(analysisRuns)
+    .values({
+      userId,
+      childId: (
+        await db
+          .select({ childId: uploads.childId })
+          .from(uploads)
+          .where(and(eq(uploads.id, uploadId), eq(uploads.userId, userId)))
+          .limit(1)
+      )[0].childId,
+      uploadId,
+      status: 'queued',
+      stage: 'queued',
+      progressPercent: 0,
+      estimatedMinutes: 4,
+      statusMessage: 'Queued for preprocessing.',
+    })
+    .returning();
+
+  await db
+    .update(uploads)
+    .set({
+      status: 'submitted',
+      submittedAt: new Date(),
+      updatedAt: new Date(),
+    })
+    .where(and(eq(uploads.id, uploadId), eq(uploads.userId, userId)));
+
+  await recordRunLifecycleEvent({
+    runId: run.id,
+    userId,
+    childId: run.childId,
+    uploadId: run.uploadId,
+    eventType: 'queued',
+    status: run.status,
+    stage: run.stage,
+    message: run.statusMessage || 'Queued for preprocessing.',
+    metadata: {},
+  });
+
+  return {
+    ...run,
+    reportId: null,
+  };
+}
+
+export async function getRunForUser(userId: number, runId: number) {
+  if (FAMILY_EDU_DEMO_MODE) {
+    return updateFamilyMockState((state) => {
+      const run = state.runs.find((item) => item.userId === userId && item.id === runId);
+      if (!run) {
+        return null;
+      }
+      return syncDemoRunState(state, run.id);
+    });
+  }
+
+  const [run] = await db
+    .select()
+    .from(analysisRuns)
+    .where(and(eq(analysisRuns.id, runId), eq(analysisRuns.userId, userId)))
+    .limit(1);
+
+  if (!run) {
+    return null;
+  }
+
+  const [report] = await db
+    .select({ id: reports.id })
+    .from(reports)
+    .where(eq(reports.runId, run.id))
+    .limit(1);
+
+  const [child] = await db
+    .select({ nickname: children.nickname, grade: children.grade, curriculum: children.curriculum })
+    .from(children)
+    .where(eq(children.id, run.childId))
+    .limit(1);
+
+  const [upload] = await db
+    .select({
+      id: uploads.id,
+      totalPages: uploads.totalPages,
+      sourceType: uploads.sourceType,
+      notes: uploads.notes,
+    })
+    .from(uploads)
+    .where(eq(uploads.id, run.uploadId))
+    .limit(1);
+
+  const pageRecords = await db.select().from(pages).where(eq(pages.uploadId, run.uploadId));
+
+  return {
+    ...run,
+    reportId: report?.id ?? null,
+    child,
+    upload,
+    pageRecords,
+  };
+}
+
+export async function processRunForUser(
+  userId: number,
+  runId: number,
+  options?: {
+    force?: boolean;
+    preferMathpix?: boolean;
+  }
+) {
+  const requestedEngine = options?.preferMathpix ? 'mathpix' : 'openai';
+
+  if (FAMILY_EDU_DEMO_MODE) {
+    return updateFamilyMockState(async (state) => {
+      const run = state.runs.find((item) => item.userId === userId && item.id === runId);
+      if (!run) {
+        return null;
+      }
+
+      const upload = state.uploads.find((item) => item.id === run.uploadId) || null;
+      const pageRecords = state.pages.filter((item) => item.uploadId === run.uploadId);
+
+      if (run.status === 'failed' && !options?.force) {
+        return {
+          run: getDemoRunWithReport(state, run.id),
+          bundle: null,
+          reportId: null,
+          requestedEngine,
+        };
+      }
+
+      const result = await finalizeDemoRunWithExtraction(state, run, {
+        force: options?.force,
+        preferMathpix:
+          options?.preferMathpix || Boolean(upload?.notes.toLowerCase().includes('mathpix')),
+        reviewOverride: getForcedReviewReason(upload?.notes, pageRecords),
+      });
+      const updatedRun = getDemoRunWithReport(state, run.id);
+
+      return {
+        run: updatedRun,
+        bundle: result.bundle,
+        reportId: updatedRun?.reportId ?? result.report?.id ?? null,
+        requestedEngine,
+      };
+    });
+  }
+
+  const run = await getRunForUser(userId, runId);
+  if (!run) {
+    return null;
+  }
+
+  if (run.status === 'failed' && !options?.force) {
+    return {
+      run,
+      bundle: null,
+      reportId: run.reportId ?? null,
+      requestedEngine,
+    };
+  }
+
+  const [upload] = await db
+    .select({
+      id: uploads.id,
+      notes: uploads.notes,
+      sourceType: uploads.sourceType,
+    })
+    .from(uploads)
+    .where(eq(uploads.id, run.uploadId))
+    .limit(1);
+
+  const pageRecords = await db.select().from(pages).where(eq(pages.uploadId, run.uploadId));
+  const bundle = await processRunExtraction({
+    runId: run.id,
+    pages: pageRecords.map((page) => ({
+      id: page.id,
+      pageNumber: page.pageNumber,
+      previewLabel: page.previewLabel,
+      sourceName: page.sourceName,
+      storagePath: page.storagePath,
+      qualityFlags: {
+        blurry: Boolean(page.qualityFlags?.blurry),
+        rotated: Boolean(page.qualityFlags?.rotated),
+        dark: Boolean(page.qualityFlags?.dark),
+        lowContrast: Boolean(page.qualityFlags?.lowContrast),
+      },
+    })),
+    preferMathpix:
+      options?.preferMathpix || Boolean(upload?.notes?.toLowerCase().includes('mathpix')),
+  });
+
+  const forcedReviewReason = getForcedReviewReason(upload?.notes, pageRecords);
+  const reviewReason = forcedReviewReason || bundle.reviewReason;
+
+  await db
+    .delete(reports)
+    .where(eq(reports.runId, run.id));
+
+  const existingItems = await db
+    .select({ id: problemItems.id })
+    .from(problemItems)
+    .where(eq(problemItems.runId, run.id));
+
+  if (existingItems.length > 0) {
+    await db
+      .delete(itemErrors)
+      .where(inArray(itemErrors.itemId, existingItems.map((item) => item.id)));
+    await db
+      .delete(problemItems)
+      .where(eq(problemItems.runId, run.id));
+  }
+
+  const labelsByCode = new Map(
+    (
+      await db
+        .select()
+        .from(errorLabels)
+    ).map((label) => [label.code, label] as const)
+  );
+
+  for (const taxonomy of TAXONOMY) {
+    if (!labelsByCode.has(taxonomy.code)) {
+      const [createdLabel] = await db
+        .insert(errorLabels)
+        .values({
+          code: taxonomy.code,
+          displayName: taxonomy.displayName,
+          description: taxonomy.description,
+        })
+        .returning();
+      labelsByCode.set(createdLabel.code, createdLabel);
+    }
+  }
+
+  for (const item of bundle.labeledItems) {
+    const [createdItem] = await db
+      .insert(problemItems)
+      .values({
+        runId: run.id,
+        pageId: item.evidenceAnchor.pageId,
+        problemNo: item.problemNo,
+        problemText: item.problemText,
+        studentWork: item.studentWork,
+        teacherMark: item.teacherMark,
+        modelIsCorrect: item.modelIsCorrect,
+        itemConfidence: item.itemConfidence,
+        evidenceAnchor: item.evidenceAnchor,
+      })
+      .returning();
+
+    for (const label of item.labels) {
+      const storedLabel = labelsByCode.get(label.code);
+      if (!storedLabel) {
+        continue;
+      }
+      await db.insert(itemErrors).values({
+        itemId: createdItem.id,
+        labelId: storedLabel.id,
+        severity: label.severity,
+        rationale: item.rationale,
+        confidence: label.labelConfidence,
+      });
+    }
+  }
+
+  const [child] = await db
+    .select({
+      nickname: children.nickname,
+      grade: children.grade,
+      curriculum: children.curriculum,
+    })
+    .from(children)
+    .where(eq(children.id, run.childId))
+    .limit(1);
+
+  if (child && upload) {
+    const reportPayload = buildReportsFromExtraction({
+      bundle: {
+        ...bundle,
+        requiresReview: Boolean(reviewReason),
+        reviewReason,
+      },
+      child,
+      upload,
+    });
+
+    await db.insert(reports).values({
+      runId: run.id,
+      parentReportJson: reportPayload.parentReportJson,
+      studentReportJson: reportPayload.studentReportJson,
+      tutorReportJson: reportPayload.tutorReportJson,
+    });
+  }
+
+  await db
+    .update(analysisRuns)
+    .set({
+      overallConfidence: bundle.overallConfidence,
+      status: reviewReason ? 'needs_review' : 'done',
+      stage: reviewReason ? 'review' : 'done',
+      progressPercent: 100,
+      statusMessage: reviewReason
+        ? 'Needs review before the full report is released.'
+        : 'Diagnosis generated successfully.',
+      needsReviewReason: reviewReason,
+      errorMessage: null,
+      finishedAt: new Date(),
+      updatedAt: new Date(),
+    })
+    .where(and(eq(analysisRuns.id, run.id), eq(analysisRuns.userId, userId)));
+
+  await recordRunCompletionArtifacts({
+    run: {
+      ...run,
+      status: reviewReason ? 'needs_review' : 'done',
+      stage: reviewReason ? 'review' : 'done',
+      statusMessage: reviewReason
+        ? 'Needs review before the full report is released.'
+        : 'Diagnosis generated successfully.',
+      overallConfidence: bundle.overallConfidence,
+      needsReviewReason: reviewReason,
+      finishedAt: nowIso(),
+      updatedAt: nowIso(),
+    } as StoredRun,
+    bundle: {
+      ...bundle,
+      requiresReview: Boolean(reviewReason),
+      reviewReason,
+    },
+    engine: requestedEngine,
+  });
+
+  const refreshedRun = await getRunForUser(userId, runId);
+  return {
+    run: refreshedRun,
+    bundle: {
+      ...bundle,
+      requiresReview: Boolean(reviewReason),
+      reviewReason,
+    },
+    reportId: refreshedRun?.reportId ?? null,
+    requestedEngine,
+  };
+}
+
+export async function retryRunForUser(userId: number, runId: number) {
+  if (FAMILY_EDU_DEMO_MODE) {
+    return updateFamilyMockState(async (state) => {
+      const run = state.runs.find((item) => item.userId === userId && item.id === runId);
+      if (!run) {
+        return null;
+      }
+      const upload = state.uploads.find((item) => item.id === run.uploadId);
+      if (upload && upload.notes.toLowerCase().includes('fail')) {
+        upload.notes = upload.notes.replace(/fail/gi, 'retried');
+        upload.updatedAt = nowIso();
+      }
+
+      run.status = 'queued';
+      run.stage = 'queued';
+      run.progressPercent = 0;
+      run.statusMessage = 'Retry queued.';
+      run.overallConfidence = null;
+      run.needsReviewReason = null;
+      run.errorMessage = null;
+      run.startedAt = null;
+      run.finishedAt = null;
+      run.createdAt = nowIso();
+      run.updatedAt = nowIso();
+      removeDemoExtractionArtifacts(state, run.id);
+      logMockActivity(state, userId, 'RETRY_RUN', `Retried run ${run.id}.`);
+      await recordRunLifecycleEvent({
+        runId: run.id,
+        userId,
+        childId: run.childId,
+        uploadId: run.uploadId,
+        eventType: 'retry_queued',
+        status: run.status,
+        stage: run.stage,
+        message: run.statusMessage,
+        metadata: {},
+      });
+      return syncDemoRunState(state, run.id);
+    });
+  }
+
+  const [run] = await db
+    .update(analysisRuns)
+    .set({
+      status: 'queued',
+      stage: 'queued',
+      progressPercent: 0,
+      statusMessage: 'Retry queued.',
+      overallConfidence: null,
+      needsReviewReason: null,
+      errorMessage: null,
+      startedAt: null,
+      finishedAt: null,
+      updatedAt: new Date(),
+    })
+    .where(and(eq(analysisRuns.id, runId), eq(analysisRuns.userId, userId)))
+    .returning();
+
+  if (run) {
+    await recordRunLifecycleEvent({
+      runId: run.id,
+      userId,
+      childId: run.childId,
+      uploadId: run.uploadId,
+      eventType: 'retry_queued',
+      status: run.status,
+      stage: run.stage,
+      message: run.statusMessage || 'Retry queued.',
+      metadata: {},
+    });
+  }
+
+  return run || null;
+}
+
+export async function getReportForUser(userId: number, reportId: number) {
+  if (FAMILY_EDU_DEMO_MODE) {
+    const state = await readFamilyMockState();
+    const report = state.reports.find((item) => item.id === reportId);
+    if (!report) {
+      return null;
+    }
+    const run = state.runs.find((item) => item.id === report.runId && item.userId === userId);
+    if (!run) {
+      return null;
+    }
+    const child = state.children.find((item) => item.id === run.childId) || null;
+    return {
+      ...report,
+      run,
+      child,
+      shareLinks: state.shareLinks.filter((item) => item.reportId === report.id),
+    };
+  }
+
+  const [report] = await db
+    .select()
+    .from(reports)
+    .innerJoin(analysisRuns, eq(reports.runId, analysisRuns.id))
+    .where(and(eq(reports.id, reportId), eq(analysisRuns.userId, userId)))
+    .limit(1);
+
+  if (!report) {
+    return null;
+  }
+
+  const reportLinks = await listShareLinksForReport(userId, reportId);
+  return {
+    ...report,
+    shareLinks: reportLinks,
+  };
+}
+
+export async function getReportByRunForUser(userId: number, runId: number) {
+  if (FAMILY_EDU_DEMO_MODE) {
+    const state = await readFamilyMockState();
+    const run = state.runs.find((item) => item.id === runId && item.userId === userId);
+    if (!run) {
+      return null;
+    }
+    const report = state.reports.find((item) => item.runId === run.id);
+    return report || null;
+  }
+
+  const [report] = await db
+    .select()
+    .from(reports)
+    .innerJoin(analysisRuns, eq(reports.runId, analysisRuns.id))
+    .where(and(eq(reports.runId, runId), eq(analysisRuns.userId, userId)))
+    .limit(1);
+
+  return report || null;
+}
+
+export async function updateReportPlanProgressForUser(
+  userId: number,
+  reportId: number,
+  input: {
+    completedDays?: number[];
+    parentNote?: string | null;
+  }
+) {
+  if (FAMILY_EDU_DEMO_MODE) {
+    return updateFamilyMockState((state) => {
+      const report = state.reports.find((item) => item.id === reportId);
+      if (!report) {
+        return null;
+      }
+
+      const run = state.runs.find((item) => item.id === report.runId && item.userId === userId);
+      if (!run) {
+        return null;
+      }
+
+      const currentCompletedDays = Array.isArray(report.parentReportJson.completedDays)
+        ? (report.parentReportJson.completedDays as number[])
+        : [];
+      const normalizedDays = Array.from(
+        new Set(
+          (input.completedDays || currentCompletedDays)
+            .filter((day) => Number.isInteger(day))
+            .filter((day) => day >= 1 && day <= 7)
+        )
+      ).sort((left, right) => left - right);
+
+      report.parentReportJson = {
+        ...report.parentReportJson,
+        completedDays: normalizedDays,
+        parentNote:
+          typeof input.parentNote === 'string'
+            ? input.parentNote.trim()
+            : (report.parentReportJson.parentNote as string | undefined) || '',
+      };
+      report.updatedAt = nowIso();
+
+      const child = state.children.find((item) => item.id === run.childId) || null;
+      return {
+        ...report,
+        run,
+        child,
+      };
+    });
+  }
+
+  const reportRecord = await getReportForUser(userId, reportId);
+  if (!reportRecord) {
+    return null;
+  }
+
+  const currentCompletedDays = Array.isArray((reportRecord as any).parentReportJson?.completedDays)
+    ? ((reportRecord as any).parentReportJson.completedDays as number[])
+    : [];
+  const normalizedDays = Array.from(
+    new Set(
+      (input.completedDays || currentCompletedDays)
+        .filter((day) => Number.isInteger(day))
+        .filter((day) => day >= 1 && day <= 7)
+    )
+  ).sort((left, right) => left - right);
+
+  const nextParentReport = {
+    ...(reportRecord as any).parentReportJson,
+    completedDays: normalizedDays,
+    parentNote:
+      typeof input.parentNote === 'string'
+        ? input.parentNote.trim()
+        : (reportRecord as any).parentReportJson?.parentNote || '',
+  };
+
+  await db
+    .update(reports)
+    .set({
+      parentReportJson: nextParentReport,
+      updatedAt: new Date(),
+    })
+    .where(eq(reports.id, reportId));
+
+  return getReportForUser(userId, reportId);
+}
+
+export async function getPageArtifactForUser(userId: number, pageId: number) {
+  if (FAMILY_EDU_DEMO_MODE) {
+    const state = await readFamilyMockState();
+    const page = state.pages.find((item) => item.id === pageId);
+    if (!page) {
+      return null;
+    }
+    const upload = state.uploads.find((item) => item.id === page.uploadId && item.userId === userId);
+    if (!upload) {
+      return null;
+    }
+    return page;
+  }
+
+  const rows = await db
+    .select({
+      id: pages.id,
+      uploadId: pages.uploadId,
+      uploadFileId: pages.uploadFileId,
+      pageNumber: pages.pageNumber,
+      sourceName: pages.sourceName,
+      storagePath: pages.storagePath,
+      previewLabel: pages.previewLabel,
+      isBlurry: pages.isBlurry,
+      isRotated: pages.isRotated,
+      isDark: pages.isDark,
+      qualityScore: pages.qualityScore,
+      qualityFlags: pages.qualityFlags,
+      createdAt: pages.createdAt,
+    })
+    .from(pages)
+    .innerJoin(uploads, eq(pages.uploadId, uploads.id))
+    .where(and(eq(pages.id, pageId), eq(uploads.userId, userId)))
+    .limit(1);
+
+  return rows[0] || null;
+}
+
+function extractTopFinding(report: StoredReport | Record<string, unknown>) {
+  const parentReport = (
+    'parentReportJson' in report ? report.parentReportJson : report
+  ) as Record<string, unknown>;
+  const topFindings = Array.isArray(parentReport.topFindings)
+    ? (parentReport.topFindings as Array<Record<string, unknown>>)
+    : [];
+  const evidenceGroups = Array.isArray(parentReport.evidenceGroups)
+    ? (parentReport.evidenceGroups as Array<Record<string, unknown>>)
+    : [];
+
+  const primaryFinding = topFindings[0] || null;
+  const primaryGroup = evidenceGroups[0] || null;
+
+  return {
+    title: typeof primaryFinding?.title === 'string' ? primaryFinding.title : 'No diagnosis yet',
+    count:
+      typeof primaryGroup?.count === 'number'
+        ? primaryGroup.count
+        : Array.isArray(primaryFinding?.evidence)
+          ? primaryFinding.evidence.length
+          : 0,
+  };
+}
+
+function buildReportCompareSummary(
+  currentReport: StoredReport | Record<string, unknown>,
+  previousReport: StoredReport | Record<string, unknown> | null
+) {
+  if (!previousReport) {
+    return 'First report for this child. Use this as the baseline for next week.';
+  }
+
+  const currentFinding = extractTopFinding(currentReport);
+  const previousFinding = extractTopFinding(previousReport);
+
+  if (currentFinding.title === previousFinding.title) {
+    if (currentFinding.count < previousFinding.count) {
+      return `Improving: ${currentFinding.title} appears in fewer anchored examples than the previous report.`;
+    }
+    if (currentFinding.count > previousFinding.count) {
+      return `Still sticky: ${currentFinding.title} appears in more anchored examples than the previous report.`;
+    }
+    return `Steady pattern: ${currentFinding.title} is still the main focus compared with the previous report.`;
+  }
+
+  return `Focus shifted from ${previousFinding.title} to ${currentFinding.title}.`;
+}
+
+export async function listReportsForChild(userId: number, childId: number, limit = 5) {
+  if (FAMILY_EDU_DEMO_MODE) {
+    const state = await readFamilyMockState();
+    const childRuns = state.runs
+      .filter((run) => run.userId === userId && run.childId === childId)
+      .map((run) => ({
+        run,
+        report: state.reports.find((report) => report.runId === run.id) || null,
+      }))
+      .filter((entry) => entry.report)
+      .sort((left, right) =>
+        (right.report?.createdAt || '').localeCompare(left.report?.createdAt || '')
+      )
+      .slice(0, limit);
+
+    return childRuns.map((entry, index) => {
+      const currentReport = entry.report as StoredReport;
+      const previousReport = childRuns[index + 1]?.report || null;
+      return {
+        id: currentReport.id,
+        runId: currentReport.runId,
+        createdAt: currentReport.createdAt,
+        summary: String(currentReport.parentReportJson.summary || ''),
+        topFinding: extractTopFinding(currentReport).title,
+        compareSummary: buildReportCompareSummary(currentReport, previousReport),
+        parentNote: String(currentReport.parentReportJson.parentNote || ''),
+        completedDays: Array.isArray(currentReport.parentReportJson.completedDays)
+          ? (currentReport.parentReportJson.completedDays as number[])
+          : [],
+      };
+    });
+  }
+
+  const rows = await db
+    .select({
+      report: reports,
+      runId: analysisRuns.id,
+    })
+    .from(reports)
+    .innerJoin(analysisRuns, eq(reports.runId, analysisRuns.id))
+    .where(and(eq(analysisRuns.userId, userId), eq(analysisRuns.childId, childId)))
+    .orderBy(desc(reports.createdAt))
+    .limit(limit);
+
+  return rows.map((entry, index) => ({
+    id: entry.report.id,
+    runId: entry.runId,
+    createdAt: entry.report.createdAt,
+    summary: String((entry.report.parentReportJson as any)?.summary || ''),
+    topFinding: extractTopFinding(entry.report).title,
+    compareSummary: buildReportCompareSummary(
+      entry.report,
+      rows[index + 1]?.report || null
+    ),
+    parentNote: String((entry.report.parentReportJson as any)?.parentNote || ''),
+    completedDays: Array.isArray((entry.report.parentReportJson as any)?.completedDays)
+      ? ((entry.report.parentReportJson as any).completedDays as number[])
+      : [],
+  }));
+}
+
+export async function listShareLinksForReport(userId: number, reportId: number) {
+  if (FAMILY_EDU_DEMO_MODE) {
+    const state = await readFamilyMockState();
+    const report = state.reports.find((item) => item.id === reportId);
+    if (!report) {
+      return [];
+    }
+    const run = state.runs.find((item) => item.id === report.runId && item.userId === userId);
+    if (!run) {
+      return [];
+    }
+    return state.shareLinks
+      .filter((item) => item.reportId === reportId)
+      .sort((left, right) => right.createdAt.localeCompare(left.createdAt));
+  }
+
+  const rows = await db
+    .select({ shareLink: shareLinks })
+    .from(shareLinks)
+    .innerJoin(reports, eq(shareLinks.reportId, reports.id))
+    .innerJoin(analysisRuns, eq(reports.runId, analysisRuns.id))
+    .where(and(eq(analysisRuns.userId, userId), eq(reports.id, reportId)))
+    .orderBy(desc(shareLinks.createdAt));
+
+  return rows.map((row) => row.shareLink);
+}
+
+export async function createShareLinkForReport(userId: number, reportId: number) {
+  const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+  const token = randomUUID().replace(/-/g, '');
+
+  if (FAMILY_EDU_DEMO_MODE) {
+    return updateFamilyMockState((state) => {
+      const report = state.reports.find((item) => item.id === reportId);
+      if (!report) {
+        return null;
+      }
+      const run = state.runs.find((item) => item.id === report.runId && item.userId === userId);
+      if (!run) {
+        return null;
+      }
+
+      const shareLink: StoredShareLink = {
+        id: state.meta.nextIds.shareLink++,
+        reportId,
+        token,
+        role: 'tutor',
+        createdAt: nowIso(),
+        expiresAt: expiresAt.toISOString(),
+        revokedAt: null,
+      };
+      state.shareLinks.unshift(shareLink);
+      return shareLink;
+    });
+  }
+
+  const report = await getReportForUser(userId, reportId);
+  if (!report) {
+    return null;
+  }
+
+  const [createdLink] = await db
+    .insert(shareLinks)
+    .values({
+      reportId,
+      token,
+      role: 'tutor',
+      expiresAt,
+    })
+    .returning();
+
+  return createdLink;
+}
+
+export async function revokeShareLinkForReport(userId: number, reportId: number, token: string) {
+  if (FAMILY_EDU_DEMO_MODE) {
+    return updateFamilyMockState((state) => {
+      const report = state.reports.find((item) => item.id === reportId);
+      if (!report) {
+        return null;
+      }
+      const run = state.runs.find((item) => item.id === report.runId && item.userId === userId);
+      if (!run) {
+        return null;
+      }
+      const shareLink = state.shareLinks.find(
+        (item) => item.reportId === reportId && item.token === token
+      );
+      if (!shareLink) {
+        return null;
+      }
+      shareLink.revokedAt = nowIso();
+      return shareLink;
+    });
+  }
+
+  const report = await getReportForUser(userId, reportId);
+  if (!report) {
+    return null;
+  }
+
+  const [updatedLink] = await db
+    .update(shareLinks)
+    .set({ revokedAt: new Date() })
+    .where(and(eq(shareLinks.reportId, reportId), eq(shareLinks.token, token)))
+    .returning();
+
+  return updatedLink || null;
+}
+
+export async function getSharedReportByToken(token: string) {
+  if (FAMILY_EDU_DEMO_MODE) {
+    const state = await readFamilyMockState();
+    const shareLink = state.shareLinks.find((item) => item.token === token) || null;
+    if (!shareLink) {
+      return { status: 'missing' as const, report: null, shareLink: null };
+    }
+    if (shareLink.revokedAt) {
+      return { status: 'revoked' as const, report: null, shareLink };
+    }
+    if (new Date(shareLink.expiresAt) < new Date()) {
+      return { status: 'expired' as const, report: null, shareLink };
+    }
+
+    const report = state.reports.find((item) => item.id === shareLink.reportId) || null;
+    if (!report) {
+      return { status: 'missing' as const, report: null, shareLink };
+    }
+    const run = state.runs.find((item) => item.id === report.runId) || null;
+    const child = run ? state.children.find((item) => item.id === run.childId) || null : null;
+
+    return {
+      status: 'active' as const,
+      shareLink,
+      report: {
+        id: report.id,
+        tutorReportJson: report.tutorReportJson,
+        child: child
+          ? {
+              nickname: child.nickname,
+              grade: child.grade,
+              curriculum: child.curriculum,
+            }
+          : null,
+      },
+    };
+  }
+
+  const rows = await db
+    .select({
+      shareLink: shareLinks,
+      report: reports,
+      run: analysisRuns,
+      child: children,
+    })
+    .from(shareLinks)
+    .innerJoin(reports, eq(shareLinks.reportId, reports.id))
+    .innerJoin(analysisRuns, eq(reports.runId, analysisRuns.id))
+    .innerJoin(children, eq(analysisRuns.childId, children.id))
+    .where(eq(shareLinks.token, token))
+    .limit(1);
+
+  const row = rows[0];
+  if (!row) {
+    return { status: 'missing' as const, report: null, shareLink: null };
+  }
+  if (row.shareLink.revokedAt) {
+    return { status: 'revoked' as const, report: null, shareLink: row.shareLink };
+  }
+  if (new Date(row.shareLink.expiresAt) < new Date()) {
+    return { status: 'expired' as const, report: null, shareLink: row.shareLink };
+  }
+
+  return {
+    status: 'active' as const,
+    shareLink: row.shareLink,
+    report: {
+      id: row.report.id,
+      tutorReportJson: row.report.tutorReportJson,
+      child: {
+        nickname: row.child.nickname,
+        grade: row.child.grade,
+        curriculum: row.child.curriculum,
+      },
+    },
+  };
+}
+
+export async function listActivityForUser(userId: number) {
+  if (FAMILY_EDU_DEMO_MODE) {
+    const state = await readFamilyMockState();
+    return state.activityLogs
+      .filter((item) => item.userId === userId)
+      .slice(0, 10)
+      .map((item) => ({
+        id: item.id,
+        action: item.action,
+        timestamp: item.timestamp,
+        ipAddress: '127.0.0.1',
+        userName: 'Demo Parent',
+      }));
+  }
+
+  return db
+    .select({
+      id: activityLogs.id,
+      action: activityLogs.action,
+      timestamp: activityLogs.timestamp,
+      ipAddress: activityLogs.ipAddress,
+    })
+    .from(activityLogs)
+    .where(eq(activityLogs.userId, userId))
+    .orderBy(desc(activityLogs.timestamp))
+    .limit(10);
+}

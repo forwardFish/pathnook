@@ -1,0 +1,34 @@
+{
+  "project": "familyEducation",
+  "repository_path": "D:\\lyh\\agent\\agent-frame\\familyEducation",
+  "workflow": "agentsystem/software_engineering",
+  "source_of_truth": [
+    "docs/需求文档.md",
+    "docs/saas-starter 一天落地实施说明.md",
+    "docs/requirements/prd_requirement_index.md",
+    "docs/requirements/prd_traceability_matrix.md",
+    "docs/testing/page_test_matrix.md",
+    "docs/testing/click_path_matrix.md",
+    "docs/testing/api_data_ai_test_matrix.md",
+    "docs/testing/final_program_acceptance.md"
+  ],
+  "delivery_assets": [
+    "tasks/backlog_v1/sprint_overview.md",
+    "tasks/story_status_registry.json",
+    "tasks/story_acceptance_reviews.json",
+    "tasks/runtime/README.md"
+  ],
+  "runtime_artifact_dirs": [
+    "tasks/runtime/story_admissions",
+    "tasks/runtime/story_failures",
+    "tasks/runtime/story_handoffs",
+    "tasks/runtime/browser_evidence",
+    "tasks/runtime/qa_results",
+    "tasks/runtime/traceability_audits",
+    "tasks/runtime/sprint_acceptance",
+    "tasks/runtime/final_acceptance",
+    "tasks/runtime/review_packets"
+  ],
+  "status": "sprint_5_accepted_sprint_6_in_progress",
+  "last_updated": "2026-04-04T23:59:00+08:00"
+}

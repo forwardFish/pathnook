@@ -1,0 +1,766 @@
+import 'server-only';
+
+import { and, desc, eq, inArray, ne } from 'drizzle-orm';
+import { db } from '@/lib/db/drizzle';
+import {
+  analysisRuns,
+  billingEvents,
+  reports,
+  subscriptions,
+  teamMembers,
+  teams,
+} from '@/lib/db/schema';
+import { readFamilyMockState, updateFamilyMockState } from '@/lib/family/mock-store';
+import type {
+  FamilyMockState,
+  StoredBillingEvent,
+  StoredSubscription,
+} from '@/lib/family/types';
+import {
+  BILLING_PLANS,
+  getBillingPlanByPriceId,
+  isRecurringPlanType,
+  type BillingPlanType,
+} from '@/lib/payments/catalog';
+import { scheduleReportReadyReminderForReport } from '@/lib/notifications/reminders';
+
+type BillingSnapshot = {
+  activePlanType: 'free' | BillingPlanType;
+  planName: string | null;
+  subscriptionStatus: string;
+  reportCredits: number;
+  unlockedReportIds: number[];
+  accessibleReportIds: number[];
+  lockedReportIds: number[];
+  currentPeriodEndsAt: string | null;
+  plans: typeof BILLING_PLANS;
+};
+
+type CheckoutCompletionInput = {
+  userId: number;
+  priceId: string;
+  checkoutSessionId: string;
+  provider?: 'creem' | 'stripe' | 'demo';
+  stripeCustomerId?: string | null;
+  stripeSubscriptionId?: string | null;
+  status?: string;
+  currentPeriodEndsAt?: string | null;
+};
+
+type BillingWebhookInput = {
+  source: 'creem' | 'stripe' | 'demo';
+  eventId: string;
+  eventType: string;
+  payload: Record<string, unknown>;
+  userId: number;
+  priceId: string;
+  checkoutSessionId?: string | null;
+  stripeCustomerId?: string | null;
+  stripeSubscriptionId?: string | null;
+  status?: string;
+  currentPeriodEndsAt?: string | null;
+};
+
+type StoredSubscriptionStatus =
+  | 'pending'
+  | 'active'
+  | 'trialing'
+  | 'canceled'
+  | 'expired'
+  | 'paused'
+  | 'scheduled_cancel'
+  | 'unpaid';
+
+function isDemoMode() {
+  return process.env['FAMILY_EDU_DEMO_MODE'] === '1';
+}
+
+function nowIso() {
+  return new Date().toISOString();
+}
+
+function normalizeUnlockedReportIds(ids: number[]) {
+  return Array.from(
+    new Set(ids.filter((id) => Number.isInteger(id) && id > 0))
+  ).sort((left, right) => right - left);
+}
+
+function hasRecurringAccess(status: string) {
+  return (
+    status === 'active' ||
+    status === 'trialing' ||
+    status === 'scheduled_cancel'
+  );
+}
+
+function normalizeSubscriptionStatus(
+  status: string | null | undefined,
+  fallback: StoredSubscriptionStatus
+): StoredSubscriptionStatus {
+  switch (status) {
+    case 'pending':
+    case 'active':
+    case 'trialing':
+    case 'canceled':
+    case 'expired':
+    case 'paused':
+    case 'scheduled_cancel':
+    case 'unpaid':
+      return status;
+    default:
+      return fallback;
+  }
+}
+
+function getTeamSubscriptionStatus(snapshot: BillingSnapshot) {
+  if (isRecurringPlanType(snapshot.activePlanType)) {
+    return snapshot.subscriptionStatus;
+  }
+  if (snapshot.activePlanType === 'one_time') {
+    return snapshot.accessibleReportIds.length > 0 || snapshot.reportCredits > 0
+      ? 'active'
+      : 'expired';
+  }
+  return 'free';
+}
+
+function getPlanName(planType: 'free' | BillingPlanType) {
+  if (planType === 'free') {
+    return null;
+  }
+
+  return BILLING_PLANS.find((plan) => plan.planType === planType)?.name || null;
+}
+
+function getUserReportIdsFromState(state: FamilyMockState, userId: number) {
+  return state.reports
+    .map((report) => {
+      const run = state.runs.find((candidate) => candidate.id === report.runId);
+      if (!run || run.userId !== userId) {
+        return null;
+      }
+      return {
+        id: report.id,
+        createdAt: report.createdAt,
+      };
+    })
+    .filter((item): item is { id: number; createdAt: string } => Boolean(item))
+    .sort((left, right) => right.createdAt.localeCompare(left.createdAt))
+    .map((item) => item.id);
+}
+
+function getLatestActiveRecurringSubscriptionFromState(
+  state: FamilyMockState,
+  userId: number
+) {
+  return (
+    state.subscriptions
+      .filter(
+        (item) =>
+          item.userId === userId &&
+          isRecurringPlanType(item.planType) &&
+          hasRecurringAccess(item.status)
+      )
+      .sort((left, right) => right.updatedAt.localeCompare(left.updatedAt))[0] ||
+    null
+  );
+}
+
+function getRecurringPlanIdsForDb() {
+  return BILLING_PLANS.filter((plan) => isRecurringPlanType(plan.planType)).map(
+    (plan) => plan.planType
+  );
+}
+
+function applyCreditsToDemoSubscription(state: FamilyMockState, userId: number) {
+  const subscription = state.subscriptions
+    .filter((item) => item.userId === userId && item.planType === 'one_time')
+    .sort((left, right) => right.updatedAt.localeCompare(left.updatedAt))[0];
+
+  if (!subscription || subscription.reportCredits <= 0) {
+    return subscription || null;
+  }
+
+  const reportIds = getUserReportIdsFromState(state, userId);
+  const unlocked = new Set(normalizeUnlockedReportIds(subscription.unlockedReportIds));
+
+  for (const reportId of reportIds) {
+    if (subscription.reportCredits <= 0) {
+      break;
+    }
+
+    if (!unlocked.has(reportId)) {
+      unlocked.add(reportId);
+      subscription.reportCredits -= 1;
+    }
+  }
+
+  subscription.unlockedReportIds = normalizeUnlockedReportIds(Array.from(unlocked));
+  subscription.updatedAt = nowIso();
+  return subscription;
+}
+
+function buildSnapshotFromDemoState(state: FamilyMockState, userId: number): BillingSnapshot {
+  const recurringSubscription = getLatestActiveRecurringSubscriptionFromState(
+    state,
+    userId
+  );
+  const oneTimeSubscription = applyCreditsToDemoSubscription(state, userId);
+  const allReportIds = getUserReportIdsFromState(state, userId);
+
+  if (recurringSubscription) {
+    return {
+      activePlanType: recurringSubscription.planType,
+      planName: getPlanName(recurringSubscription.planType),
+      subscriptionStatus: recurringSubscription.status,
+      reportCredits: 0,
+      unlockedReportIds: allReportIds,
+      accessibleReportIds: allReportIds,
+      lockedReportIds: [],
+      currentPeriodEndsAt: recurringSubscription.currentPeriodEndsAt,
+      plans: BILLING_PLANS,
+    };
+  }
+
+  const unlockedReportIds = normalizeUnlockedReportIds(
+    oneTimeSubscription?.unlockedReportIds || []
+  ).filter((reportId) => allReportIds.includes(reportId));
+  const lockedReportIds = allReportIds.filter((reportId) => !unlockedReportIds.includes(reportId));
+
+  if (oneTimeSubscription) {
+    return {
+      activePlanType: 'one_time',
+      planName: getPlanName('one_time'),
+      subscriptionStatus: oneTimeSubscription.status,
+      reportCredits: oneTimeSubscription.reportCredits,
+      unlockedReportIds,
+      accessibleReportIds: unlockedReportIds,
+      lockedReportIds,
+      currentPeriodEndsAt: oneTimeSubscription.currentPeriodEndsAt,
+      plans: BILLING_PLANS,
+    };
+  }
+
+  return {
+    activePlanType: 'free',
+    planName: null,
+    subscriptionStatus: 'free',
+    reportCredits: 0,
+    unlockedReportIds: [],
+    accessibleReportIds: [],
+    lockedReportIds: allReportIds,
+    currentPeriodEndsAt: null,
+    plans: BILLING_PLANS,
+  };
+}
+
+async function getUserTeamId(userId: number) {
+  const rows = await db
+    .select({ teamId: teamMembers.teamId })
+    .from(teamMembers)
+    .where(eq(teamMembers.userId, userId))
+    .limit(1);
+
+  return rows[0]?.teamId || null;
+}
+
+function cancelOtherDemoRecurringSubscriptions(
+  state: FamilyMockState,
+  userId: number,
+  activePlanType: Extract<BillingPlanType, 'monthly' | 'annual'>
+) {
+  for (const subscription of state.subscriptions) {
+    if (
+      subscription.userId === userId &&
+      isRecurringPlanType(subscription.planType) &&
+      subscription.planType !== activePlanType &&
+      subscription.status !== 'canceled'
+    ) {
+      subscription.status = 'canceled';
+      subscription.updatedAt = nowIso();
+    }
+  }
+}
+
+async function listUserReportIds(userId: number) {
+  const rows = await db
+    .select({
+      reportId: reports.id,
+      createdAt: reports.createdAt,
+    })
+    .from(reports)
+    .innerJoin(analysisRuns, eq(reports.runId, analysisRuns.id))
+    .where(eq(analysisRuns.userId, userId))
+    .orderBy(desc(reports.createdAt));
+
+  return rows.map((row) => row.reportId);
+}
+
+async function applyCreditsToDbSubscription(userId: number) {
+  const rows = await db
+    .select()
+    .from(subscriptions)
+    .where(and(eq(subscriptions.userId, userId), eq(subscriptions.planType, 'one_time')))
+    .orderBy(desc(subscriptions.updatedAt))
+    .limit(1);
+
+  const subscription = rows[0];
+  if (!subscription || subscription.reportCredits <= 0) {
+    return subscription || null;
+  }
+
+  const reportIds = await listUserReportIds(userId);
+  const unlocked = new Set(normalizeUnlockedReportIds(subscription.unlockedReportIds || []));
+
+  for (const reportId of reportIds) {
+    if (subscription.reportCredits <= 0) {
+      break;
+    }
+
+    if (!unlocked.has(reportId)) {
+      unlocked.add(reportId);
+      subscription.reportCredits -= 1;
+    }
+  }
+
+  const nextUnlocked = normalizeUnlockedReportIds(Array.from(unlocked));
+
+  const [updated] = await db
+    .update(subscriptions)
+    .set({
+      reportCredits: subscription.reportCredits,
+      unlockedReportIds: nextUnlocked,
+      updatedAt: new Date(),
+    })
+    .where(eq(subscriptions.id, subscription.id))
+    .returning();
+
+  return updated || subscription;
+}
+
+async function buildSnapshotFromDb(userId: number): Promise<BillingSnapshot> {
+  const recurringRows = await db
+    .select()
+    .from(subscriptions)
+    .where(
+      and(
+        eq(subscriptions.userId, userId),
+        inArray(subscriptions.planType, getRecurringPlanIdsForDb())
+      )
+    )
+    .orderBy(desc(subscriptions.updatedAt));
+  const recurringSubscription =
+    recurringRows.find((subscription) => hasRecurringAccess(subscription.status)) || null;
+  const oneTimeSubscription = await applyCreditsToDbSubscription(userId);
+  const allReportIds = await listUserReportIds(userId);
+
+  if (recurringSubscription) {
+    return {
+      activePlanType: recurringSubscription.planType as BillingPlanType,
+      planName: getPlanName(recurringSubscription.planType as BillingPlanType),
+      subscriptionStatus: recurringSubscription.status,
+      reportCredits: 0,
+      unlockedReportIds: allReportIds,
+      accessibleReportIds: allReportIds,
+      lockedReportIds: [],
+      currentPeriodEndsAt: recurringSubscription.currentPeriodEndsAt
+        ? recurringSubscription.currentPeriodEndsAt.toISOString()
+        : null,
+      plans: BILLING_PLANS,
+    };
+  }
+
+  const unlockedReportIds = normalizeUnlockedReportIds(
+    (oneTimeSubscription?.unlockedReportIds as number[] | undefined) || []
+  ).filter((reportId) => allReportIds.includes(reportId));
+  const lockedReportIds = allReportIds.filter((reportId) => !unlockedReportIds.includes(reportId));
+
+  if (oneTimeSubscription) {
+    return {
+      activePlanType: 'one_time',
+      planName: getPlanName('one_time'),
+      subscriptionStatus: oneTimeSubscription.status,
+      reportCredits: oneTimeSubscription.reportCredits,
+      unlockedReportIds,
+      accessibleReportIds: unlockedReportIds,
+      lockedReportIds,
+      currentPeriodEndsAt: oneTimeSubscription.currentPeriodEndsAt
+        ? oneTimeSubscription.currentPeriodEndsAt.toISOString()
+        : null,
+      plans: BILLING_PLANS,
+    };
+  }
+
+  return {
+    activePlanType: 'free',
+    planName: null,
+    subscriptionStatus: 'free',
+    reportCredits: 0,
+    unlockedReportIds: [],
+    accessibleReportIds: [],
+    lockedReportIds: allReportIds,
+    currentPeriodEndsAt: null,
+    plans: BILLING_PLANS,
+  };
+}
+
+export async function getBillingSnapshotForUser(userId: number): Promise<BillingSnapshot> {
+  if (isDemoMode()) {
+    const state = await readFamilyMockState();
+    return buildSnapshotFromDemoState(state, userId);
+  }
+
+  return buildSnapshotFromDb(userId);
+}
+
+export async function isReportUnlockedForUser(userId: number, reportId: number) {
+  const snapshot = await getBillingSnapshotForUser(userId);
+  return snapshot.accessibleReportIds.includes(reportId);
+}
+
+function upsertDemoSubscription(
+  state: FamilyMockState,
+  input: CheckoutCompletionInput,
+  teamId: number
+) {
+  const plan = getBillingPlanByPriceId(input.priceId);
+  if (!plan) {
+    throw new Error(`Unknown billing price: ${input.priceId}`);
+  }
+
+  const existing = state.subscriptions
+    .filter((item) => item.userId === input.userId && item.planType === plan.planType)
+    .sort((left, right) => right.updatedAt.localeCompare(left.updatedAt))[0];
+
+  if (existing) {
+    existing.provider = input.provider || 'demo';
+    existing.priceId = input.priceId;
+    existing.checkoutSessionId = input.checkoutSessionId;
+    existing.stripeCustomerId = input.stripeCustomerId || existing.stripeCustomerId;
+    existing.stripeSubscriptionId =
+      input.stripeSubscriptionId || existing.stripeSubscriptionId;
+    existing.status =
+      isRecurringPlanType(plan.planType)
+        ? normalizeSubscriptionStatus(input.status, 'active')
+        : 'active';
+    existing.currentPeriodEndsAt = input.currentPeriodEndsAt || null;
+    existing.updatedAt = nowIso();
+    if (plan.planType === 'one_time') {
+      existing.reportCredits += 1;
+    }
+    if (isRecurringPlanType(plan.planType)) {
+      cancelOtherDemoRecurringSubscriptions(state, input.userId, plan.planType);
+    }
+    return existing;
+  }
+
+  const subscription: StoredSubscription = {
+    id: state.meta.nextIds.subscription++,
+    teamId,
+    userId: input.userId,
+    provider: input.provider || 'demo',
+    planType: plan.planType,
+    priceId: input.priceId,
+    status:
+      isRecurringPlanType(plan.planType)
+        ? normalizeSubscriptionStatus(input.status, 'active')
+        : 'active',
+    stripeCustomerId: input.stripeCustomerId || null,
+    stripeSubscriptionId: input.stripeSubscriptionId || null,
+    checkoutSessionId: input.checkoutSessionId,
+    reportCredits: plan.planType === 'one_time' ? 1 : 0,
+    unlockedReportIds: [],
+    currentPeriodEndsAt: input.currentPeriodEndsAt || null,
+    createdAt: nowIso(),
+    updatedAt: nowIso(),
+  };
+  state.subscriptions.unshift(subscription);
+  if (isRecurringPlanType(plan.planType)) {
+    cancelOtherDemoRecurringSubscriptions(state, input.userId, plan.planType);
+  }
+  return subscription;
+}
+
+async function upsertDbSubscription(input: CheckoutCompletionInput) {
+  const plan = getBillingPlanByPriceId(input.priceId);
+  if (!plan) {
+    throw new Error(`Unknown billing price: ${input.priceId}`);
+  }
+
+  const teamId = await getUserTeamId(input.userId);
+  if (!teamId) {
+    throw new Error('User is not associated with a team.');
+  }
+
+  const existingRows = await db
+    .select()
+    .from(subscriptions)
+    .where(and(eq(subscriptions.userId, input.userId), eq(subscriptions.planType, plan.planType)))
+    .orderBy(desc(subscriptions.updatedAt))
+    .limit(1);
+  const existing = existingRows[0];
+
+  if (existing) {
+    const [updated] = await db
+      .update(subscriptions)
+      .set({
+        provider: input.provider || 'creem',
+        priceId: input.priceId,
+        status:
+          isRecurringPlanType(plan.planType)
+            ? normalizeSubscriptionStatus(input.status, 'active')
+            : 'active',
+        stripeCustomerId: input.stripeCustomerId || existing.stripeCustomerId,
+        stripeSubscriptionId: input.stripeSubscriptionId || existing.stripeSubscriptionId,
+        checkoutSessionId: input.checkoutSessionId,
+        reportCredits:
+          plan.planType === 'one_time'
+            ? existing.reportCredits + 1
+            : existing.reportCredits,
+        currentPeriodEndsAt: input.currentPeriodEndsAt
+          ? new Date(input.currentPeriodEndsAt)
+          : null,
+        updatedAt: new Date(),
+      })
+      .where(eq(subscriptions.id, existing.id))
+      .returning();
+
+    if (isRecurringPlanType(plan.planType)) {
+      await db
+        .update(subscriptions)
+        .set({
+          status: 'canceled',
+          updatedAt: new Date(),
+        })
+        .where(
+          and(
+            eq(subscriptions.userId, input.userId),
+            inArray(subscriptions.planType, getRecurringPlanIdsForDb()),
+            ne(subscriptions.planType, plan.planType)
+          )
+        );
+    }
+
+    await db
+      .update(teams)
+      .set({
+        planName: plan.name,
+        subscriptionStatus:
+          isRecurringPlanType(plan.planType)
+            ? normalizeSubscriptionStatus(input.status, 'active')
+            : 'active',
+        stripeCustomerId: input.stripeCustomerId || existing.stripeCustomerId || null,
+        stripeSubscriptionId:
+          isRecurringPlanType(plan.planType)
+            ? input.stripeSubscriptionId || existing.stripeSubscriptionId || null
+            : existing.stripeSubscriptionId || null,
+        stripeProductId: plan.productId,
+        updatedAt: new Date(),
+      })
+      .where(eq(teams.id, teamId));
+
+    return updated || existing;
+  }
+
+  const [created] = await db
+    .insert(subscriptions)
+    .values({
+      teamId,
+      userId: input.userId,
+      provider: input.provider || 'creem',
+      planType: plan.planType,
+      priceId: input.priceId,
+      status:
+        isRecurringPlanType(plan.planType)
+          ? normalizeSubscriptionStatus(input.status, 'active')
+          : 'active',
+      stripeCustomerId: input.stripeCustomerId || null,
+      stripeSubscriptionId: input.stripeSubscriptionId || null,
+      checkoutSessionId: input.checkoutSessionId,
+      reportCredits: plan.planType === 'one_time' ? 1 : 0,
+      unlockedReportIds: [],
+      currentPeriodEndsAt: input.currentPeriodEndsAt
+        ? new Date(input.currentPeriodEndsAt)
+        : null,
+    })
+    .returning();
+
+  if (isRecurringPlanType(plan.planType)) {
+    await db
+      .update(subscriptions)
+      .set({
+        status: 'canceled',
+        updatedAt: new Date(),
+      })
+      .where(
+        and(
+          eq(subscriptions.userId, input.userId),
+          inArray(subscriptions.planType, getRecurringPlanIdsForDb()),
+          ne(subscriptions.planType, plan.planType)
+        )
+      );
+  }
+
+  await db
+    .update(teams)
+    .set({
+      planName: plan.name,
+      subscriptionStatus:
+        isRecurringPlanType(plan.planType)
+          ? normalizeSubscriptionStatus(input.status, 'active')
+          : 'active',
+      stripeCustomerId: input.stripeCustomerId || null,
+      stripeSubscriptionId: input.stripeSubscriptionId || null,
+      stripeProductId: plan.productId,
+      updatedAt: new Date(),
+    })
+    .where(eq(teams.id, teamId));
+
+  return created;
+}
+
+export async function applyCheckoutCompletionForUser(input: CheckoutCompletionInput) {
+  if (isDemoMode()) {
+    const before = await getBillingSnapshotForUser(input.userId);
+    await updateFamilyMockState((state) => {
+      upsertDemoSubscription(state, input, 1);
+      buildSnapshotFromDemoState(state, input.userId);
+      return state;
+    });
+    const after = await getBillingSnapshotForUser(input.userId);
+    const newlyUnlocked = after.accessibleReportIds.filter(
+      (reportId) => !before.accessibleReportIds.includes(reportId)
+    );
+    for (const reportId of newlyUnlocked) {
+      await scheduleReportReadyReminderForReport(input.userId, reportId);
+    }
+    return after;
+  }
+
+  const before = await getBillingSnapshotForUser(input.userId);
+  await upsertDbSubscription({
+    provider: input.provider || 'creem',
+    ...input,
+  });
+  await applyCreditsToDbSubscription(input.userId);
+  const after = await getBillingSnapshotForUser(input.userId);
+  const newlyUnlocked = after.accessibleReportIds.filter(
+    (reportId) => !before.accessibleReportIds.includes(reportId)
+  );
+  for (const reportId of newlyUnlocked) {
+    await scheduleReportReadyReminderForReport(input.userId, reportId);
+  }
+  return after;
+}
+
+async function recordDemoBillingEvent(
+  state: FamilyMockState,
+  input: BillingWebhookInput
+) {
+  const existing = state.billingEvents.find((item) => item.eventId === input.eventId);
+  if (existing) {
+    return false;
+  }
+
+  const event: StoredBillingEvent = {
+    id: state.meta.nextIds.billingEvent++,
+    source: input.source,
+    eventId: input.eventId,
+    eventType: input.eventType,
+    payload: input.payload,
+    processedAt: nowIso(),
+  };
+  state.billingEvents.unshift(event);
+  return true;
+}
+
+async function recordDbBillingEvent(input: BillingWebhookInput) {
+  const existing = await db
+    .select({ id: billingEvents.id })
+    .from(billingEvents)
+    .where(eq(billingEvents.eventId, input.eventId))
+    .limit(1);
+
+  if (existing[0]) {
+    return false;
+  }
+
+  await db.insert(billingEvents).values({
+    source: input.source,
+    eventId: input.eventId,
+    eventType: input.eventType,
+    payload: input.payload,
+  });
+
+  return true;
+}
+
+export async function processBillingWebhookEvent(input: BillingWebhookInput) {
+  const plan = getBillingPlanByPriceId(input.priceId);
+  if (!plan) {
+    throw new Error(`Unknown billing price: ${input.priceId}`);
+  }
+
+  if (isDemoMode()) {
+    let applied = false;
+    await updateFamilyMockState(async (state) => {
+      const isNew = await recordDemoBillingEvent(state, input);
+      if (!isNew) {
+        applied = false;
+        return state;
+      }
+
+      upsertDemoSubscription(
+        state,
+        {
+          userId: input.userId,
+          priceId: input.priceId,
+          checkoutSessionId: input.checkoutSessionId || input.eventId,
+          provider: input.source,
+          stripeCustomerId: input.stripeCustomerId || null,
+          stripeSubscriptionId: input.stripeSubscriptionId || null,
+          status: input.status || 'active',
+          currentPeriodEndsAt: input.currentPeriodEndsAt || null,
+        },
+        1
+      );
+
+      buildSnapshotFromDemoState(state, input.userId);
+      applied = true;
+      return state;
+    });
+
+    return { applied, snapshot: await getBillingSnapshotForUser(input.userId) };
+  }
+
+  const isNew = await recordDbBillingEvent(input);
+  if (!isNew) {
+    return { applied: false, snapshot: await getBillingSnapshotForUser(input.userId) };
+  }
+
+  await upsertDbSubscription({
+    userId: input.userId,
+    priceId: input.priceId,
+    checkoutSessionId: input.checkoutSessionId || input.eventId,
+    provider: input.source,
+    stripeCustomerId: input.stripeCustomerId || null,
+    stripeSubscriptionId: input.stripeSubscriptionId || null,
+    status: input.status || 'active',
+    currentPeriodEndsAt: input.currentPeriodEndsAt || null,
+  });
+
+  await applyCreditsToDbSubscription(input.userId);
+  return { applied: true, snapshot: await getBillingSnapshotForUser(input.userId) };
+}
+
+export function getBillingPaywallSummary(snapshot: BillingSnapshot) {
+  return {
+    planName: snapshot.planName,
+    subscriptionStatus: snapshot.subscriptionStatus,
+    activePlanType: snapshot.activePlanType,
+    reportCredits: snapshot.reportCredits,
+    billingUrl: '/dashboard/billing',
+  };
+}
+
+export type { BillingSnapshot };
