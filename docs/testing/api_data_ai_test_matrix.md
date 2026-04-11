@@ -4,6 +4,10 @@
 
 | Test ID | Scope | Scenario | Expected Result |
 | --- | --- | --- | --- |
+| API-DIAG122-INTAKE-001 | `POST /api/uploads/[uploadId]/intake` | 保存诊断 intake 字段 | 返回成功并把 intake 字段写入 upload / run payload |
+| API-DIAG122-ITEM-001 | `POST /api/runs/[runId]/extract-items` | 生成结构化 problem items | 返回 question summary、student response、topic hint、anchor、teacher signal 等字段 |
+| API-DIAG122-TAX-001 | Diagnosis taxonomy contract | 运行 taxonomy / classify 流程 | 只输出允许的 taxonomy code 与 primary/secondary role |
+| API-DIAG122-GATE-001 | Confidence gate contract | 低置信度诊断流转 | 返回 needs_review、cautious messaging 或阻止完整发布 |
 | API-AUTH-001 | `POST /api/auth/signup` | 不勾 18+ 提交 | 返回 4xx，错误明确指向 `is18PlusConfirmed` |
 | API-AUTH-002 | `POST /api/auth/signup` | 不勾 TOS/Privacy 提交 | 返回 4xx，错误明确 |
 | API-AUTH-003 | `POST /api/auth/signup` | 合法 parent 注册 | 创建用户、写入 country/timezone/locale、建立 session |
@@ -36,11 +40,34 @@
 | API-TUT-001 | Tutor workspace | tutor 视角列表/详情 | 仅 tutor 可见允许数据 |
 | API-NTF-001 | Email reminders | 报告完成/复盘提醒 | 任务成功排队或发送 |
 | API-I18N-001 | Locale report | EN/ES 输出 | 报告语言与 locale 一致 |
+| API-DCK-001 | `POST /api/reports/[reportId]/generate-deck` | Create deck record from report facts | Returns deck id, tier pending status, and report linkage fields |
+| API-DCK-002 | `GET /api/reports/[reportId]/deck` | Read deck summary for a report | Returns the latest deck shell, linkage status, and current quality tier |
+| API-DCK-003 | `GET /api/decks/[deckId]/playback` | Read normalized playback payload | Returns slides, actions, timings, and degrade-safe playback config |
+| API-DCK-004 | `POST /api/decks/[deckId]/regenerate-slide`, `POST /api/decks/[deckId]/regenerate-actions` | Regenerate draft content | Returns updated slide/action draft and reruns deck gate |
+| API-DCK-005 | `POST /api/decks/[deckId]/snapshot` | Save playback snapshot | Persists current slide/action position and returns latest snapshot metadata |
+| API-DCK-006 | `GET /api/decks/[deckId]/snapshot` | Read playback snapshot | Returns the latest restorable playback snapshot for the owner |
+| API-DCK-007 | `GET /api/share/[token]/playback` | Tutor playback payload | Returns sanitized read-only playback payload or blocks invalid token access |
+| API-DCK-008 | `POST /api/decks/[deckId]/export-h5` | Create H5 export | Returns export job or artifact metadata tied to the deck |
+| API-DCK-009 | `POST /api/decks/[deckId]/export-pdf` | Create PDF export | Returns export job or artifact metadata tied to the deck |
+| API-DCK-010 | Deck telemetry contract | Generation/playback/export lifecycle event emission | Deck metrics are queryable from stored telemetry or artifact manifests |
+| API-DCK-011 | Export artifact readback | Read H5/PDF export state | Artifact status, location, and lifecycle timestamps remain consistent |
+| API-BND134-001 | Stage-boundary facts contract | Audit `ProblemItem`, `EvidenceAnchor`, `ItemErrorLabel`, and `DiagnosisOutline` boundaries | Structured facts stay first-class and are not collapsed into a report blob |
+| API-BND134-002 | Report-layer boundary contract | Audit report sections, explanation-card reuse, and seven-day plan structure | Diagnosis/evidence/plan remain primary and explanation/plan contracts stay structured |
+| API-BND134-003 | Share/privacy boundary contract | Audit share token, tutor summary, and privacy-boundary behavior | Tutor handoff remains read-only, revocable, and sanitized |
+| API-BND134-004 | Provider abstraction contract | Audit storage/parse/LLM abstraction and dependent job consumers | Provider abstractions remain additive and reusable rather than route-local one-offs |
+| API-BND134-005 | Run-state and quality-gate contract | Audit queue/running/needs_review/done/failed/retry/degrade rules | Quality gate and run-state behavior remain explicit and reusable |
+| API-BND134-006 | Playback-light contract | Audit playback/voice/share-play dependencies against `DECK13-*` | Playback and narration stay optional, secondary, and delegated to the v4 lane |
+| API-BND134-007 | Export-light contract | Audit H5/PDF/share-light enhancement rules | Export remains an enhancement artifact and does not replace the main report |
+| API-BND134-008 | Weekly/timeline-lite contract | Audit compare/history/timeline hooks | Compare/timeline remain lightweight hooks backed by existing child history surfaces |
+| API-BND134-009 | Postpone guardrail audit | Audit authoritative Stage 1 contracts for non-scope leakage | No Stage 1 API/test contract introduces PPTX, strong whiteboard, realtime Q&A, student app, or generalized growth frontend scope |
 
 ## Data Integrity Tests
 
 | Test ID | Data Surface | Scenario | Expected Result |
 | --- | --- | --- | --- |
+| DATA-DIAG122-ITEM-001 | `problem_items` | 结构化问题项落库 | question summary、student response、topic hint、anchor、teacher signal 等字段完整 |
+| DATA-DIAG122-TAX-001 | `item_errors` | taxonomy 与 role 持久化 | error label、primary/secondary role、severity、confidence、rationale 一致 |
+| DATA-DIAG122-DX-001 | `reports` diagnosis payload | 聚合诊断结果落库 | primary/secondary diagnosis、pattern/sporadic、do-not-overreact、overall confidence 全部存在 |
 | DATA-001 | `users` | 注册写入 locale/country/timezone | 字段非空，值与提交一致 |
 | DATA-002 | `children` ownership | 用户 A/B 交叉访问 | 不能跨用户读取或写入 |
 | DATA-003 | Child PII | 创建孩子 | 不需要真实姓名/学校字段 |
@@ -54,6 +81,21 @@
 | DATA-BIL-002 | webhook replay | 同一事件两次投递 | 账务记录不重复 |
 | DATA-HIS-001 | History compare | 第二份报告写入 | compare 只比较同一 child 的最近报告 |
 | DATA-DEL-001 | Delete flows | 删除 child/upload/report | 相关数据不可再访问 |
+| DATA-DCK-001 | `diagnosis_decks` | Persist deck shell | Deck record stores run/report linkage, version, status, and tier fields |
+| DATA-DCK-002 | `diagnosis_slides` | Persist ordered slides | Slides are stored in deterministic order with stable slide type/schema fields |
+| DATA-DCK-003 | `diagnosis_slide_actions` | Persist validated actions | Actions store whitelist-safe action type, anchor/reference payload, and timing info |
+| DATA-DCK-004 | `deck_exports` | Persist export lifecycle | H5/PDF export artifacts record status, format, and storage metadata |
+| DATA-DCK-005 | `deck_playback_snapshots` | Persist and restore playback position | Snapshot restore returns the same slide/action position that was last saved |
+| DATA-DCK-006 | `reports` deck linkage | Report-to-deck association | Report keeps latest deck id, deck status, and walkthrough visibility flags |
+| DATA-DCK-007 | `analysis_runs` deck status | Run-to-deck association | Analysis run tracks generation/review/export status without breaking prior report flow |
+| DATA-DCK-008 | Deck metrics/artifact manifests | Telemetry and evidence durability | Metrics and evidence manifests stay queryable for acceptance and regression review |
+| DATA-BND134-001 | Stage-boundary core facts | `problem_items`, `evidence_anchors`, `item_error_labels`, `diagnosis_outlines` | Core diagnosis objects remain explicit, linked, and evidence-backed |
+| DATA-BND134-002 | Stage-boundary diagnosis output | diagnosis payload facts | `doNotOverreact`, confidence-aware release, and evidence references remain structured |
+| DATA-BND134-003 | Report/explanation/plan contracts | report sections, explanation cards, seven-day plans | Explanation and plan outputs remain reusable structured contracts rather than UI-only blobs |
+| DATA-BND134-004 | Share/privacy artifacts | share token, tutor summary, privacy boundary fields | Share and privacy surfaces remain separately queryable, revocable, and sanitized |
+| DATA-BND134-005 | Provider/jobs lifecycle | analysis runs, retry, quality-gate state | Queue/running/needs_review/done/failed/retry/degrade states remain explicit and reusable |
+| DATA-BND134-006 | Playback/export light linkage | deck linkage, playback/export metadata | Light-lane playback/export metadata stay additive to the report rather than replacing it |
+| DATA-BND134-007 | Weekly/timeline lightweight hooks | compare summaries, history pointers, snapshot-linked review hooks | Timeline and compare support stay child-scoped and lightweight |
 
 ## AI / OCR / QC Tests
 
@@ -68,6 +110,15 @@
 | AI-QC-002 | Confidence routing | 低置信度 run | 进入 `needs_review` 或临时版 |
 | AI-RPT-001 | Aggregation | finding evidence 数量 | 每个 finding 至少 2 个 anchors |
 | AI-RVW-001 | Weekly review | previous report 输入 | 第二份报告显示趋势变化 |
+| AI-DCK-001 | Outline generation | Build deck outline from diagnosis/report/plan/share facts | Outline uses accepted facts only and follows fixed slide order |
+| AI-DCK-002 | Slide generation | Build slide content from outline | Slide content stays parent-first and grounded in the facts layer |
+| AI-DCK-003 | Action whitelist | Generate action payloads | Only allowed action types and references are emitted |
+| AI-DCK-004 | Anchor/reference validation | Validate slide actions | Actions with missing anchors or invalid references are rejected or degraded |
+| AI-DCK-005 | Facts-only source policy | Attempt to use raw DOM input | Generator rejects raw DOM dependence and uses canonical diagnosis facts instead |
+| AI-DCK-006 | Deck quality scoring | Score A/B/C/D tiers | Deck receives deterministic tier output and degrade policy metadata |
+| AI-DCK-007 | Fixed page contract | Generate multiple decks from same facts | Page order and required slide schema remain stable across reruns |
+| AI-DCK-008 | Share-facts reuse | Generate share-safe deck content | Share deck reuses existing report/share facts without exposing owner-only notes |
+| AI-DCK-009 | Re-gate after regenerate | Regenerate slide/actions | Regenerated content is revalidated and tier is updated accordingly |
 
 ## Non-Functional Tests
 
@@ -81,6 +132,12 @@
 | NF-006 | Deletion | 删除后访问旧链接 | 返回 404/403，不泄露已删数据 |
 | NF-007 | Logging | 关键 run 生命周期 | 日志、trace、error 事件存在 |
 | NF-008 | Cost | OCR/AI 成本遥测 | 可按 run 追踪成本 |
+| NF-DCK-001 | Responsive player routes | `/dashboard/reports/[reportId]/play`, `/share/[token]/play`, `/admin/review/[runId]/deck` | Deck routes remain usable on desktop and mobile with no blocking overflow |
+| NF-DCK-002 | Playback resilience | Pause/resume/restore across refresh | Player survives reload and restores from saved snapshot without corruption |
+| NF-DCK-003 | Browser TTS fallback | Unsupported or partially supported speech synthesis | Voice guidance falls back safely and never blocks playback |
+| NF-DCK-004 | Degraded deck UX | Tier C/D deck playback | Degrade policy removes autoplay or hides play entry without crashing the report flow |
+| NF-DCK-005 | Deck telemetry | Generation, review, playback, export events | Deck lifecycle emits auditable telemetry suitable for release evidence |
+| NF-DCK-006 | Artifact durability | Export/share/admin evidence manifest | Required deck evidence files remain readable and linked after generation/export |
 
 ## Ops And Release Tests
 

@@ -5,6 +5,8 @@
 - Local repository path: `D:\lyh\agent\agent-frame\familyEducation`
 - Existing PRD docs preserved under `docs/`
 - This repository now has planning, traceability, and testing assets under `docs/` and `tasks/backlog_v1/`.
+- A new stage-boundary planning lane now exists at `tasks/backlog_v5_stage1_boundary_1_3_4/` for `需求文档_1.3.4`.
+- `tasks/backlog_v4_diagnosis_player_1_3_x/` remains the dependent light-lane backlog for deck/player execution under the new stage-boundary split.
 - Continuity and runtime evidence scaffolding exists under `.meta/familyEducation/continuity/` and `tasks/runtime/`.
 - `scripts/validate_planning_assets.py` can verify the requirement-to-story-to-test contract before feature work starts.
 - Sprint 0 bootstrap work is accepted with a passing planning-asset audit and a passing `pnpm build`.

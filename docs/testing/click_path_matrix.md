@@ -152,7 +152,7 @@ Evidence to collect:
 - child detail 趋势截图
 - compare 结果断言
 
-## CLICK-010 — Needs Review -> Admin Approve -> Parent Reopen Report
+## CLICK-010 – Needs Review -> Admin Approve -> Parent Reopen Report
 
 Preconditions: 存在 needs_review run
 
@@ -167,3 +167,180 @@ Evidence to collect:
 - admin 审核动作截图
 - 审核 API 响应
 - parent 端重新打开报告截图
+
+## CLICK-DCK-001 – Report -> Guided Walkthrough -> Playback Controls
+
+Preconditions: 已登录且报告存在 A/B tier deck
+
+Steps:
+1. 打开 `/dashboard/reports/[reportId]`。
+2. 点击 `Guided Walkthrough` 入口。
+3. 在 `/play` 中执行 start、next slide、pause、resume、stop。
+
+Expected result: 报告可进入可播放 deck，播放控制和 slide/action 状态切换稳定。
+
+Evidence to collect:
+- report 入口截图
+- player before/after screenshot
+- playback state transition output
+
+## CLICK-DCK-002 – Parent Player -> Voice Guidance Toggle -> Browser Fallback
+
+Preconditions: deck 可播放，浏览器支持或不支持 TTS
+
+Steps:
+1. 打开 `/dashboard/reports/[reportId]/play`。
+2. 检查默认 voice 状态。
+3. 手动打开和关闭 `voice guidance`。
+4. 在不支持 TTS 的浏览器或 mocked fallback 环境下重复。
+
+Expected result: voice 默认关闭；支持 TTS 时可手动启用；不支持时进入安全 fallback 且不阻塞 walkthrough。
+
+Evidence to collect:
+- default-off screenshot
+- toggle interaction evidence
+- fallback console or API evidence
+
+## CLICK-DCK-003 – Share Report -> Tutor Play Route
+
+Preconditions: 有效 share token 且 deck 允许 share playback
+
+Steps:
+1. 从报告页生成 share token。
+2. 打开 `/share/[token]/play`。
+3. 浏览 tutor walkthrough。
+
+Expected result: tutor 只读 player 可访问，内容受 share 权限约束，且不暴露 parent-only note。
+
+Evidence to collect:
+- share token generation response
+- share player screenshot
+- privacy field omission assertion
+
+## CLICK-DCK-004 – Admin Review -> Regenerate -> Re-gate
+
+Preconditions: admin 身份且 deck 已进入 review
+
+Steps:
+1. 打开 `/admin/review/[runId]/deck`。
+2. 触发 regenerate slide 或 regenerate actions。
+3. 检查最新 gate 结果。
+
+Expected result: deck 草稿被重新生成并重新执行 quality gate，tier/错误信息同步更新。
+
+Evidence to collect:
+- admin review screenshot
+- regenerate API response
+- updated gate summary
+
+## CLICK-BND134-001 — Report -> Share -> Tutor Boundary
+
+Preconditions: 已有报告且可生成 share token
+
+Steps:
+1. 在报告页生成 share token。
+2. 打开 `/share/[token]`。
+3. 检查 tutor summary、read-only framing、隐私边界。
+
+Expected result: tutor handoff 存在，但 parent-only 内容不泄露，且 share 仍是只读。
+
+Evidence to collect:
+- share token generation response
+- share page screenshot
+- privacy boundary assertion
+
+## CLICK-BND134-002 — Report -> Guided Walkthrough Remains Secondary
+
+Preconditions: 报告存在 walkthrough/deck 入口
+
+Steps:
+1. 打开 `/dashboard/reports/[reportId]`。
+2. 先确认 Diagnosis / Evidence / Plan 为主层。
+3. 再点击 `Guided Walkthrough` 进入 `/play`。
+
+Expected result: walkthrough 是可选增强层，不替代主报告阅读路径。
+
+Evidence to collect:
+- report primary-layer screenshot
+- walkthrough entry screenshot
+- `/play` route screenshot
+
+## CLICK-BND134-003 — Child History -> Compare Remains Lightweight
+
+Preconditions: 同一 child 至少有两份报告
+
+Steps:
+1. 打开 `/dashboard/children/[childId]`。
+2. 进入 history / compare。
+3. 查看趋势、focus 变化、compare summary。
+
+Expected result: compare/timeline 仅提供轻量 hook，不出现重型 dashboard 或 generalized growth shell。
+
+Evidence to collect:
+- child history screenshot
+- compare summary screenshot
+- no-heavy-dashboard assertion
+
+## CLICK-DCK-005 – Admin Review -> Trial Playback -> Approve/Reject
+
+Preconditions: admin 身份且 deck 已进入 review
+
+Steps:
+1. 打开 `/admin/review/[runId]/deck`。
+2. 执行 trial playback。
+3. 分别执行 approve 和 reject 流程。
+
+Expected result: trial playback 可用，审核动作写入审计记录并更新 deck 状态。
+
+Evidence to collect:
+- trial playback screenshot
+- review action responses
+- status change assertions
+
+## CLICK-DCK-006 – Parent Deck -> Export H5
+
+Preconditions: deck 已生成且 export 能力开启
+
+Steps:
+1. 打开 deck 或 report 页面。
+2. 触发 `Export H5`。
+3. 读取导出 artifact 或下载入口。
+
+Expected result: H5 artifact 生成成功，生命周期状态可回读。
+
+Evidence to collect:
+- export trigger screenshot
+- export-h5 API response
+- artifact readback evidence
+
+## CLICK-DCK-007 – Parent Deck -> Export PDF
+
+Preconditions: deck 已生成且 export 能力开启
+
+Steps:
+1. 打开 deck 或 report 页面。
+2. 触发 `Export PDF`。
+3. 读取导出 artifact 或下载入口。
+
+Expected result: PDF artifact 生成成功，且仍被标注为 secondary enhancement 而不是主报告替代。
+
+Evidence to collect:
+- export UI screenshot
+- export-pdf API response
+- artifact metadata assertion
+
+## CLICK-DCK-008 – Player Snapshot Save -> Restore
+
+Preconditions: 已登录且 deck 可播放
+
+Steps:
+1. 打开 `/dashboard/reports/[reportId]/play` 并推进到中间 slide/action。
+2. 触发 snapshot 保存。
+3. 刷新页面或重新进入 player。
+
+Expected result: snapshot 成功保存并恢复，用户回到之前的播放位置。
+
+Evidence to collect:
+- mid-playback screenshot
+- snapshot API request/response
+- restored state screenshot

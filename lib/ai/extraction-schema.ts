@@ -39,9 +39,15 @@ export const labeledProblemItemSchema = canonicalProblemItemSchema.extend({
         code: z.string().min(1),
         severity: z.enum(['low', 'med', 'high']),
         labelConfidence: z.number().min(0).max(1),
+        role: z.enum(['primary', 'secondary']).default('primary'),
       })
     )
-    .min(1),
+    .min(1)
+    .max(2)
+    .refine(
+      (labels) => labels.filter((label) => label.role === 'primary').length <= 1,
+      'Each problem item can have at most one primary taxonomy label.'
+    ),
   rationale: z.string().min(1),
 });
 

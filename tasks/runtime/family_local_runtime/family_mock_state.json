@@ -1,0 +1,3798 @@
+{
+  "meta": {
+    "nextIds": {
+      "child": 2,
+      "upload": 4,
+      "uploadFile": 4,
+      "page": 16,
+      "run": 4,
+      "report": 4,
+      "activity": 8,
+      "problemItem": 31,
+      "errorLabel": 5,
+      "itemError": 31,
+      "shareLink": 2,
+      "subscription": 2,
+      "billingEvent": 1
+    }
+  },
+  "auth": {
+    "parentProfile": {
+      "id": 1,
+      "name": "Orion",
+      "email": "orion130319@gmail.com",
+      "password": "DemoParent123",
+      "role": "owner",
+      "is18PlusConfirmed": true,
+      "country": "US",
+      "timezone": "America/Los_Angeles",
+      "locale": "en-US",
+      "createdAt": "2026-04-09T08:00:50.511Z",
+      "updatedAt": "2026-04-09T09:05:10.231Z",
+      "deletedAt": null,
+      "googleSub": "115407291538600635852"
+    }
+  },
+  "children": [
+    {
+      "id": 1,
+      "userId": 1,
+      "nickname": "FinalFlow-1775721652949",
+      "grade": "5th Grade",
+      "curriculum": "Common Core",
+      "createdAt": "2026-04-09T08:00:53.028Z",
+      "updatedAt": "2026-04-09T08:00:53.028Z",
+      "deletedAt": null
+    }
+  ],
+  "uploads": [
+    {
+      "id": 1,
+      "userId": 1,
+      "childId": 1,
+      "sourceType": "quiz",
+      "notes": "final program first report",
+      "totalPages": 5,
+      "status": "submitted",
+      "createdAt": "2026-04-09T08:00:54.099Z",
+      "updatedAt": "2026-04-09T08:00:54.109Z",
+      "submittedAt": "2026-04-09T08:00:54.109Z"
+    },
+    {
+      "id": 2,
+      "userId": 1,
+      "childId": 1,
+      "sourceType": "quiz",
+      "notes": "final program second report for weekly review",
+      "totalPages": 5,
+      "status": "submitted",
+      "createdAt": "2026-04-09T08:00:54.188Z",
+      "updatedAt": "2026-04-09T08:00:54.196Z",
+      "submittedAt": "2026-04-09T08:00:54.196Z"
+    },
+    {
+      "id": 3,
+      "userId": 1,
+      "childId": 1,
+      "sourceType": "quiz",
+      "notes": "review this run for final admin evidence",
+      "totalPages": 5,
+      "status": "submitted",
+      "createdAt": "2026-04-09T08:00:54.246Z",
+      "updatedAt": "2026-04-09T08:00:54.252Z",
+      "submittedAt": "2026-04-09T08:00:54.252Z"
+    }
+  ],
+  "uploadFiles": [
+    {
+      "id": 1,
+      "uploadId": 1,
+      "originalName": "final-program-browser-fixture.pdf",
+      "mimeType": "application/pdf",
+      "sizeBytes": 2047,
+      "storagePath": "local:upload-1775721654074-a3e150c8/01-final-program-browser-fixture.pdf/final-program-browser-fixture.pdf",
+      "pageCount": 5,
+      "previewKind": "pdf",
+      "createdAt": "2026-04-09T08:00:54.099Z"
+    },
+    {
+      "id": 2,
+      "uploadId": 2,
+      "originalName": "final-program-browser-fixture.pdf",
+      "mimeType": "application/pdf",
+      "sizeBytes": 2047,
+      "storagePath": "local:upload-1775721654161-61a72c00/01-final-program-browser-fixture.pdf/final-program-browser-fixture.pdf",
+      "pageCount": 5,
+      "previewKind": "pdf",
+      "createdAt": "2026-04-09T08:00:54.188Z"
+    },
+    {
+      "id": 3,
+      "uploadId": 3,
+      "originalName": "final-program-browser-fixture.pdf",
+      "mimeType": "application/pdf",
+      "sizeBytes": 2047,
+      "storagePath": "local:upload-1775721654233-dc36e88b/01-final-program-browser-fixture.pdf/final-program-browser-fixture.pdf",
+      "pageCount": 5,
+      "previewKind": "pdf",
+      "createdAt": "2026-04-09T08:00:54.246Z"
+    }
+  ],
+  "pages": [
+    {
+      "id": 1,
+      "uploadId": 1,
+      "uploadFileId": 1,
+      "pageNumber": 1,
+      "sourceName": "final-program-browser-fixture.pdf",
+      "storagePath": "local:upload-1775721654074-a3e150c8/01-final-program-browser-fixture.pdf/page-001.pdf",
+      "previewLabel": "Fixture page 1",
+      "isBlurry": false,
+      "isRotated": false,
+      "isDark": false,
+      "qualityScore": 100,
+      "qualityFlags": {
+        "blurry": false,
+        "rotated": false,
+        "dark": false,
+        "lowContrast": false
+      },
+      "createdAt": "2026-04-09T08:00:54.099Z"
+    },
+    {
+      "id": 2,
+      "uploadId": 1,
+      "uploadFileId": 1,
+      "pageNumber": 2,
+      "sourceName": "final-program-browser-fixture.pdf",
+      "storagePath": "local:upload-1775721654074-a3e150c8/01-final-program-browser-fixture.pdf/page-002.pdf",
+      "previewLabel": "Fixture page 2",
+      "isBlurry": false,
+      "isRotated": false,
+      "isDark": false,
+      "qualityScore": 100,
+      "qualityFlags": {
+        "blurry": false,
+        "rotated": false,
+        "dark": false,
+        "lowContrast": false
+      },
+      "createdAt": "2026-04-09T08:00:54.099Z"
+    },
+    {
+      "id": 3,
+      "uploadId": 1,
+      "uploadFileId": 1,
+      "pageNumber": 3,
+      "sourceName": "final-program-browser-fixture.pdf",
+      "storagePath": "local:upload-1775721654074-a3e150c8/01-final-program-browser-fixture.pdf/page-003.pdf",
+      "previewLabel": "Fixture page 3",
+      "isBlurry": false,
+      "isRotated": false,
+      "isDark": false,
+      "qualityScore": 100,
+      "qualityFlags": {
+        "blurry": false,
+        "rotated": false,
+        "dark": false,
+        "lowContrast": false
+      },
+      "createdAt": "2026-04-09T08:00:54.099Z"
+    },
+    {
+      "id": 4,
+      "uploadId": 1,
+      "uploadFileId": 1,
+      "pageNumber": 4,
+      "sourceName": "final-program-browser-fixture.pdf",
+      "storagePath": "local:upload-1775721654074-a3e150c8/01-final-program-browser-fixture.pdf/page-004.pdf",
+      "previewLabel": "Fixture page 4",
+      "isBlurry": false,
+      "isRotated": false,
+      "isDark": false,
+      "qualityScore": 100,
+      "qualityFlags": {
+        "blurry": false,
+        "rotated": false,
+        "dark": false,
+        "lowContrast": false
+      },
+      "createdAt": "2026-04-09T08:00:54.099Z"
+    },
+    {
+      "id": 5,
+      "uploadId": 1,
+      "uploadFileId": 1,
+      "pageNumber": 5,
+      "sourceName": "final-program-browser-fixture.pdf",
+      "storagePath": "local:upload-1775721654074-a3e150c8/01-final-program-browser-fixture.pdf/page-005.pdf",
+      "previewLabel": "Fixture page 5",
+      "isBlurry": false,
+      "isRotated": false,
+      "isDark": false,
+      "qualityScore": 100,
+      "qualityFlags": {
+        "blurry": false,
+        "rotated": false,
+        "dark": false,
+        "lowContrast": false
+      },
+      "createdAt": "2026-04-09T08:00:54.099Z"
+    },
+    {
+      "id": 6,
+      "uploadId": 2,
+      "uploadFileId": 2,
+      "pageNumber": 1,
+      "sourceName": "final-program-browser-fixture.pdf",
+      "storagePath": "local:upload-1775721654161-61a72c00/01-final-program-browser-fixture.pdf/page-001.pdf",
+      "previewLabel": "Fixture page 1",
+      "isBlurry": false,
+      "isRotated": false,
+      "isDark": false,
+      "qualityScore": 100,
+      "qualityFlags": {
+        "blurry": false,
+        "rotated": false,
+        "dark": false,
+        "lowContrast": false
+      },
+      "createdAt": "2026-04-09T08:00:54.188Z"
+    },
+    {
+      "id": 7,
+      "uploadId": 2,
+      "uploadFileId": 2,
+      "pageNumber": 2,
+      "sourceName": "final-program-browser-fixture.pdf",
+      "storagePath": "local:upload-1775721654161-61a72c00/01-final-program-browser-fixture.pdf/page-002.pdf",
+      "previewLabel": "Fixture page 2",
+      "isBlurry": false,
+      "isRotated": false,
+      "isDark": false,
+      "qualityScore": 100,
+      "qualityFlags": {
+        "blurry": false,
+        "rotated": false,
+        "dark": false,
+        "lowContrast": false
+      },
+      "createdAt": "2026-04-09T08:00:54.188Z"
+    },
+    {
+      "id": 8,
+      "uploadId": 2,
+      "uploadFileId": 2,
+      "pageNumber": 3,
+      "sourceName": "final-program-browser-fixture.pdf",
+      "storagePath": "local:upload-1775721654161-61a72c00/01-final-program-browser-fixture.pdf/page-003.pdf",
+      "previewLabel": "Fixture page 3",
+      "isBlurry": false,
+      "isRotated": false,
+      "isDark": false,
+      "qualityScore": 100,
+      "qualityFlags": {
+        "blurry": false,
+        "rotated": false,
+        "dark": false,
+        "lowContrast": false
+      },
+      "createdAt": "2026-04-09T08:00:54.188Z"
+    },
+    {
+      "id": 9,
+      "uploadId": 2,
+      "uploadFileId": 2,
+      "pageNumber": 4,
+      "sourceName": "final-program-browser-fixture.pdf",
+      "storagePath": "local:upload-1775721654161-61a72c00/01-final-program-browser-fixture.pdf/page-004.pdf",
+      "previewLabel": "Fixture page 4",
+      "isBlurry": false,
+      "isRotated": false,
+      "isDark": false,
+      "qualityScore": 100,
+      "qualityFlags": {
+        "blurry": false,
+        "rotated": false,
+        "dark": false,
+        "lowContrast": false
+      },
+      "createdAt": "2026-04-09T08:00:54.188Z"
+    },
+    {
+      "id": 10,
+      "uploadId": 2,
+      "uploadFileId": 2,
+      "pageNumber": 5,
+      "sourceName": "final-program-browser-fixture.pdf",
+      "storagePath": "local:upload-1775721654161-61a72c00/01-final-program-browser-fixture.pdf/page-005.pdf",
+      "previewLabel": "Fixture page 5",
+      "isBlurry": false,
+      "isRotated": false,
+      "isDark": false,
+      "qualityScore": 100,
+      "qualityFlags": {
+        "blurry": false,
+        "rotated": false,
+        "dark": false,
+        "lowContrast": false
+      },
+      "createdAt": "2026-04-09T08:00:54.188Z"
+    },
+    {
+      "id": 11,
+      "uploadId": 3,
+      "uploadFileId": 3,
+      "pageNumber": 1,
+      "sourceName": "final-program-browser-fixture.pdf",
+      "storagePath": "local:upload-1775721654233-dc36e88b/01-final-program-browser-fixture.pdf/page-001.pdf",
+      "previewLabel": "Fixture page 1",
+      "isBlurry": false,
+      "isRotated": false,
+      "isDark": false,
+      "qualityScore": 100,
+      "qualityFlags": {
+        "blurry": false,
+        "rotated": false,
+        "dark": false,
+        "lowContrast": false
+      },
+      "createdAt": "2026-04-09T08:00:54.246Z"
+    },
+    {
+      "id": 12,
+      "uploadId": 3,
+      "uploadFileId": 3,
+      "pageNumber": 2,
+      "sourceName": "final-program-browser-fixture.pdf",
+      "storagePath": "local:upload-1775721654233-dc36e88b/01-final-program-browser-fixture.pdf/page-002.pdf",
+      "previewLabel": "Fixture page 2",
+      "isBlurry": false,
+      "isRotated": false,
+      "isDark": false,
+      "qualityScore": 100,
+      "qualityFlags": {
+        "blurry": false,
+        "rotated": false,
+        "dark": false,
+        "lowContrast": false
+      },
+      "createdAt": "2026-04-09T08:00:54.246Z"
+    },
+    {
+      "id": 13,
+      "uploadId": 3,
+      "uploadFileId": 3,
+      "pageNumber": 3,
+      "sourceName": "final-program-browser-fixture.pdf",
+      "storagePath": "local:upload-1775721654233-dc36e88b/01-final-program-browser-fixture.pdf/page-003.pdf",
+      "previewLabel": "Fixture page 3",
+      "isBlurry": false,
+      "isRotated": false,
+      "isDark": false,
+      "qualityScore": 100,
+      "qualityFlags": {
+        "blurry": false,
+        "rotated": false,
+        "dark": false,
+        "lowContrast": false
+      },
+      "createdAt": "2026-04-09T08:00:54.246Z"
+    },
+    {
+      "id": 14,
+      "uploadId": 3,
+      "uploadFileId": 3,
+      "pageNumber": 4,
+      "sourceName": "final-program-browser-fixture.pdf",
+      "storagePath": "local:upload-1775721654233-dc36e88b/01-final-program-browser-fixture.pdf/page-004.pdf",
+      "previewLabel": "Fixture page 4",
+      "isBlurry": false,
+      "isRotated": false,
+      "isDark": false,
+      "qualityScore": 100,
+      "qualityFlags": {
+        "blurry": false,
+        "rotated": false,
+        "dark": false,
+        "lowContrast": false
+      },
+      "createdAt": "2026-04-09T08:00:54.246Z"
+    },
+    {
+      "id": 15,
+      "uploadId": 3,
+      "uploadFileId": 3,
+      "pageNumber": 5,
+      "sourceName": "final-program-browser-fixture.pdf",
+      "storagePath": "local:upload-1775721654233-dc36e88b/01-final-program-browser-fixture.pdf/page-005.pdf",
+      "previewLabel": "Fixture page 5",
+      "isBlurry": false,
+      "isRotated": false,
+      "isDark": false,
+      "qualityScore": 100,
+      "qualityFlags": {
+        "blurry": false,
+        "rotated": false,
+        "dark": false,
+        "lowContrast": false
+      },
+      "createdAt": "2026-04-09T08:00:54.246Z"
+    }
+  ],
+  "runs": [
+    {
+      "id": 1,
+      "userId": 1,
+      "childId": 1,
+      "uploadId": 1,
+      "status": "done",
+      "stage": "done",
+      "progressPercent": 100,
+      "estimatedMinutes": 4,
+      "statusMessage": "Diagnosis generated successfully.",
+      "overallConfidence": 0.81,
+      "needsReviewReason": null,
+      "errorMessage": null,
+      "startedAt": null,
+      "finishedAt": "2026-04-09T08:00:54.123Z",
+      "createdAt": "2026-04-09T08:00:54.109Z",
+      "updatedAt": "2026-04-09T08:00:54.123Z"
+    },
+    {
+      "id": 2,
+      "userId": 1,
+      "childId": 1,
+      "uploadId": 2,
+      "status": "needs_review",
+      "stage": "review",
+      "progressPercent": 100,
+      "estimatedMinutes": 4,
+      "statusMessage": "Needs review before the full report is released.",
+      "overallConfidence": 0.81,
+      "needsReviewReason": "This upload was explicitly flagged for manual review before release.",
+      "errorMessage": null,
+      "startedAt": null,
+      "finishedAt": "2026-04-09T08:00:54.206Z",
+      "createdAt": "2026-04-09T08:00:54.196Z",
+      "updatedAt": "2026-04-09T08:00:54.206Z"
+    },
+    {
+      "id": 3,
+      "userId": 1,
+      "childId": 1,
+      "uploadId": 3,
+      "status": "needs_review",
+      "stage": "review",
+      "progressPercent": 100,
+      "estimatedMinutes": 4,
+      "statusMessage": "Needs review before the full report is released.",
+      "overallConfidence": 0.81,
+      "needsReviewReason": "This upload was explicitly flagged for manual review before release.",
+      "errorMessage": null,
+      "startedAt": null,
+      "finishedAt": "2026-04-09T08:00:54.265Z",
+      "createdAt": "2026-04-09T08:00:54.252Z",
+      "updatedAt": "2026-04-09T08:00:54.265Z"
+    }
+  ],
+  "reports": [
+    {
+      "id": 1,
+      "runId": 1,
+      "parentReportJson": {
+        "childNickname": "FinalFlow-1775721652949",
+        "grade": "5th Grade",
+        "curriculum": "Common Core",
+        "sourceType": "quiz",
+        "summary": "Procedure gap is the clearest repeat pattern across this upload, with Calculation slip showing up as the next focus area.",
+        "confidence": 0.81,
+        "confidenceBand": "low",
+        "releaseStatus": "ready",
+        "reviewReason": null,
+        "patternSummary": [
+          {
+            "code": "procedure_gap",
+            "title": "Procedure gap",
+            "patternType": "pattern"
+          },
+          {
+            "code": "calculation_slip",
+            "title": "Calculation slip",
+            "patternType": "pattern"
+          },
+          {
+            "code": "strategy_error",
+            "title": "Strategy error",
+            "patternType": "sporadic"
+          }
+        ],
+        "topFindings": [
+          {
+            "code": "procedure_gap",
+            "title": "Procedure gap",
+            "severity": "med",
+            "patternType": "pattern",
+            "count": 3,
+            "evidence": [
+              {
+                "pageId": 1,
+                "pageNo": 1,
+                "problemNo": "Q1",
+                "previewLabel": "Fixture page 1",
+                "highlightBox": {
+                  "x": 10,
+                  "y": 14,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q1 on page 1"
+                }
+              },
+              {
+                "pageId": 4,
+                "pageNo": 4,
+                "problemNo": "Q8",
+                "previewLabel": "Fixture page 4",
+                "highlightBox": {
+                  "x": 10,
+                  "y": 27,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q8 on page 4"
+                }
+              },
+              {
+                "pageId": 5,
+                "pageNo": 5,
+                "problemNo": "Q9",
+                "previewLabel": "Fixture page 5",
+                "highlightBox": {
+                  "x": 10,
+                  "y": 40,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q9 on page 5"
+                }
+              }
+            ],
+            "whatToDo": "Rebuild the step order with slow, spoken practice before adding harder problems.",
+            "rationale": "The student setup shows the right ingredients but the step order breaks before the result."
+          },
+          {
+            "code": "calculation_slip",
+            "title": "Calculation slip",
+            "severity": "med",
+            "patternType": "pattern",
+            "count": 3,
+            "evidence": [
+              {
+                "pageId": 1,
+                "pageNo": 1,
+                "problemNo": "Q2",
+                "previewLabel": "Fixture page 1",
+                "highlightBox": {
+                  "x": 10,
+                  "y": 27,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q2 on page 1"
+                }
+              },
+              {
+                "pageId": 2,
+                "pageNo": 2,
+                "problemNo": "Q3",
+                "previewLabel": "Fixture page 2",
+                "highlightBox": {
+                  "x": 10,
+                  "y": 40,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q3 on page 2"
+                }
+              },
+              {
+                "pageId": 5,
+                "pageNo": 5,
+                "problemNo": "Q10",
+                "previewLabel": "Fixture page 5",
+                "highlightBox": {
+                  "x": 10,
+                  "y": 53,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q10 on page 5"
+                }
+              }
+            ],
+            "whatToDo": "Keep the same method but add a deliberate final arithmetic check.",
+            "rationale": "The method is mostly correct, but the arithmetic execution slips near the finish."
+          },
+          {
+            "code": "strategy_error",
+            "title": "Strategy error",
+            "severity": "med",
+            "patternType": "sporadic",
+            "count": 2,
+            "evidence": [
+              {
+                "pageId": 3,
+                "pageNo": 3,
+                "problemNo": "Q6",
+                "previewLabel": "Fixture page 3",
+                "highlightBox": {
+                  "x": 10,
+                  "y": 79,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q6 on page 3"
+                }
+              },
+              {
+                "pageId": 4,
+                "pageNo": 4,
+                "problemNo": "Q7",
+                "previewLabel": "Fixture page 4",
+                "highlightBox": {
+                  "x": 10,
+                  "y": 14,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q7 on page 4"
+                }
+              }
+            ],
+            "whatToDo": "Compare two solving strategies and choose the simpler one before starting.",
+            "rationale": "The student chooses a weaker strategy than the page seems to require."
+          }
+        ],
+        "evidenceGroups": [
+          {
+            "code": "procedure_gap",
+            "displayName": "Procedure gap",
+            "description": "The student knows the concept but loses the correct step order.",
+            "count": 3,
+            "averageConfidence": 0.73,
+            "severity": "med",
+            "items": [
+              {
+                "pageId": 1,
+                "pageNo": 1,
+                "problemNo": "Q1",
+                "previewLabel": "Fixture page 1",
+                "problemText": "Solve the mixed fraction problem from Fixture page 1.",
+                "studentWork": "Student work shows steps but loses precision near the final line.",
+                "teacherMark": "wrong",
+                "rationale": "The student setup shows the right ingredients but the step order breaks before the result.",
+                "labelCodes": [
+                  "procedure_gap"
+                ],
+                "itemConfidence": 0.84,
+                "labelConfidence": 0.79,
+                "highlightBox": {
+                  "x": 10,
+                  "y": 14,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q1 on page 1"
+                }
+              },
+              {
+                "pageId": 4,
+                "pageNo": 4,
+                "problemNo": "Q8",
+                "previewLabel": "Fixture page 4",
+                "problemText": "Check the computation and notation from Fixture page 4.",
+                "studentWork": "Student reaches the right setup but misses one arithmetic or notation detail.",
+                "teacherMark": "wrong",
+                "rationale": "The student setup shows the right ingredients but the step order breaks before the result.",
+                "labelCodes": [
+                  "procedure_gap"
+                ],
+                "itemConfidence": 0.74,
+                "labelConfidence": 0.69,
+                "highlightBox": {
+                  "x": 10,
+                  "y": 27,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q8 on page 4"
+                }
+              },
+              {
+                "pageId": 5,
+                "pageNo": 5,
+                "problemNo": "Q9",
+                "previewLabel": "Fixture page 5",
+                "problemText": "Solve the mixed fraction problem from Fixture page 5.",
+                "studentWork": "Student work shows steps but loses precision near the final line.",
+                "teacherMark": "wrong",
+                "rationale": "The student setup shows the right ingredients but the step order breaks before the result.",
+                "labelCodes": [
+                  "procedure_gap"
+                ],
+                "itemConfidence": 0.76,
+                "labelConfidence": 0.71,
+                "highlightBox": {
+                  "x": 10,
+                  "y": 40,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q9 on page 5"
+                }
+              }
+            ]
+          },
+          {
+            "code": "calculation_slip",
+            "displayName": "Calculation slip",
+            "description": "The setup is mostly correct, but arithmetic execution slips.",
+            "count": 3,
+            "averageConfidence": 0.73,
+            "severity": "med",
+            "items": [
+              {
+                "pageId": 1,
+                "pageNo": 1,
+                "problemNo": "Q2",
+                "previewLabel": "Fixture page 1",
+                "problemText": "Check the computation and notation from Fixture page 1.",
+                "studentWork": "Student reaches the right setup but misses one arithmetic or notation detail.",
+                "teacherMark": "wrong",
+                "rationale": "The method is mostly correct, but the arithmetic execution slips near the finish.",
+                "labelCodes": [
+                  "calculation_slip"
+                ],
+                "itemConfidence": 0.8,
+                "labelConfidence": 0.75,
+                "highlightBox": {
+                  "x": 10,
+                  "y": 27,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q2 on page 1"
+                }
+              },
+              {
+                "pageId": 2,
+                "pageNo": 2,
+                "problemNo": "Q3",
+                "previewLabel": "Fixture page 2",
+                "problemText": "Solve the mixed fraction problem from Fixture page 2.",
+                "studentWork": "Student work shows steps but loses precision near the final line.",
+                "teacherMark": "partial",
+                "rationale": "The method is mostly correct, but the arithmetic execution slips near the finish.",
+                "labelCodes": [
+                  "calculation_slip"
+                ],
+                "itemConfidence": 0.82,
+                "labelConfidence": 0.77,
+                "highlightBox": {
+                  "x": 10,
+                  "y": 40,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q3 on page 2"
+                }
+              },
+              {
+                "pageId": 5,
+                "pageNo": 5,
+                "problemNo": "Q10",
+                "previewLabel": "Fixture page 5",
+                "problemText": "Check the computation and notation from Fixture page 5.",
+                "studentWork": "Student reaches the right setup but misses one arithmetic or notation detail.",
+                "teacherMark": "partial",
+                "rationale": "The method is mostly correct, but the arithmetic execution slips near the finish.",
+                "labelCodes": [
+                  "calculation_slip"
+                ],
+                "itemConfidence": 0.72,
+                "labelConfidence": 0.67,
+                "highlightBox": {
+                  "x": 10,
+                  "y": 53,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q10 on page 5"
+                }
+              }
+            ]
+          },
+          {
+            "code": "strategy_error",
+            "displayName": "Strategy error",
+            "description": "The student chooses an inefficient or mismatched solving strategy.",
+            "count": 2,
+            "averageConfidence": 0.72,
+            "severity": "med",
+            "items": [
+              {
+                "pageId": 3,
+                "pageNo": 3,
+                "problemNo": "Q6",
+                "previewLabel": "Fixture page 3",
+                "problemText": "Check the computation and notation from Fixture page 3.",
+                "studentWork": "Student reaches the right setup but misses one arithmetic or notation detail.",
+                "teacherMark": "partial",
+                "rationale": "The student chooses a weaker strategy than the page seems to require.",
+                "labelCodes": [
+                  "strategy_error"
+                ],
+                "itemConfidence": 0.76,
+                "labelConfidence": 0.71,
+                "highlightBox": {
+                  "x": 10,
+                  "y": 79,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q6 on page 3"
+                }
+              },
+              {
+                "pageId": 4,
+                "pageNo": 4,
+                "problemNo": "Q7",
+                "previewLabel": "Fixture page 4",
+                "problemText": "Solve the mixed fraction problem from Fixture page 4.",
+                "studentWork": "Student work shows steps but loses precision near the final line.",
+                "teacherMark": "partial",
+                "rationale": "The student chooses a weaker strategy than the page seems to require.",
+                "labelCodes": [
+                  "strategy_error"
+                ],
+                "itemConfidence": 0.78,
+                "labelConfidence": 0.73,
+                "highlightBox": {
+                  "x": 10,
+                  "y": 14,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q7 on page 4"
+                }
+              }
+            ]
+          },
+          {
+            "code": "notation_error",
+            "displayName": "Notation error",
+            "description": "The student uses inconsistent signs, symbols, or formatting.",
+            "count": 2,
+            "averageConfidence": 0.74,
+            "severity": "med",
+            "items": [
+              {
+                "pageId": 2,
+                "pageNo": 2,
+                "problemNo": "Q4",
+                "previewLabel": "Fixture page 2",
+                "problemText": "Check the computation and notation from Fixture page 2.",
+                "studentWork": "Student reaches the right setup but misses one arithmetic or notation detail.",
+                "teacherMark": "partial",
+                "rationale": "The student switches or drops notation, which changes the meaning of the work.",
+                "labelCodes": [
+                  "notation_error"
+                ],
+                "itemConfidence": 0.78,
+                "labelConfidence": 0.73,
+                "highlightBox": {
+                  "x": 10,
+                  "y": 53,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q4 on page 2"
+                }
+              },
+              {
+                "pageId": 3,
+                "pageNo": 3,
+                "problemNo": "Q5",
+                "previewLabel": "Fixture page 3",
+                "problemText": "Solve the mixed fraction problem from Fixture page 3.",
+                "studentWork": "Student work shows steps but loses precision near the final line.",
+                "teacherMark": "wrong",
+                "rationale": "The student switches or drops notation, which changes the meaning of the work.",
+                "labelCodes": [
+                  "notation_error"
+                ],
+                "itemConfidence": 0.8,
+                "labelConfidence": 0.75,
+                "highlightBox": {
+                  "x": 10,
+                  "y": 66,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q5 on page 3"
+                }
+              }
+            ]
+          }
+        ],
+        "doThisWeek": "Start by stabilizing procedure gap before introducing harder mixed practice.",
+        "notNow": "Do not turn this report into direct homework answers or jump to harder packets before the repeated pattern settles.",
+        "sevenDayPlan": [
+          {
+            "day": 1,
+            "minutes": 20,
+            "goal": "Name the pattern behind Procedure gap.",
+            "practice": "Review two worked examples and explain why the method matters.",
+            "parentPrompt": "Ask your child to narrate the first step before writing anything.",
+            "successSignal": "They can describe the setup in words before solving."
+          },
+          {
+            "day": 2,
+            "minutes": 20,
+            "goal": "Slow down the procedure for Procedure gap.",
+            "practice": "Solve two short items while speaking each step out loud.",
+            "parentPrompt": "Pause after each line and ask what changed from the line above.",
+            "successSignal": "The order of steps stays consistent without guessing."
+          },
+          {
+            "day": 3,
+            "minutes": 20,
+            "goal": "Catch slips linked to Calculation slip.",
+            "practice": "Do one warm-up and two error-correction items from the same skill family.",
+            "parentPrompt": "Ask which symbol, sign, or number is easiest to lose when rushing.",
+            "successSignal": "Your child can self-correct at least one slip before you point to it."
+          },
+          {
+            "day": 4,
+            "minutes": 15,
+            "goal": "Mix old and new without increasing pressure.",
+            "practice": "Use two mixed questions and one short reflection after each answer.",
+            "parentPrompt": "Ask which problem felt more stable today and why.",
+            "successSignal": "They can compare one strong response and one wobbly response."
+          },
+          {
+            "day": 5,
+            "minutes": 15,
+            "goal": "Rehearse Procedure gap in a new context.",
+            "practice": "Try one worksheet-style item and one verbal explanation prompt.",
+            "parentPrompt": "Ask how they know they picked the right starting strategy.",
+            "successSignal": "They choose the method with less prompting than earlier in the week."
+          },
+          {
+            "day": 6,
+            "minutes": 15,
+            "goal": "Practice checking instead of racing to finish.",
+            "practice": "Complete one timed-light practice set with a final check pass.",
+            "parentPrompt": "Ask what they check first when they think they are done.",
+            "successSignal": "They perform a deliberate final check on signs, units, or notation."
+          },
+          {
+            "day": 7,
+            "minutes": 15,
+            "goal": "Wrap the week with confidence and one small stretch.",
+            "practice": "Revisit one earlier mistake and one mixed challenge item.",
+            "parentPrompt": "Ask what feels easier now and what still needs one more week.",
+            "successSignal": "They can explain one improvement and one next focus area."
+          }
+        ],
+        "completedDays": [],
+        "releasedWithReviewBanner": false,
+        "reviewBanner": null,
+        "guardrail": "This report supports diagnosis and practice planning, not direct homework answers.",
+        "locale": "en-US"
+      },
+      "studentReportJson": {
+        "headline": "This week we are making procedure gap feel more predictable.",
+        "focusAreas": [
+          "Procedure gap",
+          "Calculation slip",
+          "Strategy error"
+        ],
+        "nextSteps": [
+          {
+            "day": 1,
+            "minutes": 20,
+            "goal": "Name the pattern behind Procedure gap.",
+            "practice": "Review two worked examples and explain why the method matters.",
+            "parentPrompt": "Ask your child to narrate the first step before writing anything.",
+            "successSignal": "They can describe the setup in words before solving."
+          },
+          {
+            "day": 2,
+            "minutes": 20,
+            "goal": "Slow down the procedure for Procedure gap.",
+            "practice": "Solve two short items while speaking each step out loud.",
+            "parentPrompt": "Pause after each line and ask what changed from the line above.",
+            "successSignal": "The order of steps stays consistent without guessing."
+          },
+          {
+            "day": 3,
+            "minutes": 20,
+            "goal": "Catch slips linked to Calculation slip.",
+            "practice": "Do one warm-up and two error-correction items from the same skill family.",
+            "parentPrompt": "Ask which symbol, sign, or number is easiest to lose when rushing.",
+            "successSignal": "Your child can self-correct at least one slip before you point to it."
+          }
+        ],
+        "encouragement": "The goal is not speed. The goal is clear steps, cleaner checking, and fewer repeated slips."
+      },
+      "tutorReportJson": {
+        "intakeSummary": "FinalFlow-1775721652949 (5th Grade, Common Core) uploaded a quiz packet for structured diagnosis.",
+        "recommendedFocus": "Procedure gap",
+        "secondaryFocus": "Calculation slip",
+        "evidenceGroups": [
+          {
+            "code": "procedure_gap",
+            "displayName": "Procedure gap",
+            "description": "The student knows the concept but loses the correct step order.",
+            "count": 3,
+            "averageConfidence": 0.73,
+            "severity": "med",
+            "items": [
+              {
+                "pageId": 1,
+                "pageNo": 1,
+                "problemNo": "Q1",
+                "previewLabel": "Fixture page 1",
+                "problemText": "Solve the mixed fraction problem from Fixture page 1.",
+                "studentWork": "Student work shows steps but loses precision near the final line.",
+                "teacherMark": "wrong",
+                "rationale": "The student setup shows the right ingredients but the step order breaks before the result.",
+                "labelCodes": [
+                  "procedure_gap"
+                ],
+                "itemConfidence": 0.84,
+                "labelConfidence": 0.79,
+                "highlightBox": {
+                  "x": 10,
+                  "y": 14,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q1 on page 1"
+                }
+              },
+              {
+                "pageId": 4,
+                "pageNo": 4,
+                "problemNo": "Q8",
+                "previewLabel": "Fixture page 4",
+                "problemText": "Check the computation and notation from Fixture page 4.",
+                "studentWork": "Student reaches the right setup but misses one arithmetic or notation detail.",
+                "teacherMark": "wrong",
+                "rationale": "The student setup shows the right ingredients but the step order breaks before the result.",
+                "labelCodes": [
+                  "procedure_gap"
+                ],
+                "itemConfidence": 0.74,
+                "labelConfidence": 0.69,
+                "highlightBox": {
+                  "x": 10,
+                  "y": 27,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q8 on page 4"
+                }
+              },
+              {
+                "pageId": 5,
+                "pageNo": 5,
+                "problemNo": "Q9",
+                "previewLabel": "Fixture page 5",
+                "problemText": "Solve the mixed fraction problem from Fixture page 5.",
+                "studentWork": "Student work shows steps but loses precision near the final line.",
+                "teacherMark": "wrong",
+                "rationale": "The student setup shows the right ingredients but the step order breaks before the result.",
+                "labelCodes": [
+                  "procedure_gap"
+                ],
+                "itemConfidence": 0.76,
+                "labelConfidence": 0.71,
+                "highlightBox": {
+                  "x": 10,
+                  "y": 40,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q9 on page 5"
+                }
+              }
+            ]
+          },
+          {
+            "code": "calculation_slip",
+            "displayName": "Calculation slip",
+            "description": "The setup is mostly correct, but arithmetic execution slips.",
+            "count": 3,
+            "averageConfidence": 0.73,
+            "severity": "med",
+            "items": [
+              {
+                "pageId": 1,
+                "pageNo": 1,
+                "problemNo": "Q2",
+                "previewLabel": "Fixture page 1",
+                "problemText": "Check the computation and notation from Fixture page 1.",
+                "studentWork": "Student reaches the right setup but misses one arithmetic or notation detail.",
+                "teacherMark": "wrong",
+                "rationale": "The method is mostly correct, but the arithmetic execution slips near the finish.",
+                "labelCodes": [
+                  "calculation_slip"
+                ],
+                "itemConfidence": 0.8,
+                "labelConfidence": 0.75,
+                "highlightBox": {
+                  "x": 10,
+                  "y": 27,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q2 on page 1"
+                }
+              },
+              {
+                "pageId": 2,
+                "pageNo": 2,
+                "problemNo": "Q3",
+                "previewLabel": "Fixture page 2",
+                "problemText": "Solve the mixed fraction problem from Fixture page 2.",
+                "studentWork": "Student work shows steps but loses precision near the final line.",
+                "teacherMark": "partial",
+                "rationale": "The method is mostly correct, but the arithmetic execution slips near the finish.",
+                "labelCodes": [
+                  "calculation_slip"
+                ],
+                "itemConfidence": 0.82,
+                "labelConfidence": 0.77,
+                "highlightBox": {
+                  "x": 10,
+                  "y": 40,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q3 on page 2"
+                }
+              },
+              {
+                "pageId": 5,
+                "pageNo": 5,
+                "problemNo": "Q10",
+                "previewLabel": "Fixture page 5",
+                "problemText": "Check the computation and notation from Fixture page 5.",
+                "studentWork": "Student reaches the right setup but misses one arithmetic or notation detail.",
+                "teacherMark": "partial",
+                "rationale": "The method is mostly correct, but the arithmetic execution slips near the finish.",
+                "labelCodes": [
+                  "calculation_slip"
+                ],
+                "itemConfidence": 0.72,
+                "labelConfidence": 0.67,
+                "highlightBox": {
+                  "x": 10,
+                  "y": 53,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q10 on page 5"
+                }
+              }
+            ]
+          },
+          {
+            "code": "strategy_error",
+            "displayName": "Strategy error",
+            "description": "The student chooses an inefficient or mismatched solving strategy.",
+            "count": 2,
+            "averageConfidence": 0.72,
+            "severity": "med",
+            "items": [
+              {
+                "pageId": 3,
+                "pageNo": 3,
+                "problemNo": "Q6",
+                "previewLabel": "Fixture page 3",
+                "problemText": "Check the computation and notation from Fixture page 3.",
+                "studentWork": "Student reaches the right setup but misses one arithmetic or notation detail.",
+                "teacherMark": "partial",
+                "rationale": "The student chooses a weaker strategy than the page seems to require.",
+                "labelCodes": [
+                  "strategy_error"
+                ],
+                "itemConfidence": 0.76,
+                "labelConfidence": 0.71,
+                "highlightBox": {
+                  "x": 10,
+                  "y": 79,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q6 on page 3"
+                }
+              },
+              {
+                "pageId": 4,
+                "pageNo": 4,
+                "problemNo": "Q7",
+                "previewLabel": "Fixture page 4",
+                "problemText": "Solve the mixed fraction problem from Fixture page 4.",
+                "studentWork": "Student work shows steps but loses precision near the final line.",
+                "teacherMark": "partial",
+                "rationale": "The student chooses a weaker strategy than the page seems to require.",
+                "labelCodes": [
+                  "strategy_error"
+                ],
+                "itemConfidence": 0.78,
+                "labelConfidence": 0.73,
+                "highlightBox": {
+                  "x": 10,
+                  "y": 14,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q7 on page 4"
+                }
+              }
+            ]
+          },
+          {
+            "code": "notation_error",
+            "displayName": "Notation error",
+            "description": "The student uses inconsistent signs, symbols, or formatting.",
+            "count": 2,
+            "averageConfidence": 0.74,
+            "severity": "med",
+            "items": [
+              {
+                "pageId": 2,
+                "pageNo": 2,
+                "problemNo": "Q4",
+                "previewLabel": "Fixture page 2",
+                "problemText": "Check the computation and notation from Fixture page 2.",
+                "studentWork": "Student reaches the right setup but misses one arithmetic or notation detail.",
+                "teacherMark": "partial",
+                "rationale": "The student switches or drops notation, which changes the meaning of the work.",
+                "labelCodes": [
+                  "notation_error"
+                ],
+                "itemConfidence": 0.78,
+                "labelConfidence": 0.73,
+                "highlightBox": {
+                  "x": 10,
+                  "y": 53,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q4 on page 2"
+                }
+              },
+              {
+                "pageId": 3,
+                "pageNo": 3,
+                "problemNo": "Q5",
+                "previewLabel": "Fixture page 3",
+                "problemText": "Solve the mixed fraction problem from Fixture page 3.",
+                "studentWork": "Student work shows steps but loses precision near the final line.",
+                "teacherMark": "wrong",
+                "rationale": "The student switches or drops notation, which changes the meaning of the work.",
+                "labelCodes": [
+                  "notation_error"
+                ],
+                "itemConfidence": 0.8,
+                "labelConfidence": 0.75,
+                "highlightBox": {
+                  "x": 10,
+                  "y": 66,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q5 on page 3"
+                }
+              }
+            ]
+          }
+        ],
+        "confidence": 0.81,
+        "releaseStatus": "ready",
+        "reviewReason": null,
+        "notes": "The extraction confidence is strong enough for a first-session tutoring brief."
+      },
+      "createdAt": "2026-04-09T08:00:54.123Z",
+      "updatedAt": "2026-04-09T08:00:54.123Z"
+    },
+    {
+      "id": 2,
+      "runId": 2,
+      "parentReportJson": {
+        "childNickname": "FinalFlow-1775721652949",
+        "grade": "5th Grade",
+        "curriculum": "Common Core",
+        "sourceType": "quiz",
+        "summary": "Procedure gap is the clearest repeat pattern across this upload, with Calculation slip showing up as the next focus area.",
+        "confidence": 0.81,
+        "confidenceBand": "low",
+        "releaseStatus": "needs_review",
+        "reviewReason": "This upload was explicitly flagged for manual review before release.",
+        "patternSummary": [
+          {
+            "code": "procedure_gap",
+            "title": "Procedure gap",
+            "patternType": "pattern"
+          },
+          {
+            "code": "calculation_slip",
+            "title": "Calculation slip",
+            "patternType": "pattern"
+          },
+          {
+            "code": "strategy_error",
+            "title": "Strategy error",
+            "patternType": "sporadic"
+          }
+        ],
+        "topFindings": [
+          {
+            "code": "procedure_gap",
+            "title": "Procedure gap",
+            "severity": "med",
+            "patternType": "pattern",
+            "count": 3,
+            "evidence": [
+              {
+                "pageId": 6,
+                "pageNo": 1,
+                "problemNo": "Q1",
+                "previewLabel": "Fixture page 1",
+                "highlightBox": {
+                  "x": 10,
+                  "y": 14,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q1 on page 1"
+                }
+              },
+              {
+                "pageId": 9,
+                "pageNo": 4,
+                "problemNo": "Q8",
+                "previewLabel": "Fixture page 4",
+                "highlightBox": {
+                  "x": 10,
+                  "y": 27,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q8 on page 4"
+                }
+              },
+              {
+                "pageId": 10,
+                "pageNo": 5,
+                "problemNo": "Q9",
+                "previewLabel": "Fixture page 5",
+                "highlightBox": {
+                  "x": 10,
+                  "y": 40,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q9 on page 5"
+                }
+              }
+            ],
+            "whatToDo": "Rebuild the step order with slow, spoken practice before adding harder problems.",
+            "rationale": "The student setup shows the right ingredients but the step order breaks before the result."
+          },
+          {
+            "code": "calculation_slip",
+            "title": "Calculation slip",
+            "severity": "med",
+            "patternType": "pattern",
+            "count": 3,
+            "evidence": [
+              {
+                "pageId": 6,
+                "pageNo": 1,
+                "problemNo": "Q2",
+                "previewLabel": "Fixture page 1",
+                "highlightBox": {
+                  "x": 10,
+                  "y": 27,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q2 on page 1"
+                }
+              },
+              {
+                "pageId": 7,
+                "pageNo": 2,
+                "problemNo": "Q3",
+                "previewLabel": "Fixture page 2",
+                "highlightBox": {
+                  "x": 10,
+                  "y": 40,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q3 on page 2"
+                }
+              },
+              {
+                "pageId": 10,
+                "pageNo": 5,
+                "problemNo": "Q10",
+                "previewLabel": "Fixture page 5",
+                "highlightBox": {
+                  "x": 10,
+                  "y": 53,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q10 on page 5"
+                }
+              }
+            ],
+            "whatToDo": "Keep the same method but add a deliberate final arithmetic check.",
+            "rationale": "The method is mostly correct, but the arithmetic execution slips near the finish."
+          },
+          {
+            "code": "strategy_error",
+            "title": "Strategy error",
+            "severity": "med",
+            "patternType": "sporadic",
+            "count": 2,
+            "evidence": [
+              {
+                "pageId": 8,
+                "pageNo": 3,
+                "problemNo": "Q6",
+                "previewLabel": "Fixture page 3",
+                "highlightBox": {
+                  "x": 10,
+                  "y": 79,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q6 on page 3"
+                }
+              },
+              {
+                "pageId": 9,
+                "pageNo": 4,
+                "problemNo": "Q7",
+                "previewLabel": "Fixture page 4",
+                "highlightBox": {
+                  "x": 10,
+                  "y": 14,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q7 on page 4"
+                }
+              }
+            ],
+            "whatToDo": "Compare two solving strategies and choose the simpler one before starting.",
+            "rationale": "The student chooses a weaker strategy than the page seems to require."
+          }
+        ],
+        "evidenceGroups": [
+          {
+            "code": "procedure_gap",
+            "displayName": "Procedure gap",
+            "description": "The student knows the concept but loses the correct step order.",
+            "count": 3,
+            "averageConfidence": 0.73,
+            "severity": "med",
+            "items": [
+              {
+                "pageId": 6,
+                "pageNo": 1,
+                "problemNo": "Q1",
+                "previewLabel": "Fixture page 1",
+                "problemText": "Solve the mixed fraction problem from Fixture page 1.",
+                "studentWork": "Student work shows steps but loses precision near the final line.",
+                "teacherMark": "wrong",
+                "rationale": "The student setup shows the right ingredients but the step order breaks before the result.",
+                "labelCodes": [
+                  "procedure_gap"
+                ],
+                "itemConfidence": 0.84,
+                "labelConfidence": 0.79,
+                "highlightBox": {
+                  "x": 10,
+                  "y": 14,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q1 on page 1"
+                }
+              },
+              {
+                "pageId": 9,
+                "pageNo": 4,
+                "problemNo": "Q8",
+                "previewLabel": "Fixture page 4",
+                "problemText": "Check the computation and notation from Fixture page 4.",
+                "studentWork": "Student reaches the right setup but misses one arithmetic or notation detail.",
+                "teacherMark": "wrong",
+                "rationale": "The student setup shows the right ingredients but the step order breaks before the result.",
+                "labelCodes": [
+                  "procedure_gap"
+                ],
+                "itemConfidence": 0.74,
+                "labelConfidence": 0.69,
+                "highlightBox": {
+                  "x": 10,
+                  "y": 27,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q8 on page 4"
+                }
+              },
+              {
+                "pageId": 10,
+                "pageNo": 5,
+                "problemNo": "Q9",
+                "previewLabel": "Fixture page 5",
+                "problemText": "Solve the mixed fraction problem from Fixture page 5.",
+                "studentWork": "Student work shows steps but loses precision near the final line.",
+                "teacherMark": "wrong",
+                "rationale": "The student setup shows the right ingredients but the step order breaks before the result.",
+                "labelCodes": [
+                  "procedure_gap"
+                ],
+                "itemConfidence": 0.76,
+                "labelConfidence": 0.71,
+                "highlightBox": {
+                  "x": 10,
+                  "y": 40,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q9 on page 5"
+                }
+              }
+            ]
+          },
+          {
+            "code": "calculation_slip",
+            "displayName": "Calculation slip",
+            "description": "The setup is mostly correct, but arithmetic execution slips.",
+            "count": 3,
+            "averageConfidence": 0.73,
+            "severity": "med",
+            "items": [
+              {
+                "pageId": 6,
+                "pageNo": 1,
+                "problemNo": "Q2",
+                "previewLabel": "Fixture page 1",
+                "problemText": "Check the computation and notation from Fixture page 1.",
+                "studentWork": "Student reaches the right setup but misses one arithmetic or notation detail.",
+                "teacherMark": "wrong",
+                "rationale": "The method is mostly correct, but the arithmetic execution slips near the finish.",
+                "labelCodes": [
+                  "calculation_slip"
+                ],
+                "itemConfidence": 0.8,
+                "labelConfidence": 0.75,
+                "highlightBox": {
+                  "x": 10,
+                  "y": 27,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q2 on page 1"
+                }
+              },
+              {
+                "pageId": 7,
+                "pageNo": 2,
+                "problemNo": "Q3",
+                "previewLabel": "Fixture page 2",
+                "problemText": "Solve the mixed fraction problem from Fixture page 2.",
+                "studentWork": "Student work shows steps but loses precision near the final line.",
+                "teacherMark": "partial",
+                "rationale": "The method is mostly correct, but the arithmetic execution slips near the finish.",
+                "labelCodes": [
+                  "calculation_slip"
+                ],
+                "itemConfidence": 0.82,
+                "labelConfidence": 0.77,
+                "highlightBox": {
+                  "x": 10,
+                  "y": 40,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q3 on page 2"
+                }
+              },
+              {
+                "pageId": 10,
+                "pageNo": 5,
+                "problemNo": "Q10",
+                "previewLabel": "Fixture page 5",
+                "problemText": "Check the computation and notation from Fixture page 5.",
+                "studentWork": "Student reaches the right setup but misses one arithmetic or notation detail.",
+                "teacherMark": "partial",
+                "rationale": "The method is mostly correct, but the arithmetic execution slips near the finish.",
+                "labelCodes": [
+                  "calculation_slip"
+                ],
+                "itemConfidence": 0.72,
+                "labelConfidence": 0.67,
+                "highlightBox": {
+                  "x": 10,
+                  "y": 53,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q10 on page 5"
+                }
+              }
+            ]
+          },
+          {
+            "code": "strategy_error",
+            "displayName": "Strategy error",
+            "description": "The student chooses an inefficient or mismatched solving strategy.",
+            "count": 2,
+            "averageConfidence": 0.72,
+            "severity": "med",
+            "items": [
+              {
+                "pageId": 8,
+                "pageNo": 3,
+                "problemNo": "Q6",
+                "previewLabel": "Fixture page 3",
+                "problemText": "Check the computation and notation from Fixture page 3.",
+                "studentWork": "Student reaches the right setup but misses one arithmetic or notation detail.",
+                "teacherMark": "partial",
+                "rationale": "The student chooses a weaker strategy than the page seems to require.",
+                "labelCodes": [
+                  "strategy_error"
+                ],
+                "itemConfidence": 0.76,
+                "labelConfidence": 0.71,
+                "highlightBox": {
+                  "x": 10,
+                  "y": 79,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q6 on page 3"
+                }
+              },
+              {
+                "pageId": 9,
+                "pageNo": 4,
+                "problemNo": "Q7",
+                "previewLabel": "Fixture page 4",
+                "problemText": "Solve the mixed fraction problem from Fixture page 4.",
+                "studentWork": "Student work shows steps but loses precision near the final line.",
+                "teacherMark": "partial",
+                "rationale": "The student chooses a weaker strategy than the page seems to require.",
+                "labelCodes": [
+                  "strategy_error"
+                ],
+                "itemConfidence": 0.78,
+                "labelConfidence": 0.73,
+                "highlightBox": {
+                  "x": 10,
+                  "y": 14,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q7 on page 4"
+                }
+              }
+            ]
+          },
+          {
+            "code": "notation_error",
+            "displayName": "Notation error",
+            "description": "The student uses inconsistent signs, symbols, or formatting.",
+            "count": 2,
+            "averageConfidence": 0.74,
+            "severity": "med",
+            "items": [
+              {
+                "pageId": 7,
+                "pageNo": 2,
+                "problemNo": "Q4",
+                "previewLabel": "Fixture page 2",
+                "problemText": "Check the computation and notation from Fixture page 2.",
+                "studentWork": "Student reaches the right setup but misses one arithmetic or notation detail.",
+                "teacherMark": "partial",
+                "rationale": "The student switches or drops notation, which changes the meaning of the work.",
+                "labelCodes": [
+                  "notation_error"
+                ],
+                "itemConfidence": 0.78,
+                "labelConfidence": 0.73,
+                "highlightBox": {
+                  "x": 10,
+                  "y": 53,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q4 on page 2"
+                }
+              },
+              {
+                "pageId": 8,
+                "pageNo": 3,
+                "problemNo": "Q5",
+                "previewLabel": "Fixture page 3",
+                "problemText": "Solve the mixed fraction problem from Fixture page 3.",
+                "studentWork": "Student work shows steps but loses precision near the final line.",
+                "teacherMark": "wrong",
+                "rationale": "The student switches or drops notation, which changes the meaning of the work.",
+                "labelCodes": [
+                  "notation_error"
+                ],
+                "itemConfidence": 0.8,
+                "labelConfidence": 0.75,
+                "highlightBox": {
+                  "x": 10,
+                  "y": 66,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q5 on page 3"
+                }
+              }
+            ]
+          }
+        ],
+        "doThisWeek": "Start by stabilizing procedure gap before introducing harder mixed practice.",
+        "notNow": "Do not turn this report into direct homework answers or jump to harder packets before the repeated pattern settles.",
+        "sevenDayPlan": [
+          {
+            "day": 1,
+            "minutes": 20,
+            "goal": "Name the pattern behind Procedure gap.",
+            "practice": "Review two worked examples and explain why the method matters.",
+            "parentPrompt": "Ask your child to narrate the first step before writing anything.",
+            "successSignal": "They can describe the setup in words before solving."
+          },
+          {
+            "day": 2,
+            "minutes": 20,
+            "goal": "Slow down the procedure for Procedure gap.",
+            "practice": "Solve two short items while speaking each step out loud.",
+            "parentPrompt": "Pause after each line and ask what changed from the line above.",
+            "successSignal": "The order of steps stays consistent without guessing."
+          },
+          {
+            "day": 3,
+            "minutes": 20,
+            "goal": "Catch slips linked to Calculation slip.",
+            "practice": "Do one warm-up and two error-correction items from the same skill family.",
+            "parentPrompt": "Ask which symbol, sign, or number is easiest to lose when rushing.",
+            "successSignal": "Your child can self-correct at least one slip before you point to it."
+          },
+          {
+            "day": 4,
+            "minutes": 15,
+            "goal": "Mix old and new without increasing pressure.",
+            "practice": "Use two mixed questions and one short reflection after each answer.",
+            "parentPrompt": "Ask which problem felt more stable today and why.",
+            "successSignal": "They can compare one strong response and one wobbly response."
+          },
+          {
+            "day": 5,
+            "minutes": 15,
+            "goal": "Rehearse Procedure gap in a new context.",
+            "practice": "Try one worksheet-style item and one verbal explanation prompt.",
+            "parentPrompt": "Ask how they know they picked the right starting strategy.",
+            "successSignal": "They choose the method with less prompting than earlier in the week."
+          },
+          {
+            "day": 6,
+            "minutes": 15,
+            "goal": "Practice checking instead of racing to finish.",
+            "practice": "Complete one timed-light practice set with a final check pass.",
+            "parentPrompt": "Ask what they check first when they think they are done.",
+            "successSignal": "They perform a deliberate final check on signs, units, or notation."
+          },
+          {
+            "day": 7,
+            "minutes": 15,
+            "goal": "Wrap the week with confidence and one small stretch.",
+            "practice": "Revisit one earlier mistake and one mixed challenge item.",
+            "parentPrompt": "Ask what feels easier now and what still needs one more week.",
+            "successSignal": "They can explain one improvement and one next focus area."
+          }
+        ],
+        "completedDays": [],
+        "releasedWithReviewBanner": true,
+        "reviewBanner": "Draft report only: This upload was explicitly flagged for manual review before release.",
+        "guardrail": "This report supports diagnosis and practice planning, not direct homework answers.",
+        "locale": "en-US"
+      },
+      "studentReportJson": {
+        "headline": "This week we are making procedure gap feel more predictable.",
+        "focusAreas": [
+          "Procedure gap",
+          "Calculation slip",
+          "Strategy error"
+        ],
+        "nextSteps": [
+          {
+            "day": 1,
+            "minutes": 20,
+            "goal": "Name the pattern behind Procedure gap.",
+            "practice": "Review two worked examples and explain why the method matters.",
+            "parentPrompt": "Ask your child to narrate the first step before writing anything.",
+            "successSignal": "They can describe the setup in words before solving."
+          },
+          {
+            "day": 2,
+            "minutes": 20,
+            "goal": "Slow down the procedure for Procedure gap.",
+            "practice": "Solve two short items while speaking each step out loud.",
+            "parentPrompt": "Pause after each line and ask what changed from the line above.",
+            "successSignal": "The order of steps stays consistent without guessing."
+          },
+          {
+            "day": 3,
+            "minutes": 20,
+            "goal": "Catch slips linked to Calculation slip.",
+            "practice": "Do one warm-up and two error-correction items from the same skill family.",
+            "parentPrompt": "Ask which symbol, sign, or number is easiest to lose when rushing.",
+            "successSignal": "Your child can self-correct at least one slip before you point to it."
+          }
+        ],
+        "encouragement": "The goal is not speed. The goal is clear steps, cleaner checking, and fewer repeated slips."
+      },
+      "tutorReportJson": {
+        "intakeSummary": "FinalFlow-1775721652949 (5th Grade, Common Core) uploaded a quiz packet for structured diagnosis.",
+        "recommendedFocus": "Procedure gap",
+        "secondaryFocus": "Calculation slip",
+        "evidenceGroups": [
+          {
+            "code": "procedure_gap",
+            "displayName": "Procedure gap",
+            "description": "The student knows the concept but loses the correct step order.",
+            "count": 3,
+            "averageConfidence": 0.73,
+            "severity": "med",
+            "items": [
+              {
+                "pageId": 6,
+                "pageNo": 1,
+                "problemNo": "Q1",
+                "previewLabel": "Fixture page 1",
+                "problemText": "Solve the mixed fraction problem from Fixture page 1.",
+                "studentWork": "Student work shows steps but loses precision near the final line.",
+                "teacherMark": "wrong",
+                "rationale": "The student setup shows the right ingredients but the step order breaks before the result.",
+                "labelCodes": [
+                  "procedure_gap"
+                ],
+                "itemConfidence": 0.84,
+                "labelConfidence": 0.79,
+                "highlightBox": {
+                  "x": 10,
+                  "y": 14,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q1 on page 1"
+                }
+              },
+              {
+                "pageId": 9,
+                "pageNo": 4,
+                "problemNo": "Q8",
+                "previewLabel": "Fixture page 4",
+                "problemText": "Check the computation and notation from Fixture page 4.",
+                "studentWork": "Student reaches the right setup but misses one arithmetic or notation detail.",
+                "teacherMark": "wrong",
+                "rationale": "The student setup shows the right ingredients but the step order breaks before the result.",
+                "labelCodes": [
+                  "procedure_gap"
+                ],
+                "itemConfidence": 0.74,
+                "labelConfidence": 0.69,
+                "highlightBox": {
+                  "x": 10,
+                  "y": 27,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q8 on page 4"
+                }
+              },
+              {
+                "pageId": 10,
+                "pageNo": 5,
+                "problemNo": "Q9",
+                "previewLabel": "Fixture page 5",
+                "problemText": "Solve the mixed fraction problem from Fixture page 5.",
+                "studentWork": "Student work shows steps but loses precision near the final line.",
+                "teacherMark": "wrong",
+                "rationale": "The student setup shows the right ingredients but the step order breaks before the result.",
+                "labelCodes": [
+                  "procedure_gap"
+                ],
+                "itemConfidence": 0.76,
+                "labelConfidence": 0.71,
+                "highlightBox": {
+                  "x": 10,
+                  "y": 40,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q9 on page 5"
+                }
+              }
+            ]
+          },
+          {
+            "code": "calculation_slip",
+            "displayName": "Calculation slip",
+            "description": "The setup is mostly correct, but arithmetic execution slips.",
+            "count": 3,
+            "averageConfidence": 0.73,
+            "severity": "med",
+            "items": [
+              {
+                "pageId": 6,
+                "pageNo": 1,
+                "problemNo": "Q2",
+                "previewLabel": "Fixture page 1",
+                "problemText": "Check the computation and notation from Fixture page 1.",
+                "studentWork": "Student reaches the right setup but misses one arithmetic or notation detail.",
+                "teacherMark": "wrong",
+                "rationale": "The method is mostly correct, but the arithmetic execution slips near the finish.",
+                "labelCodes": [
+                  "calculation_slip"
+                ],
+                "itemConfidence": 0.8,
+                "labelConfidence": 0.75,
+                "highlightBox": {
+                  "x": 10,
+                  "y": 27,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q2 on page 1"
+                }
+              },
+              {
+                "pageId": 7,
+                "pageNo": 2,
+                "problemNo": "Q3",
+                "previewLabel": "Fixture page 2",
+                "problemText": "Solve the mixed fraction problem from Fixture page 2.",
+                "studentWork": "Student work shows steps but loses precision near the final line.",
+                "teacherMark": "partial",
+                "rationale": "The method is mostly correct, but the arithmetic execution slips near the finish.",
+                "labelCodes": [
+                  "calculation_slip"
+                ],
+                "itemConfidence": 0.82,
+                "labelConfidence": 0.77,
+                "highlightBox": {
+                  "x": 10,
+                  "y": 40,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q3 on page 2"
+                }
+              },
+              {
+                "pageId": 10,
+                "pageNo": 5,
+                "problemNo": "Q10",
+                "previewLabel": "Fixture page 5",
+                "problemText": "Check the computation and notation from Fixture page 5.",
+                "studentWork": "Student reaches the right setup but misses one arithmetic or notation detail.",
+                "teacherMark": "partial",
+                "rationale": "The method is mostly correct, but the arithmetic execution slips near the finish.",
+                "labelCodes": [
+                  "calculation_slip"
+                ],
+                "itemConfidence": 0.72,
+                "labelConfidence": 0.67,
+                "highlightBox": {
+                  "x": 10,
+                  "y": 53,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q10 on page 5"
+                }
+              }
+            ]
+          },
+          {
+            "code": "strategy_error",
+            "displayName": "Strategy error",
+            "description": "The student chooses an inefficient or mismatched solving strategy.",
+            "count": 2,
+            "averageConfidence": 0.72,
+            "severity": "med",
+            "items": [
+              {
+                "pageId": 8,
+                "pageNo": 3,
+                "problemNo": "Q6",
+                "previewLabel": "Fixture page 3",
+                "problemText": "Check the computation and notation from Fixture page 3.",
+                "studentWork": "Student reaches the right setup but misses one arithmetic or notation detail.",
+                "teacherMark": "partial",
+                "rationale": "The student chooses a weaker strategy than the page seems to require.",
+                "labelCodes": [
+                  "strategy_error"
+                ],
+                "itemConfidence": 0.76,
+                "labelConfidence": 0.71,
+                "highlightBox": {
+                  "x": 10,
+                  "y": 79,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q6 on page 3"
+                }
+              },
+              {
+                "pageId": 9,
+                "pageNo": 4,
+                "problemNo": "Q7",
+                "previewLabel": "Fixture page 4",
+                "problemText": "Solve the mixed fraction problem from Fixture page 4.",
+                "studentWork": "Student work shows steps but loses precision near the final line.",
+                "teacherMark": "partial",
+                "rationale": "The student chooses a weaker strategy than the page seems to require.",
+                "labelCodes": [
+                  "strategy_error"
+                ],
+                "itemConfidence": 0.78,
+                "labelConfidence": 0.73,
+                "highlightBox": {
+                  "x": 10,
+                  "y": 14,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q7 on page 4"
+                }
+              }
+            ]
+          },
+          {
+            "code": "notation_error",
+            "displayName": "Notation error",
+            "description": "The student uses inconsistent signs, symbols, or formatting.",
+            "count": 2,
+            "averageConfidence": 0.74,
+            "severity": "med",
+            "items": [
+              {
+                "pageId": 7,
+                "pageNo": 2,
+                "problemNo": "Q4",
+                "previewLabel": "Fixture page 2",
+                "problemText": "Check the computation and notation from Fixture page 2.",
+                "studentWork": "Student reaches the right setup but misses one arithmetic or notation detail.",
+                "teacherMark": "partial",
+                "rationale": "The student switches or drops notation, which changes the meaning of the work.",
+                "labelCodes": [
+                  "notation_error"
+                ],
+                "itemConfidence": 0.78,
+                "labelConfidence": 0.73,
+                "highlightBox": {
+                  "x": 10,
+                  "y": 53,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q4 on page 2"
+                }
+              },
+              {
+                "pageId": 8,
+                "pageNo": 3,
+                "problemNo": "Q5",
+                "previewLabel": "Fixture page 3",
+                "problemText": "Solve the mixed fraction problem from Fixture page 3.",
+                "studentWork": "Student work shows steps but loses precision near the final line.",
+                "teacherMark": "wrong",
+                "rationale": "The student switches or drops notation, which changes the meaning of the work.",
+                "labelCodes": [
+                  "notation_error"
+                ],
+                "itemConfidence": 0.8,
+                "labelConfidence": 0.75,
+                "highlightBox": {
+                  "x": 10,
+                  "y": 66,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q5 on page 3"
+                }
+              }
+            ]
+          }
+        ],
+        "confidence": 0.81,
+        "releaseStatus": "needs_review",
+        "reviewReason": "This upload was explicitly flagged for manual review before release.",
+        "notes": "Use this as a draft until manual review confirms the weakest evidence anchors."
+      },
+      "createdAt": "2026-04-09T08:00:54.206Z",
+      "updatedAt": "2026-04-09T08:00:54.206Z"
+    },
+    {
+      "id": 3,
+      "runId": 3,
+      "parentReportJson": {
+        "childNickname": "FinalFlow-1775721652949",
+        "grade": "5th Grade",
+        "curriculum": "Common Core",
+        "sourceType": "quiz",
+        "summary": "Procedure gap is the clearest repeat pattern across this upload, with Calculation slip showing up as the next focus area.",
+        "confidence": 0.81,
+        "confidenceBand": "low",
+        "releaseStatus": "needs_review",
+        "reviewReason": "This upload was explicitly flagged for manual review before release.",
+        "patternSummary": [
+          {
+            "code": "procedure_gap",
+            "title": "Procedure gap",
+            "patternType": "pattern"
+          },
+          {
+            "code": "calculation_slip",
+            "title": "Calculation slip",
+            "patternType": "pattern"
+          },
+          {
+            "code": "strategy_error",
+            "title": "Strategy error",
+            "patternType": "sporadic"
+          }
+        ],
+        "topFindings": [
+          {
+            "code": "procedure_gap",
+            "title": "Procedure gap",
+            "severity": "med",
+            "patternType": "pattern",
+            "count": 3,
+            "evidence": [
+              {
+                "pageId": 11,
+                "pageNo": 1,
+                "problemNo": "Q1",
+                "previewLabel": "Fixture page 1",
+                "highlightBox": {
+                  "x": 10,
+                  "y": 14,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q1 on page 1"
+                }
+              },
+              {
+                "pageId": 14,
+                "pageNo": 4,
+                "problemNo": "Q8",
+                "previewLabel": "Fixture page 4",
+                "highlightBox": {
+                  "x": 10,
+                  "y": 27,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q8 on page 4"
+                }
+              },
+              {
+                "pageId": 15,
+                "pageNo": 5,
+                "problemNo": "Q9",
+                "previewLabel": "Fixture page 5",
+                "highlightBox": {
+                  "x": 10,
+                  "y": 40,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q9 on page 5"
+                }
+              }
+            ],
+            "whatToDo": "Rebuild the step order with slow, spoken practice before adding harder problems.",
+            "rationale": "The student setup shows the right ingredients but the step order breaks before the result."
+          },
+          {
+            "code": "calculation_slip",
+            "title": "Calculation slip",
+            "severity": "med",
+            "patternType": "pattern",
+            "count": 3,
+            "evidence": [
+              {
+                "pageId": 11,
+                "pageNo": 1,
+                "problemNo": "Q2",
+                "previewLabel": "Fixture page 1",
+                "highlightBox": {
+                  "x": 10,
+                  "y": 27,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q2 on page 1"
+                }
+              },
+              {
+                "pageId": 12,
+                "pageNo": 2,
+                "problemNo": "Q3",
+                "previewLabel": "Fixture page 2",
+                "highlightBox": {
+                  "x": 10,
+                  "y": 40,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q3 on page 2"
+                }
+              },
+              {
+                "pageId": 15,
+                "pageNo": 5,
+                "problemNo": "Q10",
+                "previewLabel": "Fixture page 5",
+                "highlightBox": {
+                  "x": 10,
+                  "y": 53,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q10 on page 5"
+                }
+              }
+            ],
+            "whatToDo": "Keep the same method but add a deliberate final arithmetic check.",
+            "rationale": "The method is mostly correct, but the arithmetic execution slips near the finish."
+          },
+          {
+            "code": "strategy_error",
+            "title": "Strategy error",
+            "severity": "med",
+            "patternType": "sporadic",
+            "count": 2,
+            "evidence": [
+              {
+                "pageId": 13,
+                "pageNo": 3,
+                "problemNo": "Q6",
+                "previewLabel": "Fixture page 3",
+                "highlightBox": {
+                  "x": 10,
+                  "y": 79,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q6 on page 3"
+                }
+              },
+              {
+                "pageId": 14,
+                "pageNo": 4,
+                "problemNo": "Q7",
+                "previewLabel": "Fixture page 4",
+                "highlightBox": {
+                  "x": 10,
+                  "y": 14,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q7 on page 4"
+                }
+              }
+            ],
+            "whatToDo": "Compare two solving strategies and choose the simpler one before starting.",
+            "rationale": "The student chooses a weaker strategy than the page seems to require."
+          }
+        ],
+        "evidenceGroups": [
+          {
+            "code": "procedure_gap",
+            "displayName": "Procedure gap",
+            "description": "The student knows the concept but loses the correct step order.",
+            "count": 3,
+            "averageConfidence": 0.73,
+            "severity": "med",
+            "items": [
+              {
+                "pageId": 11,
+                "pageNo": 1,
+                "problemNo": "Q1",
+                "previewLabel": "Fixture page 1",
+                "problemText": "Solve the mixed fraction problem from Fixture page 1.",
+                "studentWork": "Student work shows steps but loses precision near the final line.",
+                "teacherMark": "wrong",
+                "rationale": "The student setup shows the right ingredients but the step order breaks before the result.",
+                "labelCodes": [
+                  "procedure_gap"
+                ],
+                "itemConfidence": 0.84,
+                "labelConfidence": 0.79,
+                "highlightBox": {
+                  "x": 10,
+                  "y": 14,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q1 on page 1"
+                }
+              },
+              {
+                "pageId": 14,
+                "pageNo": 4,
+                "problemNo": "Q8",
+                "previewLabel": "Fixture page 4",
+                "problemText": "Check the computation and notation from Fixture page 4.",
+                "studentWork": "Student reaches the right setup but misses one arithmetic or notation detail.",
+                "teacherMark": "wrong",
+                "rationale": "The student setup shows the right ingredients but the step order breaks before the result.",
+                "labelCodes": [
+                  "procedure_gap"
+                ],
+                "itemConfidence": 0.74,
+                "labelConfidence": 0.69,
+                "highlightBox": {
+                  "x": 10,
+                  "y": 27,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q8 on page 4"
+                }
+              },
+              {
+                "pageId": 15,
+                "pageNo": 5,
+                "problemNo": "Q9",
+                "previewLabel": "Fixture page 5",
+                "problemText": "Solve the mixed fraction problem from Fixture page 5.",
+                "studentWork": "Student work shows steps but loses precision near the final line.",
+                "teacherMark": "wrong",
+                "rationale": "The student setup shows the right ingredients but the step order breaks before the result.",
+                "labelCodes": [
+                  "procedure_gap"
+                ],
+                "itemConfidence": 0.76,
+                "labelConfidence": 0.71,
+                "highlightBox": {
+                  "x": 10,
+                  "y": 40,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q9 on page 5"
+                }
+              }
+            ]
+          },
+          {
+            "code": "calculation_slip",
+            "displayName": "Calculation slip",
+            "description": "The setup is mostly correct, but arithmetic execution slips.",
+            "count": 3,
+            "averageConfidence": 0.73,
+            "severity": "med",
+            "items": [
+              {
+                "pageId": 11,
+                "pageNo": 1,
+                "problemNo": "Q2",
+                "previewLabel": "Fixture page 1",
+                "problemText": "Check the computation and notation from Fixture page 1.",
+                "studentWork": "Student reaches the right setup but misses one arithmetic or notation detail.",
+                "teacherMark": "wrong",
+                "rationale": "The method is mostly correct, but the arithmetic execution slips near the finish.",
+                "labelCodes": [
+                  "calculation_slip"
+                ],
+                "itemConfidence": 0.8,
+                "labelConfidence": 0.75,
+                "highlightBox": {
+                  "x": 10,
+                  "y": 27,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q2 on page 1"
+                }
+              },
+              {
+                "pageId": 12,
+                "pageNo": 2,
+                "problemNo": "Q3",
+                "previewLabel": "Fixture page 2",
+                "problemText": "Solve the mixed fraction problem from Fixture page 2.",
+                "studentWork": "Student work shows steps but loses precision near the final line.",
+                "teacherMark": "partial",
+                "rationale": "The method is mostly correct, but the arithmetic execution slips near the finish.",
+                "labelCodes": [
+                  "calculation_slip"
+                ],
+                "itemConfidence": 0.82,
+                "labelConfidence": 0.77,
+                "highlightBox": {
+                  "x": 10,
+                  "y": 40,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q3 on page 2"
+                }
+              },
+              {
+                "pageId": 15,
+                "pageNo": 5,
+                "problemNo": "Q10",
+                "previewLabel": "Fixture page 5",
+                "problemText": "Check the computation and notation from Fixture page 5.",
+                "studentWork": "Student reaches the right setup but misses one arithmetic or notation detail.",
+                "teacherMark": "partial",
+                "rationale": "The method is mostly correct, but the arithmetic execution slips near the finish.",
+                "labelCodes": [
+                  "calculation_slip"
+                ],
+                "itemConfidence": 0.72,
+                "labelConfidence": 0.67,
+                "highlightBox": {
+                  "x": 10,
+                  "y": 53,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q10 on page 5"
+                }
+              }
+            ]
+          },
+          {
+            "code": "strategy_error",
+            "displayName": "Strategy error",
+            "description": "The student chooses an inefficient or mismatched solving strategy.",
+            "count": 2,
+            "averageConfidence": 0.72,
+            "severity": "med",
+            "items": [
+              {
+                "pageId": 13,
+                "pageNo": 3,
+                "problemNo": "Q6",
+                "previewLabel": "Fixture page 3",
+                "problemText": "Check the computation and notation from Fixture page 3.",
+                "studentWork": "Student reaches the right setup but misses one arithmetic or notation detail.",
+                "teacherMark": "partial",
+                "rationale": "The student chooses a weaker strategy than the page seems to require.",
+                "labelCodes": [
+                  "strategy_error"
+                ],
+                "itemConfidence": 0.76,
+                "labelConfidence": 0.71,
+                "highlightBox": {
+                  "x": 10,
+                  "y": 79,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q6 on page 3"
+                }
+              },
+              {
+                "pageId": 14,
+                "pageNo": 4,
+                "problemNo": "Q7",
+                "previewLabel": "Fixture page 4",
+                "problemText": "Solve the mixed fraction problem from Fixture page 4.",
+                "studentWork": "Student work shows steps but loses precision near the final line.",
+                "teacherMark": "partial",
+                "rationale": "The student chooses a weaker strategy than the page seems to require.",
+                "labelCodes": [
+                  "strategy_error"
+                ],
+                "itemConfidence": 0.78,
+                "labelConfidence": 0.73,
+                "highlightBox": {
+                  "x": 10,
+                  "y": 14,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q7 on page 4"
+                }
+              }
+            ]
+          },
+          {
+            "code": "notation_error",
+            "displayName": "Notation error",
+            "description": "The student uses inconsistent signs, symbols, or formatting.",
+            "count": 2,
+            "averageConfidence": 0.74,
+            "severity": "med",
+            "items": [
+              {
+                "pageId": 12,
+                "pageNo": 2,
+                "problemNo": "Q4",
+                "previewLabel": "Fixture page 2",
+                "problemText": "Check the computation and notation from Fixture page 2.",
+                "studentWork": "Student reaches the right setup but misses one arithmetic or notation detail.",
+                "teacherMark": "partial",
+                "rationale": "The student switches or drops notation, which changes the meaning of the work.",
+                "labelCodes": [
+                  "notation_error"
+                ],
+                "itemConfidence": 0.78,
+                "labelConfidence": 0.73,
+                "highlightBox": {
+                  "x": 10,
+                  "y": 53,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q4 on page 2"
+                }
+              },
+              {
+                "pageId": 13,
+                "pageNo": 3,
+                "problemNo": "Q5",
+                "previewLabel": "Fixture page 3",
+                "problemText": "Solve the mixed fraction problem from Fixture page 3.",
+                "studentWork": "Student work shows steps but loses precision near the final line.",
+                "teacherMark": "wrong",
+                "rationale": "The student switches or drops notation, which changes the meaning of the work.",
+                "labelCodes": [
+                  "notation_error"
+                ],
+                "itemConfidence": 0.8,
+                "labelConfidence": 0.75,
+                "highlightBox": {
+                  "x": 10,
+                  "y": 66,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q5 on page 3"
+                }
+              }
+            ]
+          }
+        ],
+        "doThisWeek": "Start by stabilizing procedure gap before introducing harder mixed practice.",
+        "notNow": "Do not turn this report into direct homework answers or jump to harder packets before the repeated pattern settles.",
+        "sevenDayPlan": [
+          {
+            "day": 1,
+            "minutes": 20,
+            "goal": "Name the pattern behind Procedure gap.",
+            "practice": "Review two worked examples and explain why the method matters.",
+            "parentPrompt": "Ask your child to narrate the first step before writing anything.",
+            "successSignal": "They can describe the setup in words before solving."
+          },
+          {
+            "day": 2,
+            "minutes": 20,
+            "goal": "Slow down the procedure for Procedure gap.",
+            "practice": "Solve two short items while speaking each step out loud.",
+            "parentPrompt": "Pause after each line and ask what changed from the line above.",
+            "successSignal": "The order of steps stays consistent without guessing."
+          },
+          {
+            "day": 3,
+            "minutes": 20,
+            "goal": "Catch slips linked to Calculation slip.",
+            "practice": "Do one warm-up and two error-correction items from the same skill family.",
+            "parentPrompt": "Ask which symbol, sign, or number is easiest to lose when rushing.",
+            "successSignal": "Your child can self-correct at least one slip before you point to it."
+          },
+          {
+            "day": 4,
+            "minutes": 15,
+            "goal": "Mix old and new without increasing pressure.",
+            "practice": "Use two mixed questions and one short reflection after each answer.",
+            "parentPrompt": "Ask which problem felt more stable today and why.",
+            "successSignal": "They can compare one strong response and one wobbly response."
+          },
+          {
+            "day": 5,
+            "minutes": 15,
+            "goal": "Rehearse Procedure gap in a new context.",
+            "practice": "Try one worksheet-style item and one verbal explanation prompt.",
+            "parentPrompt": "Ask how they know they picked the right starting strategy.",
+            "successSignal": "They choose the method with less prompting than earlier in the week."
+          },
+          {
+            "day": 6,
+            "minutes": 15,
+            "goal": "Practice checking instead of racing to finish.",
+            "practice": "Complete one timed-light practice set with a final check pass.",
+            "parentPrompt": "Ask what they check first when they think they are done.",
+            "successSignal": "They perform a deliberate final check on signs, units, or notation."
+          },
+          {
+            "day": 7,
+            "minutes": 15,
+            "goal": "Wrap the week with confidence and one small stretch.",
+            "practice": "Revisit one earlier mistake and one mixed challenge item.",
+            "parentPrompt": "Ask what feels easier now and what still needs one more week.",
+            "successSignal": "They can explain one improvement and one next focus area."
+          }
+        ],
+        "completedDays": [],
+        "releasedWithReviewBanner": true,
+        "reviewBanner": "Draft report only: This upload was explicitly flagged for manual review before release.",
+        "guardrail": "This report supports diagnosis and practice planning, not direct homework answers.",
+        "locale": "en-US"
+      },
+      "studentReportJson": {
+        "headline": "This week we are making procedure gap feel more predictable.",
+        "focusAreas": [
+          "Procedure gap",
+          "Calculation slip",
+          "Strategy error"
+        ],
+        "nextSteps": [
+          {
+            "day": 1,
+            "minutes": 20,
+            "goal": "Name the pattern behind Procedure gap.",
+            "practice": "Review two worked examples and explain why the method matters.",
+            "parentPrompt": "Ask your child to narrate the first step before writing anything.",
+            "successSignal": "They can describe the setup in words before solving."
+          },
+          {
+            "day": 2,
+            "minutes": 20,
+            "goal": "Slow down the procedure for Procedure gap.",
+            "practice": "Solve two short items while speaking each step out loud.",
+            "parentPrompt": "Pause after each line and ask what changed from the line above.",
+            "successSignal": "The order of steps stays consistent without guessing."
+          },
+          {
+            "day": 3,
+            "minutes": 20,
+            "goal": "Catch slips linked to Calculation slip.",
+            "practice": "Do one warm-up and two error-correction items from the same skill family.",
+            "parentPrompt": "Ask which symbol, sign, or number is easiest to lose when rushing.",
+            "successSignal": "Your child can self-correct at least one slip before you point to it."
+          }
+        ],
+        "encouragement": "The goal is not speed. The goal is clear steps, cleaner checking, and fewer repeated slips."
+      },
+      "tutorReportJson": {
+        "intakeSummary": "FinalFlow-1775721652949 (5th Grade, Common Core) uploaded a quiz packet for structured diagnosis.",
+        "recommendedFocus": "Procedure gap",
+        "secondaryFocus": "Calculation slip",
+        "evidenceGroups": [
+          {
+            "code": "procedure_gap",
+            "displayName": "Procedure gap",
+            "description": "The student knows the concept but loses the correct step order.",
+            "count": 3,
+            "averageConfidence": 0.73,
+            "severity": "med",
+            "items": [
+              {
+                "pageId": 11,
+                "pageNo": 1,
+                "problemNo": "Q1",
+                "previewLabel": "Fixture page 1",
+                "problemText": "Solve the mixed fraction problem from Fixture page 1.",
+                "studentWork": "Student work shows steps but loses precision near the final line.",
+                "teacherMark": "wrong",
+                "rationale": "The student setup shows the right ingredients but the step order breaks before the result.",
+                "labelCodes": [
+                  "procedure_gap"
+                ],
+                "itemConfidence": 0.84,
+                "labelConfidence": 0.79,
+                "highlightBox": {
+                  "x": 10,
+                  "y": 14,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q1 on page 1"
+                }
+              },
+              {
+                "pageId": 14,
+                "pageNo": 4,
+                "problemNo": "Q8",
+                "previewLabel": "Fixture page 4",
+                "problemText": "Check the computation and notation from Fixture page 4.",
+                "studentWork": "Student reaches the right setup but misses one arithmetic or notation detail.",
+                "teacherMark": "wrong",
+                "rationale": "The student setup shows the right ingredients but the step order breaks before the result.",
+                "labelCodes": [
+                  "procedure_gap"
+                ],
+                "itemConfidence": 0.74,
+                "labelConfidence": 0.69,
+                "highlightBox": {
+                  "x": 10,
+                  "y": 27,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q8 on page 4"
+                }
+              },
+              {
+                "pageId": 15,
+                "pageNo": 5,
+                "problemNo": "Q9",
+                "previewLabel": "Fixture page 5",
+                "problemText": "Solve the mixed fraction problem from Fixture page 5.",
+                "studentWork": "Student work shows steps but loses precision near the final line.",
+                "teacherMark": "wrong",
+                "rationale": "The student setup shows the right ingredients but the step order breaks before the result.",
+                "labelCodes": [
+                  "procedure_gap"
+                ],
+                "itemConfidence": 0.76,
+                "labelConfidence": 0.71,
+                "highlightBox": {
+                  "x": 10,
+                  "y": 40,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q9 on page 5"
+                }
+              }
+            ]
+          },
+          {
+            "code": "calculation_slip",
+            "displayName": "Calculation slip",
+            "description": "The setup is mostly correct, but arithmetic execution slips.",
+            "count": 3,
+            "averageConfidence": 0.73,
+            "severity": "med",
+            "items": [
+              {
+                "pageId": 11,
+                "pageNo": 1,
+                "problemNo": "Q2",
+                "previewLabel": "Fixture page 1",
+                "problemText": "Check the computation and notation from Fixture page 1.",
+                "studentWork": "Student reaches the right setup but misses one arithmetic or notation detail.",
+                "teacherMark": "wrong",
+                "rationale": "The method is mostly correct, but the arithmetic execution slips near the finish.",
+                "labelCodes": [
+                  "calculation_slip"
+                ],
+                "itemConfidence": 0.8,
+                "labelConfidence": 0.75,
+                "highlightBox": {
+                  "x": 10,
+                  "y": 27,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q2 on page 1"
+                }
+              },
+              {
+                "pageId": 12,
+                "pageNo": 2,
+                "problemNo": "Q3",
+                "previewLabel": "Fixture page 2",
+                "problemText": "Solve the mixed fraction problem from Fixture page 2.",
+                "studentWork": "Student work shows steps but loses precision near the final line.",
+                "teacherMark": "partial",
+                "rationale": "The method is mostly correct, but the arithmetic execution slips near the finish.",
+                "labelCodes": [
+                  "calculation_slip"
+                ],
+                "itemConfidence": 0.82,
+                "labelConfidence": 0.77,
+                "highlightBox": {
+                  "x": 10,
+                  "y": 40,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q3 on page 2"
+                }
+              },
+              {
+                "pageId": 15,
+                "pageNo": 5,
+                "problemNo": "Q10",
+                "previewLabel": "Fixture page 5",
+                "problemText": "Check the computation and notation from Fixture page 5.",
+                "studentWork": "Student reaches the right setup but misses one arithmetic or notation detail.",
+                "teacherMark": "partial",
+                "rationale": "The method is mostly correct, but the arithmetic execution slips near the finish.",
+                "labelCodes": [
+                  "calculation_slip"
+                ],
+                "itemConfidence": 0.72,
+                "labelConfidence": 0.67,
+                "highlightBox": {
+                  "x": 10,
+                  "y": 53,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q10 on page 5"
+                }
+              }
+            ]
+          },
+          {
+            "code": "strategy_error",
+            "displayName": "Strategy error",
+            "description": "The student chooses an inefficient or mismatched solving strategy.",
+            "count": 2,
+            "averageConfidence": 0.72,
+            "severity": "med",
+            "items": [
+              {
+                "pageId": 13,
+                "pageNo": 3,
+                "problemNo": "Q6",
+                "previewLabel": "Fixture page 3",
+                "problemText": "Check the computation and notation from Fixture page 3.",
+                "studentWork": "Student reaches the right setup but misses one arithmetic or notation detail.",
+                "teacherMark": "partial",
+                "rationale": "The student chooses a weaker strategy than the page seems to require.",
+                "labelCodes": [
+                  "strategy_error"
+                ],
+                "itemConfidence": 0.76,
+                "labelConfidence": 0.71,
+                "highlightBox": {
+                  "x": 10,
+                  "y": 79,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q6 on page 3"
+                }
+              },
+              {
+                "pageId": 14,
+                "pageNo": 4,
+                "problemNo": "Q7",
+                "previewLabel": "Fixture page 4",
+                "problemText": "Solve the mixed fraction problem from Fixture page 4.",
+                "studentWork": "Student work shows steps but loses precision near the final line.",
+                "teacherMark": "partial",
+                "rationale": "The student chooses a weaker strategy than the page seems to require.",
+                "labelCodes": [
+                  "strategy_error"
+                ],
+                "itemConfidence": 0.78,
+                "labelConfidence": 0.73,
+                "highlightBox": {
+                  "x": 10,
+                  "y": 14,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q7 on page 4"
+                }
+              }
+            ]
+          },
+          {
+            "code": "notation_error",
+            "displayName": "Notation error",
+            "description": "The student uses inconsistent signs, symbols, or formatting.",
+            "count": 2,
+            "averageConfidence": 0.74,
+            "severity": "med",
+            "items": [
+              {
+                "pageId": 12,
+                "pageNo": 2,
+                "problemNo": "Q4",
+                "previewLabel": "Fixture page 2",
+                "problemText": "Check the computation and notation from Fixture page 2.",
+                "studentWork": "Student reaches the right setup but misses one arithmetic or notation detail.",
+                "teacherMark": "partial",
+                "rationale": "The student switches or drops notation, which changes the meaning of the work.",
+                "labelCodes": [
+                  "notation_error"
+                ],
+                "itemConfidence": 0.78,
+                "labelConfidence": 0.73,
+                "highlightBox": {
+                  "x": 10,
+                  "y": 53,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q4 on page 2"
+                }
+              },
+              {
+                "pageId": 13,
+                "pageNo": 3,
+                "problemNo": "Q5",
+                "previewLabel": "Fixture page 3",
+                "problemText": "Solve the mixed fraction problem from Fixture page 3.",
+                "studentWork": "Student work shows steps but loses precision near the final line.",
+                "teacherMark": "wrong",
+                "rationale": "The student switches or drops notation, which changes the meaning of the work.",
+                "labelCodes": [
+                  "notation_error"
+                ],
+                "itemConfidence": 0.8,
+                "labelConfidence": 0.75,
+                "highlightBox": {
+                  "x": 10,
+                  "y": 66,
+                  "width": 78,
+                  "height": 10,
+                  "label": "Problem Q5 on page 3"
+                }
+              }
+            ]
+          }
+        ],
+        "confidence": 0.81,
+        "releaseStatus": "needs_review",
+        "reviewReason": "This upload was explicitly flagged for manual review before release.",
+        "notes": "Use this as a draft until manual review confirms the weakest evidence anchors."
+      },
+      "createdAt": "2026-04-09T08:00:54.265Z",
+      "updatedAt": "2026-04-09T08:00:54.265Z"
+    }
+  ],
+  "problemItems": [
+    {
+      "id": 1,
+      "runId": 1,
+      "pageId": 1,
+      "problemNo": "Q1",
+      "problemText": "Solve the mixed fraction problem from Fixture page 1.",
+      "studentWork": "Student work shows steps but loses precision near the final line.",
+      "teacherMark": "wrong",
+      "modelIsCorrect": false,
+      "itemConfidence": 0.84,
+      "evidenceAnchor": {
+        "pageNo": 1,
+        "problemNo": "Q1",
+        "previewLabel": "Fixture page 1"
+      },
+      "createdAt": "2026-04-09T08:00:54.123Z"
+    },
+    {
+      "id": 2,
+      "runId": 1,
+      "pageId": 1,
+      "problemNo": "Q2",
+      "problemText": "Check the computation and notation from Fixture page 1.",
+      "studentWork": "Student reaches the right setup but misses one arithmetic or notation detail.",
+      "teacherMark": "wrong",
+      "modelIsCorrect": false,
+      "itemConfidence": 0.8,
+      "evidenceAnchor": {
+        "pageNo": 1,
+        "problemNo": "Q2",
+        "previewLabel": "Fixture page 1"
+      },
+      "createdAt": "2026-04-09T08:00:54.123Z"
+    },
+    {
+      "id": 3,
+      "runId": 1,
+      "pageId": 2,
+      "problemNo": "Q3",
+      "problemText": "Solve the mixed fraction problem from Fixture page 2.",
+      "studentWork": "Student work shows steps but loses precision near the final line.",
+      "teacherMark": "partial",
+      "modelIsCorrect": false,
+      "itemConfidence": 0.82,
+      "evidenceAnchor": {
+        "pageNo": 2,
+        "problemNo": "Q3",
+        "previewLabel": "Fixture page 2"
+      },
+      "createdAt": "2026-04-09T08:00:54.123Z"
+    },
+    {
+      "id": 4,
+      "runId": 1,
+      "pageId": 2,
+      "problemNo": "Q4",
+      "problemText": "Check the computation and notation from Fixture page 2.",
+      "studentWork": "Student reaches the right setup but misses one arithmetic or notation detail.",
+      "teacherMark": "partial",
+      "modelIsCorrect": false,
+      "itemConfidence": 0.78,
+      "evidenceAnchor": {
+        "pageNo": 2,
+        "problemNo": "Q4",
+        "previewLabel": "Fixture page 2"
+      },
+      "createdAt": "2026-04-09T08:00:54.123Z"
+    },
+    {
+      "id": 5,
+      "runId": 1,
+      "pageId": 3,
+      "problemNo": "Q5",
+      "problemText": "Solve the mixed fraction problem from Fixture page 3.",
+      "studentWork": "Student work shows steps but loses precision near the final line.",
+      "teacherMark": "wrong",
+      "modelIsCorrect": false,
+      "itemConfidence": 0.8,
+      "evidenceAnchor": {
+        "pageNo": 3,
+        "problemNo": "Q5",
+        "previewLabel": "Fixture page 3"
+      },
+      "createdAt": "2026-04-09T08:00:54.123Z"
+    },
+    {
+      "id": 6,
+      "runId": 1,
+      "pageId": 3,
+      "problemNo": "Q6",
+      "problemText": "Check the computation and notation from Fixture page 3.",
+      "studentWork": "Student reaches the right setup but misses one arithmetic or notation detail.",
+      "teacherMark": "partial",
+      "modelIsCorrect": false,
+      "itemConfidence": 0.76,
+      "evidenceAnchor": {
+        "pageNo": 3,
+        "problemNo": "Q6",
+        "previewLabel": "Fixture page 3"
+      },
+      "createdAt": "2026-04-09T08:00:54.123Z"
+    },
+    {
+      "id": 7,
+      "runId": 1,
+      "pageId": 4,
+      "problemNo": "Q7",
+      "problemText": "Solve the mixed fraction problem from Fixture page 4.",
+      "studentWork": "Student work shows steps but loses precision near the final line.",
+      "teacherMark": "partial",
+      "modelIsCorrect": false,
+      "itemConfidence": 0.78,
+      "evidenceAnchor": {
+        "pageNo": 4,
+        "problemNo": "Q7",
+        "previewLabel": "Fixture page 4"
+      },
+      "createdAt": "2026-04-09T08:00:54.123Z"
+    },
+    {
+      "id": 8,
+      "runId": 1,
+      "pageId": 4,
+      "problemNo": "Q8",
+      "problemText": "Check the computation and notation from Fixture page 4.",
+      "studentWork": "Student reaches the right setup but misses one arithmetic or notation detail.",
+      "teacherMark": "wrong",
+      "modelIsCorrect": false,
+      "itemConfidence": 0.74,
+      "evidenceAnchor": {
+        "pageNo": 4,
+        "problemNo": "Q8",
+        "previewLabel": "Fixture page 4"
+      },
+      "createdAt": "2026-04-09T08:00:54.123Z"
+    },
+    {
+      "id": 9,
+      "runId": 1,
+      "pageId": 5,
+      "problemNo": "Q9",
+      "problemText": "Solve the mixed fraction problem from Fixture page 5.",
+      "studentWork": "Student work shows steps but loses precision near the final line.",
+      "teacherMark": "wrong",
+      "modelIsCorrect": false,
+      "itemConfidence": 0.76,
+      "evidenceAnchor": {
+        "pageNo": 5,
+        "problemNo": "Q9",
+        "previewLabel": "Fixture page 5"
+      },
+      "createdAt": "2026-04-09T08:00:54.123Z"
+    },
+    {
+      "id": 10,
+      "runId": 1,
+      "pageId": 5,
+      "problemNo": "Q10",
+      "problemText": "Check the computation and notation from Fixture page 5.",
+      "studentWork": "Student reaches the right setup but misses one arithmetic or notation detail.",
+      "teacherMark": "partial",
+      "modelIsCorrect": false,
+      "itemConfidence": 0.72,
+      "evidenceAnchor": {
+        "pageNo": 5,
+        "problemNo": "Q10",
+        "previewLabel": "Fixture page 5"
+      },
+      "createdAt": "2026-04-09T08:00:54.123Z"
+    },
+    {
+      "id": 11,
+      "runId": 2,
+      "pageId": 6,
+      "problemNo": "Q1",
+      "problemText": "Solve the mixed fraction problem from Fixture page 1.",
+      "studentWork": "Student work shows steps but loses precision near the final line.",
+      "teacherMark": "wrong",
+      "modelIsCorrect": false,
+      "itemConfidence": 0.84,
+      "evidenceAnchor": {
+        "pageNo": 1,
+        "problemNo": "Q1",
+        "previewLabel": "Fixture page 1"
+      },
+      "createdAt": "2026-04-09T08:00:54.206Z"
+    },
+    {
+      "id": 12,
+      "runId": 2,
+      "pageId": 6,
+      "problemNo": "Q2",
+      "problemText": "Check the computation and notation from Fixture page 1.",
+      "studentWork": "Student reaches the right setup but misses one arithmetic or notation detail.",
+      "teacherMark": "wrong",
+      "modelIsCorrect": false,
+      "itemConfidence": 0.8,
+      "evidenceAnchor": {
+        "pageNo": 1,
+        "problemNo": "Q2",
+        "previewLabel": "Fixture page 1"
+      },
+      "createdAt": "2026-04-09T08:00:54.206Z"
+    },
+    {
+      "id": 13,
+      "runId": 2,
+      "pageId": 7,
+      "problemNo": "Q3",
+      "problemText": "Solve the mixed fraction problem from Fixture page 2.",
+      "studentWork": "Student work shows steps but loses precision near the final line.",
+      "teacherMark": "partial",
+      "modelIsCorrect": false,
+      "itemConfidence": 0.82,
+      "evidenceAnchor": {
+        "pageNo": 2,
+        "problemNo": "Q3",
+        "previewLabel": "Fixture page 2"
+      },
+      "createdAt": "2026-04-09T08:00:54.206Z"
+    },
+    {
+      "id": 14,
+      "runId": 2,
+      "pageId": 7,
+      "problemNo": "Q4",
+      "problemText": "Check the computation and notation from Fixture page 2.",
+      "studentWork": "Student reaches the right setup but misses one arithmetic or notation detail.",
+      "teacherMark": "partial",
+      "modelIsCorrect": false,
+      "itemConfidence": 0.78,
+      "evidenceAnchor": {
+        "pageNo": 2,
+        "problemNo": "Q4",
+        "previewLabel": "Fixture page 2"
+      },
+      "createdAt": "2026-04-09T08:00:54.206Z"
+    },
+    {
+      "id": 15,
+      "runId": 2,
+      "pageId": 8,
+      "problemNo": "Q5",
+      "problemText": "Solve the mixed fraction problem from Fixture page 3.",
+      "studentWork": "Student work shows steps but loses precision near the final line.",
+      "teacherMark": "wrong",
+      "modelIsCorrect": false,
+      "itemConfidence": 0.8,
+      "evidenceAnchor": {
+        "pageNo": 3,
+        "problemNo": "Q5",
+        "previewLabel": "Fixture page 3"
+      },
+      "createdAt": "2026-04-09T08:00:54.206Z"
+    },
+    {
+      "id": 16,
+      "runId": 2,
+      "pageId": 8,
+      "problemNo": "Q6",
+      "problemText": "Check the computation and notation from Fixture page 3.",
+      "studentWork": "Student reaches the right setup but misses one arithmetic or notation detail.",
+      "teacherMark": "partial",
+      "modelIsCorrect": false,
+      "itemConfidence": 0.76,
+      "evidenceAnchor": {
+        "pageNo": 3,
+        "problemNo": "Q6",
+        "previewLabel": "Fixture page 3"
+      },
+      "createdAt": "2026-04-09T08:00:54.206Z"
+    },
+    {
+      "id": 17,
+      "runId": 2,
+      "pageId": 9,
+      "problemNo": "Q7",
+      "problemText": "Solve the mixed fraction problem from Fixture page 4.",
+      "studentWork": "Student work shows steps but loses precision near the final line.",
+      "teacherMark": "partial",
+      "modelIsCorrect": false,
+      "itemConfidence": 0.78,
+      "evidenceAnchor": {
+        "pageNo": 4,
+        "problemNo": "Q7",
+        "previewLabel": "Fixture page 4"
+      },
+      "createdAt": "2026-04-09T08:00:54.206Z"
+    },
+    {
+      "id": 18,
+      "runId": 2,
+      "pageId": 9,
+      "problemNo": "Q8",
+      "problemText": "Check the computation and notation from Fixture page 4.",
+      "studentWork": "Student reaches the right setup but misses one arithmetic or notation detail.",
+      "teacherMark": "wrong",
+      "modelIsCorrect": false,
+      "itemConfidence": 0.74,
+      "evidenceAnchor": {
+        "pageNo": 4,
+        "problemNo": "Q8",
+        "previewLabel": "Fixture page 4"
+      },
+      "createdAt": "2026-04-09T08:00:54.206Z"
+    },
+    {
+      "id": 19,
+      "runId": 2,
+      "pageId": 10,
+      "problemNo": "Q9",
+      "problemText": "Solve the mixed fraction problem from Fixture page 5.",
+      "studentWork": "Student work shows steps but loses precision near the final line.",
+      "teacherMark": "wrong",
+      "modelIsCorrect": false,
+      "itemConfidence": 0.76,
+      "evidenceAnchor": {
+        "pageNo": 5,
+        "problemNo": "Q9",
+        "previewLabel": "Fixture page 5"
+      },
+      "createdAt": "2026-04-09T08:00:54.206Z"
+    },
+    {
+      "id": 20,
+      "runId": 2,
+      "pageId": 10,
+      "problemNo": "Q10",
+      "problemText": "Check the computation and notation from Fixture page 5.",
+      "studentWork": "Student reaches the right setup but misses one arithmetic or notation detail.",
+      "teacherMark": "partial",
+      "modelIsCorrect": false,
+      "itemConfidence": 0.72,
+      "evidenceAnchor": {
+        "pageNo": 5,
+        "problemNo": "Q10",
+        "previewLabel": "Fixture page 5"
+      },
+      "createdAt": "2026-04-09T08:00:54.206Z"
+    },
+    {
+      "id": 21,
+      "runId": 3,
+      "pageId": 11,
+      "problemNo": "Q1",
+      "problemText": "Solve the mixed fraction problem from Fixture page 1.",
+      "studentWork": "Student work shows steps but loses precision near the final line.",
+      "teacherMark": "wrong",
+      "modelIsCorrect": false,
+      "itemConfidence": 0.84,
+      "evidenceAnchor": {
+        "pageNo": 1,
+        "problemNo": "Q1",
+        "previewLabel": "Fixture page 1"
+      },
+      "createdAt": "2026-04-09T08:00:54.265Z"
+    },
+    {
+      "id": 22,
+      "runId": 3,
+      "pageId": 11,
+      "problemNo": "Q2",
+      "problemText": "Check the computation and notation from Fixture page 1.",
+      "studentWork": "Student reaches the right setup but misses one arithmetic or notation detail.",
+      "teacherMark": "wrong",
+      "modelIsCorrect": false,
+      "itemConfidence": 0.8,
+      "evidenceAnchor": {
+        "pageNo": 1,
+        "problemNo": "Q2",
+        "previewLabel": "Fixture page 1"
+      },
+      "createdAt": "2026-04-09T08:00:54.265Z"
+    },
+    {
+      "id": 23,
+      "runId": 3,
+      "pageId": 12,
+      "problemNo": "Q3",
+      "problemText": "Solve the mixed fraction problem from Fixture page 2.",
+      "studentWork": "Student work shows steps but loses precision near the final line.",
+      "teacherMark": "partial",
+      "modelIsCorrect": false,
+      "itemConfidence": 0.82,
+      "evidenceAnchor": {
+        "pageNo": 2,
+        "problemNo": "Q3",
+        "previewLabel": "Fixture page 2"
+      },
+      "createdAt": "2026-04-09T08:00:54.265Z"
+    },
+    {
+      "id": 24,
+      "runId": 3,
+      "pageId": 12,
+      "problemNo": "Q4",
+      "problemText": "Check the computation and notation from Fixture page 2.",
+      "studentWork": "Student reaches the right setup but misses one arithmetic or notation detail.",
+      "teacherMark": "partial",
+      "modelIsCorrect": false,
+      "itemConfidence": 0.78,
+      "evidenceAnchor": {
+        "pageNo": 2,
+        "problemNo": "Q4",
+        "previewLabel": "Fixture page 2"
+      },
+      "createdAt": "2026-04-09T08:00:54.265Z"
+    },
+    {
+      "id": 25,
+      "runId": 3,
+      "pageId": 13,
+      "problemNo": "Q5",
+      "problemText": "Solve the mixed fraction problem from Fixture page 3.",
+      "studentWork": "Student work shows steps but loses precision near the final line.",
+      "teacherMark": "wrong",
+      "modelIsCorrect": false,
+      "itemConfidence": 0.8,
+      "evidenceAnchor": {
+        "pageNo": 3,
+        "problemNo": "Q5",
+        "previewLabel": "Fixture page 3"
+      },
+      "createdAt": "2026-04-09T08:00:54.265Z"
+    },
+    {
+      "id": 26,
+      "runId": 3,
+      "pageId": 13,
+      "problemNo": "Q6",
+      "problemText": "Check the computation and notation from Fixture page 3.",
+      "studentWork": "Student reaches the right setup but misses one arithmetic or notation detail.",
+      "teacherMark": "partial",
+      "modelIsCorrect": false,
+      "itemConfidence": 0.76,
+      "evidenceAnchor": {
+        "pageNo": 3,
+        "problemNo": "Q6",
+        "previewLabel": "Fixture page 3"
+      },
+      "createdAt": "2026-04-09T08:00:54.265Z"
+    },
+    {
+      "id": 27,
+      "runId": 3,
+      "pageId": 14,
+      "problemNo": "Q7",
+      "problemText": "Solve the mixed fraction problem from Fixture page 4.",
+      "studentWork": "Student work shows steps but loses precision near the final line.",
+      "teacherMark": "partial",
+      "modelIsCorrect": false,
+      "itemConfidence": 0.78,
+      "evidenceAnchor": {
+        "pageNo": 4,
+        "problemNo": "Q7",
+        "previewLabel": "Fixture page 4"
+      },
+      "createdAt": "2026-04-09T08:00:54.265Z"
+    },
+    {
+      "id": 28,
+      "runId": 3,
+      "pageId": 14,
+      "problemNo": "Q8",
+      "problemText": "Check the computation and notation from Fixture page 4.",
+      "studentWork": "Student reaches the right setup but misses one arithmetic or notation detail.",
+      "teacherMark": "wrong",
+      "modelIsCorrect": false,
+      "itemConfidence": 0.74,
+      "evidenceAnchor": {
+        "pageNo": 4,
+        "problemNo": "Q8",
+        "previewLabel": "Fixture page 4"
+      },
+      "createdAt": "2026-04-09T08:00:54.265Z"
+    },
+    {
+      "id": 29,
+      "runId": 3,
+      "pageId": 15,
+      "problemNo": "Q9",
+      "problemText": "Solve the mixed fraction problem from Fixture page 5.",
+      "studentWork": "Student work shows steps but loses precision near the final line.",
+      "teacherMark": "wrong",
+      "modelIsCorrect": false,
+      "itemConfidence": 0.76,
+      "evidenceAnchor": {
+        "pageNo": 5,
+        "problemNo": "Q9",
+        "previewLabel": "Fixture page 5"
+      },
+      "createdAt": "2026-04-09T08:00:54.265Z"
+    },
+    {
+      "id": 30,
+      "runId": 3,
+      "pageId": 15,
+      "problemNo": "Q10",
+      "problemText": "Check the computation and notation from Fixture page 5.",
+      "studentWork": "Student reaches the right setup but misses one arithmetic or notation detail.",
+      "teacherMark": "partial",
+      "modelIsCorrect": false,
+      "itemConfidence": 0.72,
+      "evidenceAnchor": {
+        "pageNo": 5,
+        "problemNo": "Q10",
+        "previewLabel": "Fixture page 5"
+      },
+      "createdAt": "2026-04-09T08:00:54.265Z"
+    }
+  ],
+  "errorLabels": [
+    {
+      "id": 1,
+      "code": "procedure_gap",
+      "displayName": "Procedure gap",
+      "description": "The student knows the concept but loses the correct step order.",
+      "createdAt": "2026-04-09T08:00:54.123Z"
+    },
+    {
+      "id": 2,
+      "code": "calculation_slip",
+      "displayName": "Calculation slip",
+      "description": "The setup is mostly correct, but arithmetic execution slips.",
+      "createdAt": "2026-04-09T08:00:54.124Z"
+    },
+    {
+      "id": 3,
+      "code": "notation_error",
+      "displayName": "Notation error",
+      "description": "The student uses inconsistent signs, symbols, or formatting.",
+      "createdAt": "2026-04-09T08:00:54.125Z"
+    },
+    {
+      "id": 4,
+      "code": "strategy_error",
+      "displayName": "Strategy error",
+      "description": "The student chooses an inefficient or mismatched solving strategy.",
+      "createdAt": "2026-04-09T08:00:54.125Z"
+    }
+  ],
+  "itemErrors": [
+    {
+      "id": 1,
+      "itemId": 1,
+      "labelId": 1,
+      "severity": "low",
+      "rationale": "The student setup shows the right ingredients but the step order breaks before the result.",
+      "confidence": 0.79,
+      "createdAt": "2026-04-09T08:00:54.123Z"
+    },
+    {
+      "id": 2,
+      "itemId": 2,
+      "labelId": 2,
+      "severity": "low",
+      "rationale": "The method is mostly correct, but the arithmetic execution slips near the finish.",
+      "confidence": 0.75,
+      "createdAt": "2026-04-09T08:00:54.123Z"
+    },
+    {
+      "id": 3,
+      "itemId": 3,
+      "labelId": 2,
+      "severity": "low",
+      "rationale": "The method is mostly correct, but the arithmetic execution slips near the finish.",
+      "confidence": 0.77,
+      "createdAt": "2026-04-09T08:00:54.123Z"
+    },
+    {
+      "id": 4,
+      "itemId": 4,
+      "labelId": 3,
+      "severity": "med",
+      "rationale": "The student switches or drops notation, which changes the meaning of the work.",
+      "confidence": 0.73,
+      "createdAt": "2026-04-09T08:00:54.123Z"
+    },
+    {
+      "id": 5,
+      "itemId": 5,
+      "labelId": 3,
+      "severity": "low",
+      "rationale": "The student switches or drops notation, which changes the meaning of the work.",
+      "confidence": 0.75,
+      "createdAt": "2026-04-09T08:00:54.123Z"
+    },
+    {
+      "id": 6,
+      "itemId": 6,
+      "labelId": 4,
+      "severity": "med",
+      "rationale": "The student chooses a weaker strategy than the page seems to require.",
+      "confidence": 0.71,
+      "createdAt": "2026-04-09T08:00:54.123Z"
+    },
+    {
+      "id": 7,
+      "itemId": 7,
+      "labelId": 4,
+      "severity": "med",
+      "rationale": "The student chooses a weaker strategy than the page seems to require.",
+      "confidence": 0.73,
+      "createdAt": "2026-04-09T08:00:54.123Z"
+    },
+    {
+      "id": 8,
+      "itemId": 8,
+      "labelId": 1,
+      "severity": "med",
+      "rationale": "The student setup shows the right ingredients but the step order breaks before the result.",
+      "confidence": 0.69,
+      "createdAt": "2026-04-09T08:00:54.123Z"
+    },
+    {
+      "id": 9,
+      "itemId": 9,
+      "labelId": 1,
+      "severity": "med",
+      "rationale": "The student setup shows the right ingredients but the step order breaks before the result.",
+      "confidence": 0.71,
+      "createdAt": "2026-04-09T08:00:54.123Z"
+    },
+    {
+      "id": 10,
+      "itemId": 10,
+      "labelId": 2,
+      "severity": "med",
+      "rationale": "The method is mostly correct, but the arithmetic execution slips near the finish.",
+      "confidence": 0.67,
+      "createdAt": "2026-04-09T08:00:54.123Z"
+    },
+    {
+      "id": 11,
+      "itemId": 11,
+      "labelId": 1,
+      "severity": "low",
+      "rationale": "The student setup shows the right ingredients but the step order breaks before the result.",
+      "confidence": 0.79,
+      "createdAt": "2026-04-09T08:00:54.206Z"
+    },
+    {
+      "id": 12,
+      "itemId": 12,
+      "labelId": 2,
+      "severity": "low",
+      "rationale": "The method is mostly correct, but the arithmetic execution slips near the finish.",
+      "confidence": 0.75,
+      "createdAt": "2026-04-09T08:00:54.206Z"
+    },
+    {
+      "id": 13,
+      "itemId": 13,
+      "labelId": 2,
+      "severity": "low",
+      "rationale": "The method is mostly correct, but the arithmetic execution slips near the finish.",
+      "confidence": 0.77,
+      "createdAt": "2026-04-09T08:00:54.206Z"
+    },
+    {
+      "id": 14,
+      "itemId": 14,
+      "labelId": 3,
+      "severity": "med",
+      "rationale": "The student switches or drops notation, which changes the meaning of the work.",
+      "confidence": 0.73,
+      "createdAt": "2026-04-09T08:00:54.206Z"
+    },
+    {
+      "id": 15,
+      "itemId": 15,
+      "labelId": 3,
+      "severity": "low",
+      "rationale": "The student switches or drops notation, which changes the meaning of the work.",
+      "confidence": 0.75,
+      "createdAt": "2026-04-09T08:00:54.206Z"
+    },
+    {
+      "id": 16,
+      "itemId": 16,
+      "labelId": 4,
+      "severity": "med",
+      "rationale": "The student chooses a weaker strategy than the page seems to require.",
+      "confidence": 0.71,
+      "createdAt": "2026-04-09T08:00:54.206Z"
+    },
+    {
+      "id": 17,
+      "itemId": 17,
+      "labelId": 4,
+      "severity": "med",
+      "rationale": "The student chooses a weaker strategy than the page seems to require.",
+      "confidence": 0.73,
+      "createdAt": "2026-04-09T08:00:54.206Z"
+    },
+    {
+      "id": 18,
+      "itemId": 18,
+      "labelId": 1,
+      "severity": "med",
+      "rationale": "The student setup shows the right ingredients but the step order breaks before the result.",
+      "confidence": 0.69,
+      "createdAt": "2026-04-09T08:00:54.206Z"
+    },
+    {
+      "id": 19,
+      "itemId": 19,
+      "labelId": 1,
+      "severity": "med",
+      "rationale": "The student setup shows the right ingredients but the step order breaks before the result.",
+      "confidence": 0.71,
+      "createdAt": "2026-04-09T08:00:54.206Z"
+    },
+    {
+      "id": 20,
+      "itemId": 20,
+      "labelId": 2,
+      "severity": "med",
+      "rationale": "The method is mostly correct, but the arithmetic execution slips near the finish.",
+      "confidence": 0.67,
+      "createdAt": "2026-04-09T08:00:54.206Z"
+    },
+    {
+      "id": 21,
+      "itemId": 21,
+      "labelId": 1,
+      "severity": "low",
+      "rationale": "The student setup shows the right ingredients but the step order breaks before the result.",
+      "confidence": 0.79,
+      "createdAt": "2026-04-09T08:00:54.265Z"
+    },
+    {
+      "id": 22,
+      "itemId": 22,
+      "labelId": 2,
+      "severity": "low",
+      "rationale": "The method is mostly correct, but the arithmetic execution slips near the finish.",
+      "confidence": 0.75,
+      "createdAt": "2026-04-09T08:00:54.265Z"
+    },
+    {
+      "id": 23,
+      "itemId": 23,
+      "labelId": 2,
+      "severity": "low",
+      "rationale": "The method is mostly correct, but the arithmetic execution slips near the finish.",
+      "confidence": 0.77,
+      "createdAt": "2026-04-09T08:00:54.265Z"
+    },
+    {
+      "id": 24,
+      "itemId": 24,
+      "labelId": 3,
+      "severity": "med",
+      "rationale": "The student switches or drops notation, which changes the meaning of the work.",
+      "confidence": 0.73,
+      "createdAt": "2026-04-09T08:00:54.265Z"
+    },
+    {
+      "id": 25,
+      "itemId": 25,
+      "labelId": 3,
+      "severity": "low",
+      "rationale": "The student switches or drops notation, which changes the meaning of the work.",
+      "confidence": 0.75,
+      "createdAt": "2026-04-09T08:00:54.265Z"
+    },
+    {
+      "id": 26,
+      "itemId": 26,
+      "labelId": 4,
+      "severity": "med",
+      "rationale": "The student chooses a weaker strategy than the page seems to require.",
+      "confidence": 0.71,
+      "createdAt": "2026-04-09T08:00:54.265Z"
+    },
+    {
+      "id": 27,
+      "itemId": 27,
+      "labelId": 4,
+      "severity": "med",
+      "rationale": "The student chooses a weaker strategy than the page seems to require.",
+      "confidence": 0.73,
+      "createdAt": "2026-04-09T08:00:54.265Z"
+    },
+    {
+      "id": 28,
+      "itemId": 28,
+      "labelId": 1,
+      "severity": "med",
+      "rationale": "The student setup shows the right ingredients but the step order breaks before the result.",
+      "confidence": 0.69,
+      "createdAt": "2026-04-09T08:00:54.265Z"
+    },
+    {
+      "id": 29,
+      "itemId": 29,
+      "labelId": 1,
+      "severity": "med",
+      "rationale": "The student setup shows the right ingredients but the step order breaks before the result.",
+      "confidence": 0.71,
+      "createdAt": "2026-04-09T08:00:54.265Z"
+    },
+    {
+      "id": 30,
+      "itemId": 30,
+      "labelId": 2,
+      "severity": "med",
+      "rationale": "The method is mostly correct, but the arithmetic execution slips near the finish.",
+      "confidence": 0.67,
+      "createdAt": "2026-04-09T08:00:54.265Z"
+    }
+  ],
+  "shareLinks": [
+    {
+      "id": 1,
+      "reportId": 1,
+      "token": "3ff039c35341414a8844905222c6b599",
+      "role": "tutor",
+      "createdAt": "2026-04-09T08:00:54.151Z",
+      "expiresAt": "2026-04-16T08:00:54.151Z",
+      "revokedAt": null
+    }
+  ],
+  "subscriptions": [
+    {
+      "id": 1,
+      "teamId": 1,
+      "userId": 1,
+      "provider": "demo",
+      "planType": "one_time",
+      "priceId": "price_fe_one_time",
+      "status": "active",
+      "stripeCustomerId": null,
+      "stripeSubscriptionId": null,
+      "checkoutSessionId": "demo_unlock_1775721654213",
+      "reportCredits": 0,
+      "unlockedReportIds": [
+        2,
+        1
+      ],
+      "currentPeriodEndsAt": null,
+      "createdAt": "2026-04-09T08:00:54.141Z",
+      "updatedAt": "2026-04-09T08:00:54.224Z"
+    }
+  ],
+  "billingEvents": [],
+  "activityLogs": [
+    {
+      "id": 7,
+      "userId": 1,
+      "action": "SUBMIT_UPLOAD",
+      "detail": "Submitted upload 3 and created run 3.",
+      "timestamp": "2026-04-09T08:00:54.252Z"
+    },
+    {
+      "id": 6,
+      "userId": 1,
+      "action": "CREATE_UPLOAD",
+      "detail": "Created upload 3 with 5 pages.",
+      "timestamp": "2026-04-09T08:00:54.246Z"
+    },
+    {
+      "id": 5,
+      "userId": 1,
+      "action": "SUBMIT_UPLOAD",
+      "detail": "Submitted upload 2 and created run 2.",
+      "timestamp": "2026-04-09T08:00:54.196Z"
+    },
+    {
+      "id": 4,
+      "userId": 1,
+      "action": "CREATE_UPLOAD",
+      "detail": "Created upload 2 with 5 pages.",
+      "timestamp": "2026-04-09T08:00:54.188Z"
+    },
+    {
+      "id": 3,
+      "userId": 1,
+      "action": "SUBMIT_UPLOAD",
+      "detail": "Submitted upload 1 and created run 1.",
+      "timestamp": "2026-04-09T08:00:54.109Z"
+    },
+    {
+      "id": 2,
+      "userId": 1,
+      "action": "CREATE_UPLOAD",
+      "detail": "Created upload 1 with 5 pages.",
+      "timestamp": "2026-04-09T08:00:54.099Z"
+    },
+    {
+      "id": 1,
+      "userId": 1,
+      "action": "CREATE_CHILD",
+      "detail": "Created child profile FinalFlow-1775721652949.",
+      "timestamp": "2026-04-09T08:00:53.028Z"
+    }
+  ]
+}

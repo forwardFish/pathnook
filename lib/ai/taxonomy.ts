@@ -41,8 +41,14 @@ export const TAXONOMY = [
   },
 ] as const;
 
+export const PRIMARY_TAXONOMY_CONFIDENCE_FLOOR = 0.62;
+
 export const taxonomyCodeSet = new Set(TAXONOMY.map((item) => item.code));
 
 export function getTaxonomyByCode(code: string) {
   return TAXONOMY.find((item) => item.code === code) || null;
+}
+
+export function shouldUsePrimaryTaxonomyLabel(labelConfidence: number) {
+  return labelConfidence >= PRIMARY_TAXONOMY_CONFIDENCE_FLOOR;
 }

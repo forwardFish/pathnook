@@ -163,6 +163,16 @@ export const analysisRuns = pgTable('analysis_runs', {
   overallConfidence: real('overall_confidence'),
   needsReviewReason: text('needs_review_reason'),
   errorMessage: text('error_message'),
+  deckId: integer('deck_id'),
+  deckGenerationStatus: varchar('deck_generation_status', { length: 30 })
+    .notNull()
+    .default('idle'),
+  deckReviewStatus: varchar('deck_review_status', { length: 30 })
+    .notNull()
+    .default('not_requested'),
+  deckExportStatus: varchar('deck_export_status', { length: 30 })
+    .notNull()
+    .default('idle'),
   startedAt: timestamp('started_at'),
   finishedAt: timestamp('finished_at'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
@@ -183,6 +193,157 @@ export const reports = pgTable('reports', {
   tutorReportJson: jsonb('tutor_report_json')
     .$type<Record<string, unknown>>()
     .notNull(),
+  deckId: integer('deck_id'),
+  deckStatus: varchar('deck_status', { length: 30 }).notNull().default('idle'),
+  deckTier: varchar('deck_tier', { length: 20 }).notNull().default('pending'),
+  walkthroughVisibility: varchar('walkthrough_visibility', { length: 30 })
+    .notNull()
+    .default('hidden'),
+  voiceGuidanceDefault: boolean('voice_guidance_default')
+    .notNull()
+    .default(false),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+});
+
+export const diagnosisDecks = pgTable('diagnosis_decks', {
+  id: serial('id').primaryKey(),
+  runId: integer('run_id')
+    .notNull()
+    .references(() => analysisRuns.id),
+  reportId: integer('report_id')
+    .notNull()
+    .references(() => reports.id),
+  status: varchar('status', { length: 30 }).notNull().default('draft'),
+  tier: varchar('tier', { length: 20 }).notNull().default('pending'),
+  reviewStatus: varchar('review_status', { length: 30 })
+    .notNull()
+    .default('pending'),
+  walkthroughVisibility: varchar('walkthrough_visibility', { length: 30 })
+    .notNull()
+    .default('hidden'),
+  voiceGuidanceDefault: boolean('voice_guidance_default')
+    .notNull()
+    .default(false),
+  qualityScore: real('quality_score'),
+  qualitySummary: jsonb('quality_summary')
+    .$type<Record<string, unknown>>()
+    .notNull()
+    .default(sql`'{}'::jsonb`),
+  sourceFacts: jsonb('source_facts')
+    .$type<Record<string, unknown>>()
+    .notNull()
+    .default(sql`'{}'::jsonb`),
+  title: text('title').notNull(),
+  generatedAt: timestamp('generated_at'),
+  approvedAt: timestamp('approved_at'),
+  rejectedAt: timestamp('rejected_at'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+});
+
+export const diagnosisSlides = pgTable('diagnosis_slides', {
+  id: serial('id').primaryKey(),
+  deckId: integer('deck_id')
+    .notNull()
+    .references(() => diagnosisDecks.id),
+  slideIndex: integer('slide_index').notNull(),
+  slideType: varchar('slide_type', { length: 50 }).notNull(),
+  title: text('title').notNull(),
+  body: jsonb('body')
+    .$type<Record<string, unknown>>()
+    .notNull()
+    .default(sql`'{}'::jsonb`),
+  notes: jsonb('notes')
+    .$type<Record<string, unknown>>()
+    .notNull()
+    .default(sql`'{}'::jsonb`),
+  status: varchar('status', { length: 30 }).notNull().default('draft'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+});
+
+export const diagnosisSlideActions = pgTable('diagnosis_slide_actions', {
+  id: serial('id').primaryKey(),
+  deckId: integer('deck_id')
+    .notNull()
+    .references(() => diagnosisDecks.id),
+  slideId: integer('slide_id')
+    .notNull()
+    .references(() => diagnosisSlides.id),
+  actionIndex: integer('action_index').notNull(),
+  actionType: varchar('action_type', { length: 50 }).notNull(),
+  referenceKey: varchar('reference_key', { length: 120 }),
+  payload: jsonb('payload')
+    .$type<Record<string, unknown>>()
+    .notNull()
+    .default(sql`'{}'::jsonb`),
+  narrationText: text('narration_text').notNull().default(''),
+  autoplay: boolean('autoplay').notNull().default(false),
+  status: varchar('status', { length: 30 }).notNull().default('draft'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+});
+
+export const deckExports = pgTable('deck_exports', {
+  id: serial('id').primaryKey(),
+  deckId: integer('deck_id')
+    .notNull()
+    .references(() => diagnosisDecks.id),
+  format: varchar('format', { length: 20 }).notNull(),
+  status: varchar('status', { length: 30 }).notNull().default('queued'),
+  artifactPath: text('artifact_path'),
+  metadata: jsonb('metadata')
+    .$type<Record<string, unknown>>()
+    .notNull()
+    .default(sql`'{}'::jsonb`),
+  completedAt: timestamp('completed_at'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+});
+
+export const deckShareSettings = pgTable('deck_share_settings', {
+  id: serial('id').primaryKey(),
+  deckId: integer('deck_id')
+    .notNull()
+    .references(() => diagnosisDecks.id),
+  reportId: integer('report_id')
+    .notNull()
+    .references(() => reports.id),
+  allowParentPlayback: boolean('allow_parent_playback')
+    .notNull()
+    .default(false),
+  allowSharePlayback: boolean('allow_share_playback')
+    .notNull()
+    .default(false),
+  defaultVoiceEnabled: boolean('default_voice_enabled')
+    .notNull()
+    .default(false),
+  maxAutoplayTier: varchar('max_autoplay_tier', { length: 20 })
+    .notNull()
+    .default('B'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+});
+
+export const deckPlaybackSnapshots = pgTable('deck_playback_snapshots', {
+  id: serial('id').primaryKey(),
+  deckId: integer('deck_id')
+    .notNull()
+    .references(() => diagnosisDecks.id),
+  userId: integer('user_id').references(() => users.id),
+  shareToken: varchar('share_token', { length: 120 }),
+  currentSlideIndex: integer('current_slide_index').notNull().default(0),
+  currentActionIndex: integer('current_action_index').notNull().default(0),
+  playbackState: varchar('playback_state', { length: 20 })
+    .notNull()
+    .default('idle'),
+  voiceEnabled: boolean('voice_enabled').notNull().default(false),
+  snapshotJson: jsonb('snapshot_json')
+    .$type<Record<string, unknown>>()
+    .notNull()
+    .default(sql`'{}'::jsonb`),
+  restoredAt: timestamp('restored_at'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
 });
@@ -226,6 +387,7 @@ export const itemErrors = pgTable('item_errors', {
   severity: varchar('severity', { length: 20 }).notNull().default('med'),
   rationale: text('rationale'),
   confidence: real('confidence'),
+  isPrimary: boolean('is_primary').notNull().default(true),
   createdAt: timestamp('created_at').notNull().defaultNow(),
 });
 
@@ -378,6 +540,7 @@ export const usersRelations = relations(users, ({ many }) => ({
   uploads: many(uploads),
   analysisRuns: many(analysisRuns),
   subscriptions: many(subscriptions),
+  deckPlaybackSnapshots: many(deckPlaybackSnapshots),
 }));
 
 export const invitationsRelations = relations(invitations, ({ one }) => ({
@@ -467,6 +630,7 @@ export const analysisRunsRelations = relations(analysisRuns, ({ one, many }) => 
     references: [uploads.id],
   }),
   reports: many(reports),
+  diagnosisDecks: many(diagnosisDecks),
   problemItems: many(problemItems),
 }));
 
@@ -476,7 +640,79 @@ export const reportsRelations = relations(reports, ({ one, many }) => ({
     references: [analysisRuns.id],
   }),
   shareLinks: many(shareLinks),
+  diagnosisDecks: many(diagnosisDecks),
+  deckShareSettings: many(deckShareSettings),
 }));
+
+export const diagnosisDecksRelations = relations(diagnosisDecks, ({ one, many }) => ({
+  run: one(analysisRuns, {
+    fields: [diagnosisDecks.runId],
+    references: [analysisRuns.id],
+  }),
+  report: one(reports, {
+    fields: [diagnosisDecks.reportId],
+    references: [reports.id],
+  }),
+  slides: many(diagnosisSlides),
+  actions: many(diagnosisSlideActions),
+  exports: many(deckExports),
+  shareSettings: many(deckShareSettings),
+  playbackSnapshots: many(deckPlaybackSnapshots),
+}));
+
+export const diagnosisSlidesRelations = relations(diagnosisSlides, ({ one, many }) => ({
+  deck: one(diagnosisDecks, {
+    fields: [diagnosisSlides.deckId],
+    references: [diagnosisDecks.id],
+  }),
+  actions: many(diagnosisSlideActions),
+}));
+
+export const diagnosisSlideActionsRelations = relations(
+  diagnosisSlideActions,
+  ({ one }) => ({
+    deck: one(diagnosisDecks, {
+      fields: [diagnosisSlideActions.deckId],
+      references: [diagnosisDecks.id],
+    }),
+    slide: one(diagnosisSlides, {
+      fields: [diagnosisSlideActions.slideId],
+      references: [diagnosisSlides.id],
+    }),
+  })
+);
+
+export const deckExportsRelations = relations(deckExports, ({ one }) => ({
+  deck: one(diagnosisDecks, {
+    fields: [deckExports.deckId],
+    references: [diagnosisDecks.id],
+  }),
+}));
+
+export const deckShareSettingsRelations = relations(deckShareSettings, ({ one }) => ({
+  deck: one(diagnosisDecks, {
+    fields: [deckShareSettings.deckId],
+    references: [diagnosisDecks.id],
+  }),
+  report: one(reports, {
+    fields: [deckShareSettings.reportId],
+    references: [reports.id],
+  }),
+}));
+
+export const deckPlaybackSnapshotsRelations = relations(
+  deckPlaybackSnapshots,
+  ({ one }) => ({
+    deck: one(diagnosisDecks, {
+      fields: [deckPlaybackSnapshots.deckId],
+      references: [diagnosisDecks.id],
+    }),
+    user: one(users, {
+      fields: [deckPlaybackSnapshots.userId],
+      references: [users.id],
+    }),
+  })
+);
 
 export const problemItemsRelations = relations(problemItems, ({ one, many }) => ({
   run: one(analysisRuns, {
@@ -545,6 +781,18 @@ export type AnalysisRun = typeof analysisRuns.$inferSelect;
 export type NewAnalysisRun = typeof analysisRuns.$inferInsert;
 export type Report = typeof reports.$inferSelect;
 export type NewReport = typeof reports.$inferInsert;
+export type DiagnosisDeck = typeof diagnosisDecks.$inferSelect;
+export type NewDiagnosisDeck = typeof diagnosisDecks.$inferInsert;
+export type DiagnosisSlide = typeof diagnosisSlides.$inferSelect;
+export type NewDiagnosisSlide = typeof diagnosisSlides.$inferInsert;
+export type DiagnosisSlideAction = typeof diagnosisSlideActions.$inferSelect;
+export type NewDiagnosisSlideAction = typeof diagnosisSlideActions.$inferInsert;
+export type DeckExport = typeof deckExports.$inferSelect;
+export type NewDeckExport = typeof deckExports.$inferInsert;
+export type DeckShareSetting = typeof deckShareSettings.$inferSelect;
+export type NewDeckShareSetting = typeof deckShareSettings.$inferInsert;
+export type DeckPlaybackSnapshot = typeof deckPlaybackSnapshots.$inferSelect;
+export type NewDeckPlaybackSnapshot = typeof deckPlaybackSnapshots.$inferInsert;
 export type ProblemItem = typeof problemItems.$inferSelect;
 export type NewProblemItem = typeof problemItems.$inferInsert;
 export type ErrorLabel = typeof errorLabels.$inferSelect;

@@ -3,6 +3,7 @@ import type {
   LabeledProblemItem,
 } from '@/lib/ai/extraction-schema';
 import { canonicalExtractionPageSchema, labeledProblemItemSchema } from '@/lib/ai/extraction-schema';
+import { shouldUsePrimaryTaxonomyLabel } from '@/lib/ai/taxonomy';
 import type { PageQualityFlags } from '@/lib/family/types';
 
 type PageInput = {
@@ -96,6 +97,7 @@ export function generateDemoLabels(extractedPages: CanonicalExtractionPage[]) {
             code,
             severity: classifySeverity(labelConfidence),
             labelConfidence,
+            role: shouldUsePrimaryTaxonomyLabel(labelConfidence) ? 'primary' : 'secondary',
           },
         ],
         rationale:

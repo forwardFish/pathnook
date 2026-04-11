@@ -1,4 +1,6 @@
+import Link from 'next/link';
 import { getSharedReportByToken } from '@/lib/family/repository';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 type PageProps = {
@@ -56,6 +58,9 @@ export default async function SharedReportPage({ params }: PageProps) {
         <CardContent className="space-y-3 text-sm text-gray-700">
           <p>{tutorReport.recommendedFocus || 'Focus unavailable.'}</p>
           {tutorReport.notes ? <p>{tutorReport.notes}</p> : null}
+          <Button asChild variant="outline">
+            <Link href={`/share/${token}/play`}>Open Guided Walkthrough</Link>
+          </Button>
         </CardContent>
       </Card>
 

@@ -35,6 +35,14 @@ If any requirement remains partial, uncovered, or lacks evidence, the program ve
 Program-level test IDs:
 - `FP-001`: Full PRD coverage audit against the traceability matrix
 - `FP-002`: Full program end-to-end acceptance sweep across page, click, API, data, AI, and ops suites
+- `FP-DCK-001`: 1.3.x deck traceability audit against `DECK13-*` requirements
+- `FP-DCK-002`: Parent/share/player browser sweep across desktop and mobile
+- `FP-DCK-003`: Deck API/data/AI gate sweep
+- `FP-DCK-004`: Deck export/share/admin end-to-end release sweep
+- `FP-BND134-001`: 1.3.4 boundary traceability audit against `BND134-*` requirements
+- `FP-BND134-002`: Must-do boundary acceptance sweep
+- `FP-BND134-003`: Light-do delegation and secondary-surface sweep
+- `FP-BND134-004`: Postpone guardrail and non-scope audit
 
 ### Suite A - Public And Authenticated Pages
 - Re-run all page cases from `docs/testing/page_test_matrix.md` that apply to landing, pricing, sign-up, sign-in, dashboard, children, upload, run status, report, billing, share, tutor, and admin.
@@ -55,6 +63,19 @@ Program-level test IDs:
 ### Suite E - Non-Functional And Operations
 - Re-run `NF-*` cases from `docs/testing/api_data_ai_test_matrix.md`.
 - Validate logging, resilience, responsiveness, and release-candidate telemetry in the local runtime lane.
+
+### Suite F - Diagnosis Deck Player Lane
+- Re-run `PAGE-DCK-001` through `PAGE-DCK-016` from `docs/testing/page_test_matrix.md`.
+- Re-run `CLICK-DCK-001` through `CLICK-DCK-008` from `docs/testing/click_path_matrix.md`.
+- Re-run `API-DCK-001` through `API-DCK-011`, `DATA-DCK-001` through `DATA-DCK-008`, `AI-DCK-001` through `AI-DCK-009`, and `NF-DCK-001` through `NF-DCK-006` from `docs/testing/api_data_ai_test_matrix.md`.
+- Collect screenshot, console, network, dialog, storage, snapshot, and evidence-manifest artifacts for parent player, share player, and admin deck review routes.
+
+### Suite G - Stage Boundary Lane
+- Re-run `TC-BND134-001` through `TC-BND134-006` from `docs/testing/governance_test_matrix.md`.
+- Re-run `PAGE-BND134-001` through `PAGE-BND134-007` from `docs/testing/page_test_matrix.md`.
+- Re-run `CLICK-BND134-001` through `CLICK-BND134-003` from `docs/testing/click_path_matrix.md`.
+- Re-run `API-BND134-001` through `API-BND134-009` and `DATA-BND134-001` through `DATA-BND134-007` from `docs/testing/api_data_ai_test_matrix.md`.
+- Collect boundary traceability, must-do alignment, light-do delegation, and postpone guardrail evidence for the v5 lane.
 
 ## Evidence Pack
 

@@ -12,6 +12,7 @@ import {
   getBillingSnapshotForUser,
   isReportUnlockedForUser,
 } from '@/lib/family/billing';
+import { getDeckForReport } from '@/lib/family/decks';
 import { getReportForUser } from '@/lib/family/repository';
 import {
   getReportLabels,
@@ -53,6 +54,7 @@ export default async function ReportPage({ params, searchParams }: PageProps) {
   const paywall = getBillingPaywallSummary(
     await getBillingSnapshotForUser(user.id)
   );
+  const deck = isUnlocked ? await getDeckForReport(user.id, Number(reportId)) : null;
 
   return (
     <section className="flex-1 space-y-6 p-4 lg:p-8">
@@ -87,6 +89,13 @@ export default async function ReportPage({ params, searchParams }: PageProps) {
             </div>
           </div>
           <div className="flex flex-wrap gap-3">
+            {isUnlocked && (!deck || deck.deck.walkthroughVisibility !== 'hidden') ? (
+              <Button asChild>
+                <Link href={`/dashboard/reports/${reportId}/play`}>
+                  Guided Walkthrough
+                </Link>
+              </Button>
+            ) : null}
             {isUnlocked ? (
               <ExportPdfButton
                 reportId={Number(reportId)}

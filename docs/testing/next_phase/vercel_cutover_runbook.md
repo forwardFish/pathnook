@@ -9,13 +9,12 @@
 ## Current Verified State
 - Local build passes with `pnpm build`.
 - Drizzle migrations reach Neon with `pnpm db:migrate`.
-- Vercel production is reachable at `family-education-chi.vercel.app`.
+- Vercel is now linked to `forwardFish/familyEducation` with `Production Branch=main`.
+- Git-based production deployment `dpl_9gccr1t7PrQLYMbCuZpctYoV8Xbp` is `READY` and promoted on `family-education-chi.vercel.app`.
+- Git-based preview deployment `dpl_F7SoMQDuPuGyPz6w63qo2XsPujrK` is `READY`.
 - Vercel smoke and final acceptance evidence are written under `tasks/runtime/final_acceptance/` and `tasks/runtime/final_program_acceptance/`.
 
 ## Current Blockers
-- Vercel is linked to `forwardFish/familyEducation`, but this workspace git remote is `nextjs/saas-starter`.
-- Git-based preview deployment `dpl_4i6KRv5srK4PutFcAzf9LsjkJNWL` is `ERROR`.
-- Current production deployment `dpl_42PfvpDYVEKS32dbrvSRbny3y9sn` is reachable, but it was built from `nextjs/saas-starter`, not the Vercel-linked repo.
 - Live OpenAI credentials are missing for real AI acceptance.
 - Live Creem credentials and product IDs are missing for real checkout acceptance.
 - Blob is mounted, but the store still needs the intended private-access configuration for the production artifact path.
@@ -38,14 +37,13 @@ Expected:
 - `tasks/runtime/final_program_acceptance/final_program_acceptance.json` exists.
 
 ## Gate 1
-- Relink the Vercel project so the linked GitHub repository matches this workspace, or move the real app code into the currently linked GitHub repo.
+- Keep the Vercel project linked to `forwardFish/familyEducation`.
 - Keep `Production Branch=main`.
 - Keep `Root Directory=.`
-- Re-run a Git-based preview deployment from `main`.
-- Confirm the preview deployment is `READY`.
+- Re-run a Git-based preview deployment from a feature or validation branch.
+- Confirm the preview deployment is `READY` and built from the linked FamilyEducation repo.
 
 Expected smoke result:
-- `project.localRemoteMatchesLinkedRepo = true`
 - `suites.preview.readyState = READY`
 - `suites.preview.linkedRepoMatch = true`
 

@@ -21,6 +21,39 @@ export type RunStage =
   | 'done'
   | 'failed';
 
+export type DeckTier = 'pending' | 'A' | 'B' | 'C' | 'D';
+
+export type DeckStatus =
+  | 'draft'
+  | 'queued'
+  | 'generating'
+  | 'gated'
+  | 'ready'
+  | 'degraded'
+  | 'hidden'
+  | 'failed';
+
+export type DeckReviewStatus = 'not_requested' | 'pending' | 'approved' | 'rejected';
+
+export type DeckExportStatus = 'idle' | 'queued' | 'ready' | 'failed';
+
+export type DeckPlaybackState = 'idle' | 'playing' | 'paused' | 'stopped';
+
+export type DeckWalkthroughVisibility = 'hidden' | 'static_only' | 'full';
+
+export type DeckSlideStatus = 'draft' | 'ready' | 'regenerated';
+
+export type DeckActionStatus = 'draft' | 'ready' | 'rejected';
+
+export type DeckExportFormat = 'h5' | 'pdf';
+
+export type DeckActionType =
+  | 'highlight_evidence'
+  | 'focus_panel'
+  | 'show_fact'
+  | 'advance_note'
+  | 'scroll_to_anchor';
+
 export type PageQualityFlags = {
   blurry: boolean;
   rotated: boolean;
@@ -95,6 +128,10 @@ export type StoredRun = {
   overallConfidence: number | null;
   needsReviewReason: string | null;
   errorMessage: string | null;
+  deckId: number | null;
+  deckGenerationStatus: DeckStatus | 'idle';
+  deckReviewStatus: DeckReviewStatus;
+  deckExportStatus: DeckExportStatus;
   startedAt: string | null;
   finishedAt: string | null;
   createdAt: string;
@@ -107,6 +144,98 @@ export type StoredReport = {
   parentReportJson: Record<string, unknown>;
   studentReportJson: Record<string, unknown>;
   tutorReportJson: Record<string, unknown>;
+  deckId: number | null;
+  deckStatus: DeckStatus | 'idle';
+  deckTier: DeckTier;
+  walkthroughVisibility: DeckWalkthroughVisibility;
+  voiceGuidanceDefault: boolean;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type StoredDiagnosisDeck = {
+  id: number;
+  runId: number;
+  reportId: number;
+  status: DeckStatus;
+  tier: DeckTier;
+  reviewStatus: DeckReviewStatus;
+  walkthroughVisibility: DeckWalkthroughVisibility;
+  voiceGuidanceDefault: boolean;
+  qualityScore: number | null;
+  qualitySummary: Record<string, unknown>;
+  sourceFacts: Record<string, unknown>;
+  title: string;
+  generatedAt: string | null;
+  approvedAt: string | null;
+  rejectedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type StoredDiagnosisSlide = {
+  id: number;
+  deckId: number;
+  slideIndex: number;
+  slideType: string;
+  title: string;
+  body: Record<string, unknown>;
+  notes: Record<string, unknown>;
+  status: DeckSlideStatus;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type StoredDiagnosisSlideAction = {
+  id: number;
+  deckId: number;
+  slideId: number;
+  actionIndex: number;
+  actionType: DeckActionType;
+  referenceKey: string | null;
+  payload: Record<string, unknown>;
+  narrationText: string;
+  autoplay: boolean;
+  status: DeckActionStatus;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type StoredDeckExport = {
+  id: number;
+  deckId: number;
+  format: DeckExportFormat;
+  status: DeckExportStatus | 'processing';
+  artifactPath: string | null;
+  metadata: Record<string, unknown>;
+  completedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type StoredDeckShareSetting = {
+  id: number;
+  deckId: number;
+  reportId: number;
+  allowParentPlayback: boolean;
+  allowSharePlayback: boolean;
+  defaultVoiceEnabled: boolean;
+  maxAutoplayTier: Exclude<DeckTier, 'pending'>;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type StoredDeckPlaybackSnapshot = {
+  id: number;
+  deckId: number;
+  userId: number | null;
+  shareToken: string | null;
+  currentSlideIndex: number;
+  currentActionIndex: number;
+  playbackState: DeckPlaybackState;
+  voiceEnabled: boolean;
+  snapshotJson: Record<string, unknown>;
+  restoredAt: string | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -144,6 +273,7 @@ export type StoredItemError = {
   severity: 'low' | 'med' | 'high';
   rationale: string;
   confidence: number;
+  isPrimary: boolean;
   createdAt: string;
 };
 
@@ -251,6 +381,12 @@ export type FamilyMockState = {
       shareLink: number;
       subscription: number;
       billingEvent: number;
+      diagnosisDeck: number;
+      diagnosisSlide: number;
+      diagnosisSlideAction: number;
+      deckExport: number;
+      deckShareSetting: number;
+      deckPlaybackSnapshot: number;
     };
   };
   auth: {
@@ -262,6 +398,12 @@ export type FamilyMockState = {
   pages: StoredPage[];
   runs: StoredRun[];
   reports: StoredReport[];
+  diagnosisDecks: StoredDiagnosisDeck[];
+  diagnosisSlides: StoredDiagnosisSlide[];
+  diagnosisSlideActions: StoredDiagnosisSlideAction[];
+  deckExports: StoredDeckExport[];
+  deckShareSettings: StoredDeckShareSetting[];
+  deckPlaybackSnapshots: StoredDeckPlaybackSnapshot[];
   problemItems: StoredProblemItem[];
   errorLabels: StoredErrorLabel[];
   itemErrors: StoredItemError[];

@@ -69,6 +69,7 @@ export type AdminReviewExtractionItem = {
     displayName: string;
     severity: string;
     confidence: number | null;
+    role: 'primary' | 'secondary';
   }>;
 };
 
@@ -309,6 +310,7 @@ function buildExtractionItems(args: {
     severity: string;
     rationale: string | null;
     confidence: number | null;
+    isPrimary: boolean;
   }>;
   labelRows: Array<{
     id: number;
@@ -351,6 +353,7 @@ function buildExtractionItems(args: {
             displayName: label?.displayName || 'Unknown label',
             severity: entry.severity,
             confidence: entry.confidence,
+            role: entry.isPrimary ? ('primary' as const) : ('secondary' as const),
           };
         }),
       } satisfies AdminReviewExtractionItem;
@@ -584,6 +587,7 @@ export async function getAdminReviewDetail(runId: number): Promise<AdminReviewDe
           severity: item.severity,
           rationale: item.rationale,
           confidence: item.confidence,
+          isPrimary: item.isPrimary,
         })),
         labelRows: labelRows.map((label) => ({
           id: label.id,
@@ -668,6 +672,7 @@ export async function getAdminReviewDetail(runId: number): Promise<AdminReviewDe
             severity: itemErrors.severity,
             rationale: itemErrors.rationale,
             confidence: itemErrors.confidence,
+            isPrimary: itemErrors.isPrimary,
           })
           .from(itemErrors)
           .where(inArray(itemErrors.itemId, itemIds))

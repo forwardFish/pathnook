@@ -2,12 +2,47 @@
 
 Source of truth:
 - `docs/需求文档.md`
+- `docs/需求文档_1.3.4.md`
 - `docs/saas-starter 一天落地实施说明.md`
 
 This index converts the PRD into unique requirement IDs. No feature may start implementation until its requirement IDs are linked to Story cards and test cases.
 
 | Requirement ID | Category | Source Section | Requirement |
 | --- | --- | --- | --- |
+| DIAG122-INTAKE | Diagnosis 1.2.2 | 1.2.2 / Intake | Upload intake must persist subject, grade, source, parent concern, and teacher context into the run payload and upload record. |
+| DIAG122-ITEM | Diagnosis 1.2.2 | 1.2.2 / Problem Item Facts | Structured problem items must preserve question summary, student response summary, work type, topic hint, evidence anchor, and teacher signal fields. |
+| DIAG122-TAXONOMY | Diagnosis 1.2.2 | 1.2.2 / Taxonomy Contract | Diagnosis taxonomy and item error role contract must stay fixed and traceable through storage and report output. |
+| DIAG122-FOUNDATION-ACCEPT | Diagnosis 1.2.2 | Sprint 15 Acceptance | Sprint 15 may close only when intake, item extraction, and taxonomy foundation are implemented, verified, agentized, and accepted. |
+| DIAG122-DIAGNOSIS | Diagnosis 1.2.2 | 1.2.2 / Diagnosis Aggregation | Reports must aggregate facts into primary diagnosis, secondary diagnosis, pattern issues, sporadic issues, and do-not-overreact output. |
+| DIAG122-PLAN | Diagnosis 1.2.2 | 1.2.2 / 7-Day Plan | The diagnosis lane must generate a 7-day plan with parent-facing prompts, success checks, and pauseList guidance. |
+| DIAG122-GATE | Diagnosis 1.2.2 | 1.2.2 / Confidence Gate | Low-confidence cases must route to cautious messaging or needs_review instead of overclaiming a complete diagnosis. |
+| DIAG122-SHARE | Diagnosis 1.2.2 | 1.2.2 / Share Summary | Share output must stay tutor-friendly and parent-first while exposing diagnosis, evidence, plan, and caution summaries. |
+| DIAG122-CALIBRATION | Diagnosis 1.2.2 | 1.2.2 / Calibration Assets | Starter calibration assets must include gold samples, taxonomy handbook, diagnosis rules, and plan templates. |
+| DIAG122-FINAL-ACCEPT | Diagnosis 1.2.2 | Sprint 16 Acceptance | Sprint 16 may close only when the six-step diagnosis lane and calibration starter set are evidenced and the remaining P0 live-analysis caveat is explicit. |
+| DECK13-DATA | Diagnosis 1.3.x Deck | 1.3 / Deck Persistence | Diagnosis deck delivery must persist deck, slide, action, export, share-setting, and playback-snapshot state while linking runs and reports back to the generated deck artifact. |
+| DECK13-GENERATION | Diagnosis 1.3.x Deck | 1.3.1 / Outline And Slide Generation | Guided walkthrough decks must be generated from accepted diagnosis/report/plan/share facts with a fixed page order instead of raw DOM replay. |
+| DECK13-GATE | Diagnosis 1.3.x Deck | 1.3.2 / Deck Quality Gate | Every generated deck must pass anchor, action, and quality validation and degrade into A/B/C/D tiers before it can be exposed to users. |
+| DECK13-PLAYER | Diagnosis 1.3.x Deck | 1.3.2 / Parent Player | Parent-facing reports must offer an optional Guided Walkthrough route with review-step and visual-explanation framing layered on top of the report experience. |
+| DECK13-SHARE-PLAY | Diagnosis 1.3.x Deck | 1.3.2 / Tutor Share Player | Shared tutor walkthroughs must stay read-only, honor share revoke/expiry rules, and exclude parent-only notes while preserving the owner-scoped share lifecycle. |
+| DECK13-TTS | Diagnosis 1.3.x Deck | 1.3.3 / Voice Guidance Defaults | Voice guidance must use browser-safe fallback behavior, default to off, and respect degraded deck tiers when autoplay or narration confidence is limited. |
+| DECK13-ADMIN-REVIEW | Diagnosis 1.3.x Deck | 1.3.2 / Internal Review | Internal review surfaces must support approving, rejecting, regenerating, and trial-playing generated decks without making the deck tooling public-facing. |
+| DECK13-EXPORT | Diagnosis 1.3.x Deck | 1.3.2 / Export Enhancement | Deck artifacts must support H5 and PDF export lifecycles as secondary enhancements without replacing the main report/evidence/plan value layer. |
+| DECK13-METRICS | Diagnosis 1.3.x Deck | 1.3.2 / Metrics And Artifacts | Deck generation, review, playback, and export must emit durable status and artifact records suitable for release evidence and regression review. |
+| DECK13-FINAL-ACCEPT | Diagnosis 1.3.x Deck | Sprint 20 Acceptance | The 1.3.x player lane may close only when traceability, browser, API/data/AI gate, export, share, and admin sweeps are all green. |
+| BND134-PARENT-FIRST | Stage Boundary 1.3.4 | 1.3.4 / Principles / Parent First | Stage 1 landing, sample, report, plan, share, and walkthrough entry points must remain parent-first and diagnosis-first instead of drifting into student-first or classroom-first positioning. |
+| BND134-CORE-FACTS | Stage Boundary 1.3.4 | 1.3.4 / Must-Do / Fact Layer | Stage 1 must preserve `ProblemItem`, `EvidenceAnchor`, and related structured fact objects as first-class contracts rather than flattening them into report prose or blobs. |
+| BND134-DIAGNOSIS-CONTRACT | Stage Boundary 1.3.4 | 1.3.4 / Must-Do / Diagnosis Outline | Stage 1 diagnosis must stay evidence-backed, structured, and quality-gated through `DiagnosisOutline`-style contracts with `doNotOverreact` and confidence-aware behavior. |
+| BND134-REPORT-LAYER | Stage Boundary 1.3.4 | 1.3.4 / Must-Do / Parent Report Sections | Stage 1 reports must keep `Diagnosis`, `Evidence`, `7-Day Plan`, and tutor/share framing as the primary value layer even when walkthrough enhancements exist. |
+| BND134-EXPLANATION-CARD | Stage Boundary 1.3.4 | 1.3.4 / Must-Do / ExplanationCard | Explanation content must remain reusable structured cards linked to anchors and facts, not only embedded paragraphs in a report or player shell. |
+| BND134-PLAN-CONTRACT | Stage Boundary 1.3.4 | 1.3.4 / Must-Do / SevenDayPlan | The seven-day parent action plan must remain a reusable, structured, parent-facing contract with goals, prompts, success checks, and pause guidance. |
+| BND134-QUALITY-GATE | Stage Boundary 1.3.4 | 1.3.4 / Must-Do / Quality Gate | Stage 1 must block weak output from direct parent release through schema checks, quality grades, degrade behavior, and needs-review routing. |
+| BND134-SHARE-PRIVACY | Stage Boundary 1.3.4 | 1.3.4 / Must-Do / Share And Privacy | Tutor handoff, share tokens, privacy boundaries, expiry/revoke rules, and read-only share behavior are in-scope Stage 1 contracts. |
+| BND134-PROVIDER-JOBS | Stage Boundary 1.3.4 | 1.3.4 / Must-Do / Provider And Jobs | Storage, parse, LLM, run-state, retry, and job abstractions must stay additive and reusable instead of route-local one-offs. |
+| BND134-WALKTHROUGH-LITE | Stage Boundary 1.3.4 | 1.3.4 / Light-Do / Guided Walkthrough | Guided Walkthrough may exist in Stage 1 only as an optional, secondary explanation layer behind the main report. |
+| BND134-PLAYBACK-LITE | Stage Boundary 1.3.4 | 1.3.4 / Light-Do / Playback And Export | Playback, actions, voice guidance, H5/PDF export, and share-play enhancements may exist in lightweight form only and must remain subordinate to the report. |
+| BND134-WEEKLY-TIMELINE-LITE | Stage Boundary 1.3.4 | 1.3.4 / Light-Do / Weekly Review And Timeline | Weekly review, compare, and timeline support may exist only as lightweight child-scoped hooks rather than a new heavy dashboard or generalized growth frontend. |
+| BND134-POSTPONE-GUARDRAIL | Stage Boundary 1.3.4 | 1.3.4 / Postpone | PPTX, strong whiteboard, realtime walkthrough Q&A, multi-agent UI, student app, and generalized growth frontend work must stay out of Stage 1 execution. |
+| BND134-FINAL-ACCEPT | Stage Boundary 1.3.4 | Sprint 24 Acceptance | The 1.3.4 boundary lane may close only when must-do and light-do rows are green or delegated with evidence and postponed work remains out of execution. |
 | GOV-001 | Governance | Summary / Governance And Traceability | 实现前必须先建立 requirement index、traceability matrix 和测试矩阵。 |
 | GOV-002 | Governance | Governance And Traceability | 任何 Story 卡都必须包含 requirement_ids、test_case_ids、expected_evidence。 |
 | GOV-003 | Governance | Sprint Acceptance And Final Gate | 每个 Sprint 都必须有独立 Sprint Acceptance Story 和 traceability audit。 |

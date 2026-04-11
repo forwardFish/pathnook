@@ -39,3 +39,12 @@ next-env.d.ts
 # Docker
 postgres_data/
 .env*.local
+
+# local secrets
+client_secret_*.json
+docs/client_secret_*.json
+
+# local temp artifacts
+_tmp_*
+scripts/__pycache__/
+*.pyc

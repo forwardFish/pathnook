@@ -15,7 +15,12 @@ API_MATRIX = ROOT / "docs" / "testing" / "api_data_ai_test_matrix.md"
 GOV_MATRIX = ROOT / "docs" / "testing" / "governance_test_matrix.md"
 FINAL_ACCEPTANCE = ROOT / "docs" / "testing" / "final_program_acceptance.md"
 SPRINT_TEMPLATE = ROOT / "docs" / "testing" / "sprint_acceptance_template.md"
-BACKLOG_ROOT = ROOT / "tasks" / "backlog_v1"
+BACKLOG_ROOTS = [
+    ROOT / "tasks" / "backlog_v1",
+    ROOT / "tasks" / "backlog_v3_diagnosis_1_2_2",
+    ROOT / "tasks" / "backlog_v4_diagnosis_player_1_3_x",
+    ROOT / "tasks" / "backlog_v5_stage1_boundary_1_3_4",
+]
 STATUS_REGISTRY = ROOT / "tasks" / "story_status_registry.json"
 ACCEPTANCE_REVIEWS = ROOT / "tasks" / "story_acceptance_reviews.json"
 CONTINUITY_MANIFEST = (
@@ -95,7 +100,7 @@ def parse_story_file(path: Path) -> dict[str, object]:
 
 
 def parse_click_test_ids(text: str) -> list[str]:
-    return re.findall(r"##\s+(CLICK-\d+)", text)
+    return re.findall(r"##\s+(CLICK(?:-DCK|-BND134)?-\d+)", text)
 
 
 def parse_story_ids_from_traceability(text: str) -> set[str]:
@@ -106,6 +111,21 @@ def parse_story_ids_from_traceability(text: str) -> set[str]:
         matches = re.findall(r"FE-\d{3}", line)
         story_ids.update(matches)
     return story_ids
+
+
+def find_story_files(backlog_roots: list[Path]) -> list[Path]:
+    story_files: list[Path] = []
+    for backlog_root in backlog_roots:
+        if backlog_root.exists():
+            story_files.extend(sorted(backlog_root.glob("**/FE-*.yaml")))
+    return story_files
+
+
+def build_story_index(story_files: list[Path]) -> dict[str, Path]:
+    index: dict[str, Path] = {}
+    for story_file in story_files:
+        index[story_file.stem] = story_file
+    return index
 
 
 def main() -> int:
@@ -123,8 +143,8 @@ def main() -> int:
         STATUS_REGISTRY,
         ACCEPTANCE_REVIEWS,
         CONTINUITY_MANIFEST,
-        BACKLOG_ROOT / "sprint_overview.md",
     ]
+    required_files.extend(backlog_root / "sprint_overview.md" for backlog_root in BACKLOG_ROOTS)
     for path in required_files:
         ensure_file(path, errors)
 
@@ -148,14 +168,17 @@ def main() -> int:
     click_test_ids = set(parse_click_test_ids(read_text(CLICK_MATRIX)))
     api_test_ids = set(parse_markdown_table_first_column(read_text(API_MATRIX)))
     gov_test_ids = set(parse_markdown_table_first_column(read_text(GOV_MATRIX)))
-    final_test_ids = set(re.findall(r"\bFP-\d{3}\b", read_text(FINAL_ACCEPTANCE)))
+    final_test_ids = set(
+        re.findall(r"\b(?:FP-\d{3}|FP-DCK-\d{3}|FP-BND134-\d{3})\b", read_text(FINAL_ACCEPTANCE))
+    )
     known_test_ids = page_test_ids | click_test_ids | api_test_ids | gov_test_ids | final_test_ids
 
-    story_files = sorted(BACKLOG_ROOT.glob("**/FE-*.yaml"))
-    if len(story_files) != 49:
-        errors.append(f"Expected 49 story YAML files, found {len(story_files)}")
+    story_files = find_story_files(BACKLOG_ROOTS)
+    if not story_files:
+        errors.append("No story YAML files found in authoritative PRD backlogs.")
 
     known_story_ids = {path.stem for path in story_files}
+    story_index = build_story_index(story_files)
     traceability_story_ids = parse_story_ids_from_traceability(read_text(TRACEABILITY_MATRIX))
     missing_story_ids = sorted(traceability_story_ids - known_story_ids)
     if missing_story_ids:
@@ -163,7 +186,10 @@ def main() -> int:
             "Traceability references unknown story IDs: " + ", ".join(missing_story_ids)
         )
 
-    sprint_dirs = sorted(path for path in BACKLOG_ROOT.iterdir() if path.is_dir())
+    sprint_dirs: list[Path] = []
+    for backlog_root in BACKLOG_ROOTS:
+        if backlog_root.exists():
+            sprint_dirs.extend(sorted(path for path in backlog_root.iterdir() if path.is_dir()))
     acceptance_story_ids: set[str] = set()
     for sprint_dir in sprint_dirs:
         execution_order = sprint_dir / "execution_order.txt"
@@ -171,29 +197,18 @@ def main() -> int:
         if execution_order.exists():
             order_text = read_text(execution_order)
             matches = re.findall(r"FE-\d{3}", order_text)
-            acceptance_matches = [story_id for story_id in matches if story_id.endswith(("007", "012", "018", "024", "029", "034", "041", "045", "049"))]
+            acceptance_matches = [
+                story_id
+                for story_id in matches
+                if (
+                    story_id in story_index
+                    and str(parse_story_file(story_index[story_id]).get("story_type") or "").strip()
+                    == "sprint_acceptance_story"
+                )
+            ]
             if not acceptance_matches:
                 errors.append(f"No Sprint Acceptance Story found in {execution_order}")
             acceptance_story_ids.update(acceptance_matches)
-
-    expected_acceptance_story_ids = {
-        "FE-007",
-        "FE-012",
-        "FE-018",
-        "FE-024",
-        "FE-029",
-        "FE-034",
-        "FE-041",
-        "FE-045",
-        "FE-049",
-    }
-    if acceptance_story_ids != expected_acceptance_story_ids:
-        missing = sorted(expected_acceptance_story_ids - acceptance_story_ids)
-        extra = sorted(acceptance_story_ids - expected_acceptance_story_ids)
-        if missing:
-            errors.append("Missing expected Sprint Acceptance Story IDs: " + ", ".join(missing))
-        if extra:
-            errors.append("Unexpected Sprint Acceptance Story IDs: " + ", ".join(extra))
 
     for story_path in story_files:
         story = parse_story_file(story_path)

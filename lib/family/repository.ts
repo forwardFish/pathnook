@@ -341,6 +341,7 @@ function buildBundleFromDemoState(
           code: label.code,
           severity: linkedError.severity,
           labelConfidence: linkedError.confidence,
+          role: linkedError.isPrimary ? ('primary' as const) : ('secondary' as const),
         };
       })
       .filter((label): label is NonNullable<typeof label> => Boolean(label));
@@ -456,6 +457,7 @@ async function persistDemoExtractionBundle(
         severity: label.severity,
         rationale: item.rationale,
         confidence: label.labelConfidence,
+        isPrimary: label.role !== 'secondary',
         createdAt: now,
       };
       state.itemErrors.push(itemError);
@@ -480,6 +482,11 @@ async function persistDemoExtractionBundle(
     parentReportJson: reportPayload.parentReportJson,
     studentReportJson: reportPayload.studentReportJson,
     tutorReportJson: reportPayload.tutorReportJson,
+    deckId: null,
+    deckStatus: 'idle',
+    deckTier: 'pending',
+    walkthroughVisibility: 'hidden',
+    voiceGuidanceDefault: false,
     createdAt: now,
     updatedAt: now,
   };
@@ -1261,6 +1268,10 @@ export async function submitUploadForUser(userId: number, uploadId: number) {
         overallConfidence: null,
         needsReviewReason: null,
         errorMessage: null,
+        deckId: null,
+        deckGenerationStatus: 'idle',
+        deckReviewStatus: 'not_requested',
+        deckExportStatus: 'idle',
         startedAt: null,
         finishedAt: null,
         createdAt: nowIso(),
@@ -1556,6 +1567,7 @@ export async function processRunForUser(
         severity: label.severity,
         rationale: item.rationale,
         confidence: label.labelConfidence,
+        isPrimary: label.role !== 'secondary',
       });
     }
   }

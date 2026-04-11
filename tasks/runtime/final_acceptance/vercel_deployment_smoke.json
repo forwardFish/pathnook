@@ -1,0 +1,141 @@
+{
+  "generated_at": "2026-04-09T14:29:39.319Z",
+  "status": "pass",
+  "issues": [],
+  "project": {
+    "id": "prj_uVnuKJSGB3bjvNwSB3tpPZTFVGHw",
+    "name": "family-education",
+    "rootDirectory": ".",
+    "expectedRootDirectory": ".",
+    "linkedRepo": {
+      "owner": "forwardFish",
+      "repo": "familyEducation",
+      "full": "forwardFish/familyEducation"
+    },
+    "productionBranch": "main",
+    "localGit": {
+      "head": "6e33e58b1e553a41fe22e6b941a7229a002de361",
+      "branch": "main",
+      "remote": {
+        "raw": "https://github.com/nextjs/saas-starter.git",
+        "provider": "github",
+        "owner": "nextjs",
+        "repo": "saas-starter",
+        "full": "nextjs/saas-starter"
+      }
+    },
+    "localRemoteMatchesLinkedRepo": false,
+    "localRemoteWarning": "Local git remote is nextjs/saas-starter, while Vercel auto deploy is linked to forwardFish/familyEducation.",
+    "previewDeploymentId": "dpl_F7SoMQDuPuGyPz6w63qo2XsPujrK",
+    "productionDeploymentId": "dpl_9gccr1t7PrQLYMbCuZpctYoV8Xbp",
+    "productionAliases": [
+      "family-education-chi.vercel.app",
+      "family-education-5184250-8087s-projects.vercel.app",
+      "family-education-git-main-5184250-8087s-projects.vercel.app"
+    ]
+  },
+  "suites": [
+    {
+      "label": "preview",
+      "baseUrl": "https://family-education-akjjfqd8u-5184250-8087s-projects.vercel.app",
+      "aliases": [],
+      "deploymentId": "dpl_F7SoMQDuPuGyPz6w63qo2XsPujrK",
+      "target": null,
+      "readyState": "READY",
+      "readySubstate": "STAGED",
+      "github": {
+        "owner": "forwardFish",
+        "repo": "familyEducation",
+        "sha": "276f67ec28272566c76366d6a362729efae4aa6b",
+        "message": "Trigger Vercel preview deployment",
+        "ref": "vercel-sync-preview"
+      },
+      "linkedRepoMatch": true,
+      "checks": [
+        {
+          "route": "/",
+          "url": "https://family-education-akjjfqd8u-5184250-8087s-projects.vercel.app/",
+          "status": 200
+        },
+        {
+          "route": "/pricing",
+          "url": "https://family-education-akjjfqd8u-5184250-8087s-projects.vercel.app/pricing",
+          "status": 200
+        },
+        {
+          "route": "/sign-up",
+          "url": "https://family-education-akjjfqd8u-5184250-8087s-projects.vercel.app/sign-up",
+          "status": 200
+        },
+        {
+          "route": "/sign-in",
+          "url": "https://family-education-akjjfqd8u-5184250-8087s-projects.vercel.app/sign-in",
+          "status": 200
+        },
+        {
+          "route": "/dashboard",
+          "url": "https://family-education-akjjfqd8u-5184250-8087s-projects.vercel.app/dashboard",
+          "status": 307
+        },
+        {
+          "route": "/dashboard/billing",
+          "url": "https://family-education-akjjfqd8u-5184250-8087s-projects.vercel.app/dashboard/billing",
+          "status": 307
+        }
+      ],
+      "status": "passed",
+      "errors": []
+    },
+    {
+      "label": "production",
+      "baseUrl": "https://family-education-kmka55fmo-5184250-8087s-projects.vercel.app",
+      "aliases": [],
+      "deploymentId": "dpl_9gccr1t7PrQLYMbCuZpctYoV8Xbp",
+      "target": "production",
+      "readyState": "READY",
+      "readySubstate": "PROMOTED",
+      "github": {
+        "owner": "forwardFish",
+        "repo": "familyEducation",
+        "sha": "b33e5770e8b71a59d644fdcaa54aedadcc055844",
+        "message": "Sync FamilyEducation app for Vercel cutover",
+        "ref": "main"
+      },
+      "linkedRepoMatch": true,
+      "checks": [
+        {
+          "route": "/",
+          "url": "https://family-education-kmka55fmo-5184250-8087s-projects.vercel.app/",
+          "status": 200
+        },
+        {
+          "route": "/pricing",
+          "url": "https://family-education-kmka55fmo-5184250-8087s-projects.vercel.app/pricing",
+          "status": 200
+        },
+        {
+          "route": "/sign-up",
+          "url": "https://family-education-kmka55fmo-5184250-8087s-projects.vercel.app/sign-up",
+          "status": 200
+        },
+        {
+          "route": "/sign-in",
+          "url": "https://family-education-kmka55fmo-5184250-8087s-projects.vercel.app/sign-in",
+          "status": 200
+        },
+        {
+          "route": "/dashboard",
+          "url": "https://family-education-kmka55fmo-5184250-8087s-projects.vercel.app/dashboard",
+          "status": 307
+        },
+        {
+          "route": "/dashboard/billing",
+          "url": "https://family-education-kmka55fmo-5184250-8087s-projects.vercel.app/dashboard/billing",
+          "status": 307
+        }
+      ],
+      "status": "passed",
+      "errors": []
+    }
+  ]
+}

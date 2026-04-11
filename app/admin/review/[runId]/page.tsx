@@ -71,6 +71,11 @@ export default async function AdminReviewDetailPage({ params }: PageProps) {
           </Button>
           {detail.run.reportId ? (
             <Button asChild variant="outline">
+              <Link href={`/admin/review/${detail.run.id}/deck`}>Open Deck Review</Link>
+            </Button>
+          ) : null}
+          {detail.run.reportId ? (
+            <Button asChild variant="outline">
               <Link href={`/dashboard/reports/${detail.run.reportId}`}>Open Parent Draft</Link>
             </Button>
           ) : null}

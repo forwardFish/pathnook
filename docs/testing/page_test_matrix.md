@@ -89,6 +89,7 @@ Primary route: `/dashboard/children/[childId]/upload`
 
 | Test ID | Scenario | Preconditions | Steps | Expected Result |
 | --- | --- | --- | --- | --- |
+| PAGE-DIAG122-UPLOAD-001 | Diagnosis intake section | 已登录且有 child | 打开 upload 页面并查看 intake 模块。 | 出现 subject、grade、source、parent concern、teacher context 等输入项。 |
 | PAGE-UPL-001 | 上传 5 张图片 | 已登录且有 child | 拖拽 5 张图片到上传区。 | 上传成功，显示 5 个缩略图。 |
 | PAGE-UPL-002 | 多文件点击选择 | 已登录且有 child | 点击 Browse 选择多张图片。 | 页面显示全部预览和页数。 |
 | PAGE-UPL-003 | 超过 10 页拦截 | 已登录且有 child | 上传 11 页。 | 禁止提交并提示分两次上传。 |
@@ -106,6 +107,7 @@ Primary route: `/dashboard/runs/[runId]`
 
 | Test ID | Scenario | Preconditions | Steps | Expected Result |
 | --- | --- | --- | --- | --- |
+| PAGE-DIAG122-GATE-001 | Confidence gate visibility | quality gate 已启用 run/report | 打开 run 或 report 页面。 | 看到 A/B/C/D 或等价质量层级，低置信度时显示 needs_review 或谨慎提示。 |
 | PAGE-RUN-001 | 提交后跳转进度页 | 刚提交 upload | 观察跳转。 | 进入对应 run 页面并显示 runId。 |
 | PAGE-RUN-002 | 五种状态展示 | 准备 queued/running/done/failed/needs_review 样本 | 分别打开各状态 run。 | 页面展示正确文案和 CTA。 |
 | PAGE-RUN-003 | 进度步骤条 | running run | 查看页面。 | 看到步骤条、百分比或阶段状态、预计时间。 |
@@ -121,6 +123,7 @@ Primary route: `/dashboard/reports/[reportId]`
 
 | Test ID | Scenario | Preconditions | Steps | Expected Result |
 | --- | --- | --- | --- | --- |
+| PAGE-DIAG122-PLAN-001 | Diagnosis plan quality | 存在 1.2.2 diagnosis report | 切换到 Plan。 | 显示 7 天计划、pauseList、parentPrompt、successCheck 和 rule trace。 |
 | PAGE-RPT-001 | Diagnosis Tab 渲染 | 存在报告 | 打开报告默认页。 | 显示 Top findings 与摘要。 |
 | PAGE-RPT-002 | Pattern vs sporadic | 存在重复与偶发错误样本 | 查看 diagnosis。 | 看到 pattern 与 sporadic 区分。 |
 | PAGE-RPT-003 | 推荐与禁做项 | 存在报告 | 查看 diagnosis + plan。 | 看到 focus this week 和暂缓建议。 |
@@ -186,3 +189,59 @@ Primary route: `/dashboard/reports/[reportId]`
 | Test ID | Scenario | Preconditions | Steps | Expected Result |
 | --- | --- | --- | --- | --- |
 | PAGE-I18N-001 | EN/ES 报告切换 | locale 支持开启 | 以 EN 和 ES 分别打开同一报告。 | 文案和计划输出语言与 locale 一致。 |
+
+## Guided Walkthrough Parent Player (`/dashboard/reports/[reportId]/play`)
+
+Primary route: `/dashboard/reports/[reportId]/play`
+
+| Test ID | Scenario | Preconditions | Steps | Expected Result |
+| --- | --- | --- | --- | --- |
+| PAGE-DCK-001 | Parent play route reachability | Logged in and report has a playable deck | Open `/dashboard/reports/[reportId]/play`. | Route loads and surfaces the optional `Guided Walkthrough` shell. |
+| PAGE-DCK-002 | Report-page play entry | Logged in and report has deck tier A/B/C | Click the walkthrough entry from `/dashboard/reports/[reportId]`. | User reaches `/play` without replacing the main report experience. |
+| PAGE-DCK-003 | Fixed deck page order | Generated deck exists | Walk through all slides in order. | Slide order matches the fixed deck outline contract and uses facts-layer content only. |
+| PAGE-DCK-004 | Product-facing copy rulebook | Generated deck exists | Review shell heading, helper copy, and controls. | User-facing naming follows `1.3.3`: `Guided Walkthrough`, `review step`, `voice guidance`, `visual explanation`. |
+| PAGE-DCK-005 | Deck tier degrade behavior | Prepare A/B/C/D deck fixtures | Open the parent `/play` route for each fixture. | A/B allow full playback, C degrades to static-only or no autoplay, D hides the play entry. |
+| PAGE-DCK-006 | Playback transport controls | Deck ready for playback | Trigger start, pause, resume, stop, next action, next slide, and prev slide. | Player state changes are stable and bounded. |
+| PAGE-DCK-007 | Voice default and fallback | Browser with and without SpeechSynthesis support | Enter the player and inspect narration defaults. | Voice guidance is off by default and falls back safely when browser TTS is unavailable. |
+| PAGE-DCK-008 | Snapshot restore | Saved playback snapshot exists | Leave the player and reopen the same deck. | Playback resumes from the saved slide/action snapshot. |
+| PAGE-DCK-009 | Responsive parent player | Desktop and 390px mobile viewport | Open `/play` in both layouts. | Core playback controls and slide content remain usable without blocking overflow. |
+
+## Guided Walkthrough Share Player (`/share/[token]/play`)
+
+Primary route: `/share/[token]/play`
+
+| Test ID | Scenario | Preconditions | Steps | Expected Result |
+| --- | --- | --- | --- | --- |
+| PAGE-DCK-010 | Share play route reachability | Valid share token and shareable deck exist | Open `/share/[token]/play`. | Read-only tutor player loads with owner-scoped share access. |
+| PAGE-DCK-011 | Share privacy constraints | Share source contains parent-only note data | Open `/share/[token]/play` and inspect all visible copy. | Parent-only notes and internal owner fields are omitted. |
+| PAGE-DCK-012 | Share revoke and expiry | Prepare valid, expired, and revoked tokens | Open `/share/[token]/play` with each token. | Valid tokens render the player; expired or revoked tokens are blocked. |
+
+## Deck Admin Review (`/admin/review/[runId]/deck`)
+
+Primary route: `/admin/review/[runId]/deck`
+
+| Test ID | Scenario | Preconditions | Steps | Expected Result |
+| --- | --- | --- | --- | --- |
+| PAGE-DCK-013 | Admin deck review route | Admin user and generated deck exist | Open `/admin/review/[runId]/deck`. | Page shows slides, actions, tier score, and trial playback tools. |
+| PAGE-DCK-014 | Regenerate review actions | Admin user reviewing a deck | Use regenerate slide and regenerate actions controls. | Updated draft renders and the deck is re-gated after regeneration. |
+| PAGE-DCK-015 | Admin approve and reject | Admin user reviewing a deck | Submit approve and reject actions. | Review state, audit trail, and downstream deck visibility update correctly. |
+| PAGE-DCK-016 | Responsive admin surface | Desktop and 390px mobile viewport | Open `/admin/review/[runId]/deck`. | Core review actions and trial playback remain usable on both layouts. |
+
+## Stage Boundary Audits (`1.3.4`)
+
+Primary routes:
+- `/`
+- `/dashboard/reports/[reportId]`
+- `/dashboard/reports/[reportId]/play`
+- `/share/[token]`
+- `/dashboard/children/[childId]`
+
+| Test ID | Scenario | Preconditions | Steps | Expected Result |
+| --- | --- | --- | --- | --- |
+| PAGE-BND134-001 | Parent-first report positioning audit | Landing, sample-report, and report routes available | Review landing and report routes against `1.3.4`. | Diagnosis/evidence/7-day plan stay primary and parent-first copy remains dominant. |
+| PAGE-BND134-002 | Explanation and plan remain inside report value layer | Accepted diagnosis report exists | Review report tabs and explanation surfaces. | ExplanationCard and SevenDayPlan remain structured report-layer concepts rather than classroom-only UI. |
+| PAGE-BND134-003 | Share privacy and tutor handoff audit | Valid share token exists | Review `/share/[token]` and share-related report copy. | Tutor summary is visible, parent-only notes stay hidden, and privacy boundaries are explicit. |
+| PAGE-BND134-004 | Guided Walkthrough optional-entry audit | Report has deck entry | Review report entry and `/play` route. | `Guided Walkthrough` is present only as a secondary, optional enhancement path. |
+| PAGE-BND134-005 | Playback/export light-layer audit | Deck/player lane exists | Review player and export entry points. | Playback, voice, share-play, and export remain enhancements and do not replace the report shell. |
+| PAGE-BND134-006 | Weekly compare lite-hook audit | Child history with multiple reports exists | Review child history and compare routes. | Compare/timeline support remains lightweight and child-scoped rather than a heavy analytics dashboard. |
+| PAGE-BND134-007 | Postpone non-scope audit | Stage 1 routes loaded | Inspect core routes and menus for non-scope features. | No PPTX, strong whiteboard, realtime Q&A, student app, or generalized growth frontend entry appears in Stage 1 routes. |

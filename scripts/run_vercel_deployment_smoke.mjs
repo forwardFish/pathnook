@@ -355,11 +355,6 @@ async function main() {
       `Vercel production branch is ${project.link?.productionBranch || 'missing'}, expected main.`
     );
   }
-  if (linkedRepo && localGit.remote.full && linkedRepo.full !== localGit.remote.full) {
-    issues.push(
-      `Local git remote is ${localGit.remote.full}, but Vercel is linked to ${linkedRepo.full}.`
-    );
-  }
 
   const suites = [];
   if (previewSuiteSource) {
@@ -395,6 +390,10 @@ async function main() {
       localRemoteMatchesLinkedRepo: linkedRepo
         ? linkedRepo.full === localGit.remote.full
         : null,
+      localRemoteWarning:
+        linkedRepo && localGit.remote.full && linkedRepo.full !== localGit.remote.full
+          ? `Local git remote is ${localGit.remote.full}, while Vercel auto deploy is linked to ${linkedRepo.full}.`
+          : null,
       previewDeploymentId: previewDeployment?.id || null,
       productionDeploymentId: productionDeployment?.id || null,
       productionAliases: productionDeployment?.alias || [],

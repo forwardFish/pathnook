@@ -122,6 +122,11 @@ export default async function AdminReviewQueuePage() {
                   </Button>
                   {item.reportId ? (
                     <Button asChild variant="outline">
+                      <Link href={`/admin/review/${item.runId}/deck`}>Open Deck Review</Link>
+                    </Button>
+                  ) : null}
+                  {item.reportId ? (
+                    <Button asChild variant="outline">
                       <Link href={`/dashboard/reports/${item.reportId}`}>Open Draft Report</Link>
                     </Button>
                   ) : null}

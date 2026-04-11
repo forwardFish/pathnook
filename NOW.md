@@ -1,28 +1,29 @@
 # NOW.md
 
-- Updated: 2026-04-09T15:55:44
-- Trigger: sprint_boundary
-- Current task: Sprint 14 Acceptance And Beta Verdict
-- Sprint: sprint_14_privacy_and_beta_launch
-- Story: FE-077
-- Node: doc_writer
-- Status: running
-- Blocker: shared_dependency_blocker
+- Updated: 2026-04-11T19:46:51+08:00
+- Trigger: roadmap_transition
+- Current task: FamilyEducation 1.3.4 Stage Boundary Backlog Bootstrap
+- Sprint: sprint_21_boundary_bootstrap_and_traceability
+- Story: FE-100
+- Node: Planning Ready
+- Status: ready
+- Blocker: none
 
 ## Next Action
-Continue sprint sprint_14_privacy_and_beta_launch from the next story boundary.
+Start FE-100 from the new backlog_v5_stage1_boundary_1_3_4 lane, then continue through FE-101 and FE-102 in Sprint 21 execution order.
 
 ## Validate
-python -m pytest -q
+python scripts/validate_planning_assets.py
 
 ## Artifact Refs
-- D:\lyh\agent\agent-frame\agentsystem\runs\sprints\familyEducation\sprint_14_privacy_and_beta_launch\document_release_report.md
-- D:\lyh\agent\agent-frame\agentsystem\runs\sprints\familyEducation\sprint_14_privacy_and_beta_launch\retro_report.md
-- D:\lyh\agent\agent-frame\agentsystem\runs\sprints\familyEducation\sprint_14_privacy_and_beta_launch\ship_advice.json
-- D:\lyh\agent\agent-frame\agentsystem\runs\sprints\familyEducation\sprint_14_privacy_and_beta_launch\sprint_close_bundle.json
-- D:\lyh\agent\agent-frame\familyEducation\tasks\runtime\story_handoffs\FE-077.md
-- D:\lyh\agent\agent-frame\familyEducation\tasks\runtime\story_failures\FE-077.json
-- D:\lyh\agent\agent-frame\familyEducation\tasks\runtime\story_admissions\FE-077.json
+- D:\lyh\agent\agent-frame\familyEducation\tasks\runtime\story_admissions\FE-100.json
+- D:\lyh\agent\agent-frame\familyEducation\tasks\runtime\story_handoffs\FE-100.md
+- D:\lyh\agent\agent-frame\familyEducation\tasks\backlog_v5_stage1_boundary_1_3_4\sprint_overview.md
+- D:\lyh\agent\agent-frame\familyEducation\tasks\backlog_v4_diagnosis_player_1_3_x\sprint_overview.md
+- D:\lyh\agent\agent-frame\agentsystem\runs\sprints\familyEducation\sprint_21_boundary_bootstrap_and_traceability\sprint_framing_artifact.json
+- D:\lyh\agent\agent-frame\agentsystem\runs\sprints\familyEducation\sprint_16_product\document_release_report.md
+- D:\lyh\agent\agent-frame\agentsystem\runs\sprints\familyEducation\sprint_16_product\retro_report.md
+- D:\lyh\agent\agent-frame\familyEducation\tasks\runtime\story_handoffs\FE-086.md
 
 ## Decision Deps
 - required

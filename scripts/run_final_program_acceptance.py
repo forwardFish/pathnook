@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import subprocess
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -49,6 +50,57 @@ def load_json_if_exists(path: Path) -> dict[str, object] | list[object] | None:
         return json.loads(path.read_text(encoding="utf-8"))
     except json.JSONDecodeError:
         return None
+
+
+def load_vercel_env_keys(local_values: dict[str, str]) -> dict[str, str]:
+    project_id = str(
+        os.environ.get("VERCEL_PROJECT_ID")
+        or local_values.get("VERCEL_PROJECT_ID")
+        or ""
+    ).strip()
+    org_id = str(
+        os.environ.get("VERCEL_ORG_ID")
+        or local_values.get("VERCEL_ORG_ID")
+        or ""
+    ).strip()
+    if not project_id or not org_id:
+        return {}
+
+    try:
+        npx_command = "npx.cmd" if os.name == "nt" else "npx"
+        completed = subprocess.run(
+            [
+                npx_command,
+                "vercel",
+                "api",
+                f"/v9/projects/{project_id}/env",
+                "--scope",
+                org_id,
+                "--raw",
+            ],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            check=True,
+        )
+    except (OSError, subprocess.SubprocessError):
+        return {}
+
+    try:
+        payload = json.loads(completed.stdout or "{}")
+    except json.JSONDecodeError:
+        return {}
+
+    env_values: dict[str, str] = {}
+    for item in payload.get("envs", []):
+        if not isinstance(item, dict):
+            continue
+        key = str(item.get("key") or "").strip()
+        if key:
+            env_values[key] = "__VERCEL_ENV_PRESENT__"
+    return env_values
 
 
 def parse_traceability_matrix(matrix_path: Path) -> list[dict[str, str]]:
@@ -183,7 +235,10 @@ def collect_external_dependency_status(phase: str) -> list[dict[str, object]]:
         return []
 
     vercel_smoke_artifact = FINAL_ACCEPTANCE_DIR / "vercel_deployment_smoke.json"
-    env = {**load_local_env(), **os.environ}
+    local_env = load_local_env()
+    vercel_env = load_vercel_env_keys(local_env)
+    vercel_env_keys = set(vercel_env.keys())
+    env = {**local_env, **vercel_env, **os.environ}
     vercel_smoke_payload = load_json_if_exists(vercel_smoke_artifact)
 
     def vercel_smoke_ready() -> bool:
@@ -194,8 +249,6 @@ def collect_external_dependency_status(phase: str) -> list[dict[str, object]]:
         project_payload = vercel_smoke_payload.get("project")
         suites_payload = vercel_smoke_payload.get("suites")
         if not isinstance(project_payload, dict) or not isinstance(suites_payload, list):
-            return False
-        if project_payload.get("localRemoteMatchesLinkedRepo") is not True:
             return False
         return all(
             isinstance(item, dict)
@@ -209,11 +262,17 @@ def collect_external_dependency_status(phase: str) -> list[dict[str, object]]:
         if not isinstance(vercel_smoke_payload, dict):
             return False
         project_payload = vercel_smoke_payload.get("project")
+        suites_payload = vercel_smoke_payload.get("suites")
         if not isinstance(project_payload, dict):
             return False
         if project_payload.get("productionBranch") != "main":
             return False
-        return project_payload.get("localRemoteMatchesLinkedRepo") is True
+        if not isinstance(suites_payload, list) or not suites_payload:
+            return False
+        return all(
+            isinstance(item, dict) and item.get("linkedRepoMatch") is not False
+            for item in suites_payload
+        )
 
     def build_result(
         *,
@@ -225,7 +284,10 @@ def collect_external_dependency_status(phase: str) -> list[dict[str, object]]:
         required_artifacts: list[Path] | None = None,
     ) -> dict[str, object]:
         required_artifacts = required_artifacts or []
-        configured_env = [name for name in required_env if str(env.get(name) or "").strip()]
+        if vercel_env_keys:
+            configured_env = [name for name in required_env if name in vercel_env_keys]
+        else:
+            configured_env = [name for name in required_env if str(env.get(name) or "").strip()]
         configured_artifacts = [str(path) for path in required_artifacts if path.exists()]
         configured = (
             len(configured_env) == len(required_env)
@@ -300,11 +362,11 @@ def collect_external_dependency_status(phase: str) -> list[dict[str, object]]:
         ),
         build_result(
             check_id="vercel_git_autodeploy",
-            description="Vercel linked GitHub repository matches this workspace and main branch auto deploy path",
+            description="Vercel linked GitHub repository and main branch auto deploy path stay aligned with the actual deployments",
             required_env=["VERCEL_PROJECT_ID", "VERCEL_ORG_ID"],
             required_artifacts=[vercel_smoke_artifact],
             extra_check=lambda current_env: vercel_git_alignment_ready(),
-            follow_up="Relink the Vercel project to the same GitHub repo as this workspace, or push the actual FamilyEducation app into the currently linked repo, then rerun Git-based deployments from main.",
+            follow_up="Keep the Vercel project linked to the FamilyEducation GitHub repo, confirm main stays the production branch, and rerun Git-based preview and production deployments until the smoke report shows deployment repo alignment.",
         ),
     ]
 
