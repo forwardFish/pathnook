@@ -53,7 +53,7 @@ function LogoInner({
         style={{ width: current.mark, height: current.mark }}
       >
         <Image
-          src="/familyeducation-mark.svg"
+          src="/pathnook-mark.svg"
           alt="Pathnook logo mark"
           width={current.mark}
           height={current.mark}
@@ -77,7 +77,7 @@ function LogoInner({
               "text-slate-500",
               subtitleClassName
             )}
-            >
+          >
             Family learning support
           </span>
         ) : null}

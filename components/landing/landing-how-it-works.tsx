@@ -55,7 +55,7 @@ export function LandingHowItWorksSection() {
                 How It Works
               </p>
               <h2 className="mt-4 text-4xl font-semibold tracking-tight text-slate-950 sm:text-6xl">
-                How FamilyEducation works
+                How Pathnook works
               </h2>
               <p className="mt-5 text-xl leading-9 text-slate-600">
                 The workflow is deliberately linear so a parent always knows

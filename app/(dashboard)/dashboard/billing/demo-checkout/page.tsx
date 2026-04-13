@@ -27,7 +27,7 @@ export default async function DemoCheckoutPage({ searchParams }: PageProps) {
           Demo Checkout
         </p>
         <h1 className="text-2xl font-semibold text-gray-900">
-          Review the selected FamilyEducation plan
+          Review the selected Pathnook plan
         </h1>
         <p className="mt-2 max-w-2xl text-sm text-gray-600">
           This sandbox preview mirrors the Creem handoff so we can verify checkout success and

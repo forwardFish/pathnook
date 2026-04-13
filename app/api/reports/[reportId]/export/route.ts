@@ -168,7 +168,7 @@ export async function GET(request: Request, context: RouteContext) {
     status: 200,
     headers: {
       'content-type': 'application/pdf',
-      'content-disposition': `attachment; filename="familyeducation-report-${numericReportId}.pdf"`,
+      'content-disposition': `attachment; filename="pathnook-report-${numericReportId}.pdf"`,
     },
   });
 }

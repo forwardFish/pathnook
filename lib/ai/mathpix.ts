@@ -34,7 +34,7 @@ export async function extractWithMathpixFallback({
         app_key: appKey,
       },
       body: JSON.stringify({
-        src: 'familyeducation-fallback-placeholder',
+        src: 'pathnook-fallback-placeholder',
         formats: ['text'],
       }),
     });

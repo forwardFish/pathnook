@@ -71,7 +71,7 @@ export function Login({
         </h2>
         <p className="mt-3 text-center text-sm text-gray-600">
           {mode === 'signin'
-            ? 'Return to FamilyEducation and pick up where you left off.'
+            ? 'Return to Pathnook and pick up where you left off.'
             : 'Start with a standard account now and add student details later when you need them.'}
         </p>
       </div>
@@ -210,7 +210,7 @@ export function Login({
                 />
                 <span>
                   I agree to the Terms of Service and Privacy Policy for
-                  FamilyEducation.
+                  Pathnook.
                 </span>
               </label>
             </div>
@@ -245,7 +245,7 @@ export function Login({
           {mode === 'signin' ? (
             <div className="text-center text-sm text-gray-600">
               <a
-                href={`mailto:${FAMILY_EDU_SUPPORT_EMAIL}?subject=FamilyEducation password recovery`}
+                href={`mailto:${FAMILY_EDU_SUPPORT_EMAIL}?subject=Pathnook password recovery`}
                 className="font-medium text-orange-700 underline-offset-4 hover:underline"
               >
                 Need help recovering your password?

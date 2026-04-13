@@ -15,7 +15,7 @@ export function getDefaultDemoParentProfile(): DemoParentProfile {
   return {
     id: 1,
     name: 'Demo Parent',
-    email: 'demo-parent@familyeducation.local',
+    email: 'demo-parent@pathnook.local',
     googleSub: null,
     password: 'DemoParent123',
     role: 'owner',

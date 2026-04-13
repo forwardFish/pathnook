@@ -34,7 +34,7 @@ function getEnvProductId(
 export const BILLING_PLANS: BillingPlan[] = [
   {
     planType: 'one_time',
-    productId: getEnvProductId('one_time', 'prod_familyeducation_one_time'),
+    productId: getEnvProductId('one_time', 'prod_pathnook_one_time'),
     priceId: 'price_fe_one_time',
     name: 'One-Time Diagnosis',
     shortName: 'One-Time',
@@ -54,7 +54,7 @@ export const BILLING_PLANS: BillingPlan[] = [
   },
   {
     planType: 'monthly',
-    productId: getEnvProductId('monthly', 'prod_familyeducation_monthly'),
+    productId: getEnvProductId('monthly', 'prod_pathnook_monthly'),
     priceId: 'price_fe_monthly',
     name: 'Parent Weekly',
     shortName: 'Weekly',
@@ -75,7 +75,7 @@ export const BILLING_PLANS: BillingPlan[] = [
   },
   {
     planType: 'annual',
-    productId: getEnvProductId('annual', 'prod_familyeducation_annual'),
+    productId: getEnvProductId('annual', 'prod_pathnook_annual'),
     priceId: 'price_fe_annual',
     name: 'Parent Annual',
     shortName: 'Annual',

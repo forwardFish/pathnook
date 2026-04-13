@@ -189,7 +189,7 @@ export async function createHostedCheckoutSession({
       priceId: plan.priceId,
       planType: plan.planType,
       productId: plan.productId,
-      source: 'familyeducation-web',
+      source: 'pathnook-web',
     },
   });
 

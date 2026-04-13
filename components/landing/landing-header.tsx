@@ -31,17 +31,17 @@ export function LandingHeader() {
           : "bg-white/72 backdrop-blur-md"
       )}
     >
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-4 py-4 sm:px-6 lg:px-8">
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
         <Link href="/" aria-label="Pathnook home">
-          <FamilyLogo size="md" />
+          <FamilyLogo size="md" showSubtitle={false} />
         </Link>
 
-        <nav className="hidden items-center gap-1 lg:flex">
+        <nav className="hidden flex-1 items-center justify-center gap-2 px-6 lg:flex xl:gap-3">
           {landingNavItems.map((item) => (
             <Link
               key={item.href}
               href={item.href}
-              className="rounded-full px-4 py-2 text-base font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-950"
+              className="whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-950 xl:px-5"
             >
               {item.label}
             </Link>
@@ -49,15 +49,15 @@ export function LandingHeader() {
         </nav>
 
         <div className="hidden items-center gap-3 lg:flex">
-          <Button asChild variant="outline" className="rounded-full border-slate-300">
+          <Button asChild variant="outline" className="rounded-full border-slate-300 px-5">
             <Link href="/sign-in">Sign In</Link>
           </Button>
           <Button
             asChild
-            className="rounded-full bg-slate-950 px-6 text-white hover:bg-slate-800"
+            className="rounded-full bg-slate-950 px-5 text-white hover:bg-slate-800"
           >
             <Link href="/sign-up?redirect=dashboard">
-              Start a Diagnosis
+              Get Started
               <ArrowRight className="h-4 w-4" />
             </Link>
           </Button>
@@ -104,7 +104,7 @@ export function LandingHeader() {
                 href="/sign-up?redirect=dashboard"
                 onClick={() => setIsMenuOpen(false)}
               >
-                Start a Diagnosis
+                Get Started
               </Link>
             </Button>
           </div>

@@ -4,9 +4,9 @@ import { getUser, getTeamForUser } from '@/lib/db/queries';
 import { SWRConfig } from 'swr';
 
 export const metadata: Metadata = {
-  title: 'FamilyEducation Parent Dashboard',
+  title: 'Pathnook',
   description:
-    'Parent-first learning diagnosis, evidence review, and weekly planning.'
+    'Parent-first learning diagnosis, evidence review, and weekly planning with Pathnook.'
 };
 
 export const viewport: Viewport = {

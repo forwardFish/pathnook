@@ -229,7 +229,7 @@ export async function scheduleReportReadyReminderForReport(userId: number, repor
     userId,
     reportId,
     childId: (report as any)?.run?.childId ?? null,
-    subject: `FamilyEducation report ready for ${childNickname}`,
+    subject: `Pathnook report ready for ${childNickname}`,
     message:
       'Your report is now readable in the parent dashboard. Review the diagnosis, evidence, and 7-day plan before you share it onward.',
     metadata: {
@@ -252,7 +252,7 @@ export async function scheduleWeeklyReviewReminder(input: {
     kind: 'weekly_review',
     userId: input.userId,
     childId: input.childId ?? null,
-    subject: `Weekly FamilyEducation review for ${childLabel}`,
+    subject: `Weekly Pathnook review for ${childLabel}`,
     message:
       'Open the dashboard to compare the latest report, review parent notes, and decide whether a fresh upload is needed this week.',
     metadata: {

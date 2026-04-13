@@ -13,7 +13,7 @@ const faqItems = [
       "The current intake is designed for 5 to 10 pages from homework, quizzes, tests, or correction packets. Mixed packets work as long as the pages are readable.",
   },
   {
-    question: "Does FamilyEducation give the child the answers?",
+    question: "Does Pathnook give the child the answers?",
     answer:
       "No. The report is built for parents and tutors. It focuses on error patterns, evidence anchors, and next steps rather than handing over completed work.",
   },

@@ -53,7 +53,7 @@ async function setupLegacyLocalPostgres() {
   const dockerComposeContent = `services:
   postgres:
     image: postgres:16.4-alpine
-    container_name: familyeducation_postgres
+    container_name: pathnook_postgres
     environment:
       POSTGRES_DB: postgres
       POSTGRES_USER: postgres
@@ -212,7 +212,7 @@ async function main() {
   const databaseConfig = await resolveDatabaseConfig();
   const defaultBaseUrl = databaseConfig.usingLegacyLocalFallback
     ? 'http://127.0.0.1:3000'
-    : 'https://family-education.vercel.app';
+    : 'https://www.pathnook.com';
   const baseUrl = await questionWithDefault('Step 2: Enter BASE_URL', defaultBaseUrl);
   const storageConfig = await collectBlobConfig(
     databaseConfig.usingLegacyLocalFallback
@@ -222,7 +222,7 @@ async function main() {
   const authSecret = generateAuthSecret();
 
   const envLines = [
-    '# FamilyEducation environment bootstrap',
+    '# Pathnook environment bootstrap',
     '# Production should use Vercel + Neon + Blob.',
     `DATABASE_URL=${databaseConfig.databaseUrl}`,
     '# POSTGRES_URL is kept only as a legacy fallback path.',
@@ -243,7 +243,7 @@ async function main() {
     `CREEM_PRODUCT_MONTHLY_ID=${creemConfig.productMonthlyId}`,
     `CREEM_PRODUCT_ANNUAL_ID=${creemConfig.productAnnualId}`,
     '',
-    '# FamilyEducation runtime',
+    '# Pathnook runtime',
     'SUPPORT_EMAIL=support@example.com',
     'DEFAULT_LOCALE=en-US',
     'DEFAULT_COUNTRY=US',

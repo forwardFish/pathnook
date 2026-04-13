@@ -66,7 +66,7 @@ export function LandingUseCasesSection() {
           </h2>
           <p className="mt-5 text-xl leading-9 text-slate-600">
             This section fills the role of the SEO-style landing content in the
-            reference design while staying grounded in the FamilyEducation
+            reference design while staying grounded in the Pathnook
             workflow and vocabulary.
           </p>
         </motion.div>
