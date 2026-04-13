@@ -1,14 +1,13 @@
 # DECISIONS.md
 
-- Updated: 2026-04-11T19:15:00+08:00
+- Updated: 2026-04-13T00:00:00
 
 ## Active Decision Inputs
 - D:\lyh\agent\agent-frame\.meta\familyEducation\plan_ceo_review\product_review_report.md
+- D:\lyh\agent\agent-frame\familyEducation\docs\需求文档_1.4.md
+- D:\lyh\agent\agent-frame\familyEducation\docs\需求文档_1.5.md
 
-## Active Delivery Decisions
-- `backlog_v5_stage1_boundary_1_3_4` is now the authoritative execution lane for `需求文档_1.3.4` stage-boundary planning and decomposition.
-- `backlog_v4_diagnosis_player_1_3_x` remains intact as the dependent light-lane backlog for deck/player execution; it is inherited rather than merged away.
-- Accepted Story YAMLs and acceptance packets in `backlog_v1`, `backlog_v2_beta_launch`, and `backlog_v3_diagnosis_1_2_2` remain immutable; v5 may only add dependency references, traceability links, and regression coverage.
-- `需求文档_1.3.3` still governs user-facing copy and default UX for light-lane walkthrough features: `Guided Walkthrough` is optional, voice is off by default, and visual explanation stays secondary to the report.
-- `需求文档_1.3.4` governs Stage 1 scope classification: `must-do` and `light-do` enter sprint execution; `postpone` remains documented as non-scope guardrails only.
-- Sprint execution now follows the boundary-first order: bootstrap/traceability -> must-do alignment -> light-lane mapping -> final boundary closure.
+## Execution Order
+- `1.4 v6` is already closed locally through FE-126.
+- `1.5 v7` is accepted locally as `tasks/backlog_v7_homepage_display_rewrite_1_5/`.
+- `tasks/compact_execution_1_4_1_5.md` remains the historical anti-stall execution pack for FE-117 through FE-135.

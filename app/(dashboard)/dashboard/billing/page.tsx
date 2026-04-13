@@ -3,7 +3,10 @@ import { checkoutAction, customerPortalAction } from '@/lib/payments/actions';
 import { getUser } from '@/lib/db/queries';
 import { getBillingSnapshotForUser } from '@/lib/family/billing';
 import { formatBillingInterval, isRecurringPlanType } from '@/lib/payments/catalog';
-import { getPortalSupportLabel } from '@/lib/payments/creem';
+import {
+  getBillingProviderStatusSummary,
+  getPortalSupportLabel,
+} from '@/lib/payments/service';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
@@ -36,6 +39,10 @@ function getCheckoutMessage(checkout: string | undefined, plan: string | undefin
     return 'Checkout could not be completed because the selected billing payload was invalid.';
   }
 
+  if (checkout === 'unavailable') {
+    return 'The active billing provider is not configured yet. Enable the Creem rollback flag or finish the Freemius cutover before retrying checkout.';
+  }
+
   return null;
 }
 
@@ -49,6 +56,7 @@ export default async function BillingPage({ searchParams }: PageProps) {
   const snapshot = await getBillingSnapshotForUser(user.id);
   const checkoutMessage = getCheckoutMessage(params.checkout, params.plan);
   const hasRecurringPlan = isRecurringPlanType(snapshot.activePlanType);
+  const providerStatus = getBillingProviderStatusSummary();
 
   return (
     <section className="flex-1 space-y-6 p-4 lg:p-8">
@@ -57,11 +65,11 @@ export default async function BillingPage({ searchParams }: PageProps) {
           Billing
         </p>
         <h1 className="text-3xl font-semibold tracking-tight text-gray-900">
-          Creem billing and unlock status
+          Billing and unlock status
         </h1>
         <p className="mt-2 max-w-3xl text-sm text-gray-600">
-          Payments are hosted by Creem. One-time purchases unlock a diagnosis credit, while the
-          recurring plans unlock all current reports and keep the weekly review flow open.
+          Billing runs through the active provider service. One-time purchases unlock a diagnosis
+          credit, while recurring plans unlock current reports and keep the weekly review flow open.
         </p>
       </div>
 
@@ -75,7 +83,8 @@ export default async function BillingPage({ searchParams }: PageProps) {
         <Card className="border-amber-200 bg-amber-50">
           <CardContent className="pt-6 text-sm text-amber-900">
             The Creem customer portal is not available yet for this household. Complete a live
-            checkout first so a customer record can be created.
+            billing portal is not available yet for this household. Complete a live checkout first
+            so a customer record can be created.
           </CardContent>
         </Card>
       ) : null}
@@ -127,9 +136,29 @@ export default async function BillingPage({ searchParams }: PageProps) {
 
         <Card>
           <CardHeader>
-            <CardTitle>Available plans</CardTitle>
+            <CardTitle>Billing center</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700">
+              <p className="font-medium text-slate-950">Provider status</p>
+              <p className="mt-2">
+                Requested provider: <span className="font-medium">{providerStatus.requestedProvider}</span>
+              </p>
+              <p className="mt-1">
+                Active provider: <span className="font-medium">{providerStatus.activeProvider}</span>
+              </p>
+              <p className="mt-1">
+                Rollback active: <span className="font-medium">{providerStatus.fallbackApplied ? 'yes' : 'no'}</span>
+              </p>
+              <p className="mt-1">
+                Rollback enabled: <span className="font-medium">{providerStatus.rollbackEnabled ? 'yes' : 'no'}</span>
+              </p>
+              <p className="mt-3 text-xs text-slate-500">
+                Public routes stay provider-neutral, while the billing center keeps the
+                household-visible operational status for regression checks.
+              </p>
+            </div>
+
             {snapshot.plans.map((plan) => (
               <div key={plan.priceId} className="rounded-2xl border border-gray-200 p-4">
                 <div className="flex items-start justify-between gap-4">

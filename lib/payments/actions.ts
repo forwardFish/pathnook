@@ -3,9 +3,12 @@
 import { redirect } from 'next/navigation';
 import { getUser } from '@/lib/db/queries';
 import { applyCheckoutCompletionForUser } from '@/lib/family/billing';
-import { createCheckoutSession, createCustomerPortalSession } from './creem';
 import { withTeam } from '@/lib/auth/middleware';
 import { getBillingPlanByPriceId } from '@/lib/payments/catalog';
+import {
+  redirectToBillingCheckout,
+  redirectToBillingPortal,
+} from '@/lib/payments/service';
 
 function getCurrentPeriodEndIso(interval: 'once' | 'month' | 'year') {
   const now = Date.now();
@@ -23,12 +26,32 @@ function getCurrentPeriodEndIso(interval: 'once' | 'month' | 'year') {
 
 export const checkoutAction = withTeam(async (formData, team) => {
   const priceId = formData.get('priceId') as string;
-  await createCheckoutSession({ team: team, priceId });
+  const user = await getUser();
+  if (!user) {
+    redirect(`/sign-up?redirect=checkout&priceId=${priceId}`);
+  }
+
+  await redirectToBillingCheckout({
+    team,
+    priceId,
+    userEmail: user.email,
+    userId: user.id,
+  });
 });
 
 export const customerPortalAction = withTeam(async (_, team) => {
-  const portalSession = await createCustomerPortalSession(team);
-  redirect(portalSession.url);
+  const user = await getUser();
+  if (!user) {
+    redirect('/sign-in');
+  }
+
+  await redirectToBillingPortal({
+    team: {
+      id: team.id,
+      stripeCustomerId: team.stripeCustomerId,
+    },
+    userEmail: user.email,
+  });
 });
 
 export const completeDemoCheckoutAction = withTeam(async (formData) => {

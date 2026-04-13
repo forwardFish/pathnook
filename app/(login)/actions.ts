@@ -17,7 +17,6 @@ import {
 import { comparePasswords, hashPassword, setSession } from '@/lib/auth/session';
 import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
-import { createCheckoutSession } from '@/lib/payments/creem';
 import { getUser, getUserWithTeam } from '@/lib/db/queries';
 import { logActivity } from '@/lib/db/activity';
 import { isFamilyEduDemoMode } from '@/lib/family/config';
@@ -33,6 +32,7 @@ import {
   validatedAction,
   validatedActionWithUser
 } from '@/lib/auth/middleware';
+import { redirectToBillingCheckout } from '@/lib/payments/service';
 
 const FAMILY_EDU_DEMO_MODE = isFamilyEduDemoMode();
 
@@ -114,7 +114,12 @@ export const signIn = validatedAction(signInSchema, async (data, formData) => {
   const redirectTo = formData.get('redirect') as string | null;
   if (redirectTo === 'checkout') {
     const priceId = formData.get('priceId') as string;
-    return createCheckoutSession({ team: foundTeam, priceId });
+    return redirectToBillingCheckout({
+      team: foundTeam,
+      priceId,
+      userEmail: foundUser.email,
+      userId: foundUser.id,
+    });
   }
 
   redirect('/dashboard');
@@ -310,7 +315,12 @@ export const signUp = validatedAction(signUpSchema, async (data, formData) => {
   const redirectTo = formData.get('redirect') as string | null;
   if (redirectTo === 'checkout') {
     const priceId = formData.get('priceId') as string;
-    return createCheckoutSession({ team: createdTeam, priceId });
+    return redirectToBillingCheckout({
+      team: createdTeam,
+      priceId,
+      userEmail: createdUser.email,
+      userId: createdUser.id,
+    });
   }
 
   redirect('/dashboard');

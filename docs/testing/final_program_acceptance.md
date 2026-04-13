@@ -43,6 +43,14 @@ Program-level test IDs:
 - `FP-BND134-002`: Must-do boundary acceptance sweep
 - `FP-BND134-003`: Light-do delegation and secondary-surface sweep
 - `FP-BND134-004`: Postpone guardrail and non-scope audit
+- `FP-BILL14-001`: 1.4 billing/provider traceability audit against `BILL14-*` requirements
+- `FP-BILL14-002`: Provider/data/entitlement foundation sweep
+- `FP-BILL14-003`: Checkout/portal/webhook/compatibility route sweep
+- `FP-BILL14-004`: Pathnook public-brand and billing-center release sweep
+- `FP-HOME15-001`: 1.5 homepage traceability audit against `HOME15-*` requirements
+- `FP-HOME15-002`: Homepage narrative and positioning sweep
+- `FP-HOME15-003`: Homepage public-surface, FAQ, footer, and linked-route sweep
+- `FP-HOME15-004`: Homepage responsive, CTA, and public-brand regression sweep
 
 ### Suite A - Public And Authenticated Pages
 - Re-run all page cases from `docs/testing/page_test_matrix.md` that apply to landing, pricing, sign-up, sign-in, dashboard, children, upload, run status, report, billing, share, tutor, and admin.
@@ -76,6 +84,20 @@ Program-level test IDs:
 - Re-run `CLICK-BND134-001` through `CLICK-BND134-003` from `docs/testing/click_path_matrix.md`.
 - Re-run `API-BND134-001` through `API-BND134-009` and `DATA-BND134-001` through `DATA-BND134-007` from `docs/testing/api_data_ai_test_matrix.md`.
 - Collect boundary traceability, must-do alignment, light-do delegation, and postpone guardrail evidence for the v5 lane.
+
+### Suite H - Billing Provider Cutover Lane
+- Re-run `TC-BILL14-001` through `TC-BILL14-007` from `docs/testing/governance_test_matrix.md`.
+- Re-run `PAGE-BILL14-001` through `PAGE-BILL14-006` from `docs/testing/page_test_matrix.md`.
+- Re-run `CLICK-BILL14-001` through `CLICK-BILL14-004` from `docs/testing/click_path_matrix.md`.
+- Re-run `API-BILL14-001` through `API-BILL14-009`, `DATA-BILL14-001` through `DATA-BILL14-006`, and `NF-BILL14-001` through `NF-BILL14-003` from `docs/testing/api_data_ai_test_matrix.md`.
+- Collect checkout, portal, webhook replay, entitlement diff, public-brand, billing-center, and public-route smoke evidence for the v6 lane.
+
+### Suite I - Homepage Display Rewrite Lane
+- Re-run `TC-HOME15-001` through `TC-HOME15-008` from `docs/testing/governance_test_matrix.md`.
+- Re-run `PAGE-HOME15-001` through `PAGE-HOME15-010` from `docs/testing/page_test_matrix.md`.
+- Re-run `CLICK-HOME15-001` through `CLICK-HOME15-003` from `docs/testing/click_path_matrix.md`.
+- Re-run `NF-HOME15-001` through `NF-HOME15-002` from `docs/testing/api_data_ai_test_matrix.md`.
+- Collect homepage copy audit, section-order screenshots, CTA flow logs, responsive evidence, and `1.4` public-brand regression proof for the v7 lane.
 
 ## Evidence Pack
 

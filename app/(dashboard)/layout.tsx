@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { useState, Suspense } from 'react';
 import { Button } from '@/components/ui/button';
 import { FamilyLogo } from '@/components/branding/family-logo';
+import { LandingFooter } from '@/components/landing/landing-footer';
+import { LandingHeader } from '@/components/landing/landing-header';
 import {
   CreditCard,
   Home,
@@ -19,7 +21,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { signOut } from '@/app/(login)/actions';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { User } from '@/lib/db/schema';
 import useSWR, { mutate } from 'swr';
 
@@ -130,10 +132,25 @@ function Header() {
 }
 
 export default function Layout({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  const isMarketingRoute =
+    pathname === '/' ||
+    pathname === '/pricing' ||
+    pathname === '/sample-report' ||
+    pathname === '/contact' ||
+    pathname.startsWith('/legal/');
+  const showHeader = !isMarketingRoute;
+
   return (
     <section className="flex flex-col min-h-screen">
-      <Header />
-      {children}
+      {isMarketingRoute ? <LandingHeader /> : null}
+      {showHeader ? <Header /> : null}
+      {isMarketingRoute && pathname !== '/' ? (
+        <div className="pt-24 sm:pt-28">{children}</div>
+      ) : (
+        children
+      )}
+      {isMarketingRoute ? <LandingFooter /> : null}
     </section>
   );
 }

@@ -32,7 +32,9 @@ export function LandingHeader() {
       )}
     >
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-4 py-4 sm:px-6 lg:px-8">
-        <FamilyLogo size="md" />
+        <Link href="/" aria-label="Pathnook home">
+          <FamilyLogo size="md" />
+        </Link>
 
         <nav className="hidden items-center gap-1 lg:flex">
           {landingNavItems.map((item) => (
@@ -55,7 +57,7 @@ export function LandingHeader() {
             className="rounded-full bg-slate-950 px-6 text-white hover:bg-slate-800"
           >
             <Link href="/sign-up?redirect=dashboard">
-              Create Account
+              Start a Diagnosis
               <ArrowRight className="h-4 w-4" />
             </Link>
           </Button>
@@ -102,7 +104,7 @@ export function LandingHeader() {
                 href="/sign-up?redirect=dashboard"
                 onClick={() => setIsMenuOpen(false)}
               >
-                Create Account
+                Start a Diagnosis
               </Link>
             </Button>
           </div>

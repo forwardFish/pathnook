@@ -1,8 +1,8 @@
 # Agent Coverage Report
 
-- Updated at: 2026-04-10T20:50:48
+- Updated at: 2026-04-12T19:56:31
 - Coverage status: complete
-- Stories tracked: 37
+- Stories tracked: 41
 
 ## Stories
 ### FE-054
@@ -199,6 +199,30 @@
 
 ### FE-086
 - Sprint: sprint_16_product
+- Executed: plan-eng-review, qa, review
+- Required: plan-eng-review, review, qa
+- Missing required: none
+
+### FE-114
+- Sprint: sprint_25_bootstrap_and_traceability
+- Executed: plan-eng-review, qa, review
+- Required: plan-eng-review, review, qa
+- Missing required: none
+
+### FE-115
+- Sprint: sprint_25_bootstrap_and_traceability
+- Executed: plan-eng-review, qa, review
+- Required: plan-eng-review, review, qa
+- Missing required: none
+
+### FE-116
+- Sprint: sprint_25_bootstrap_and_traceability
+- Executed: plan-eng-review, qa, review
+- Required: plan-eng-review, review, qa
+- Missing required: none
+
+### FE-117
+- Sprint: sprint_26_provider_and_data_layer
 - Executed: plan-eng-review, qa, review
 - Required: plan-eng-review, review, qa
 - Missing required: none

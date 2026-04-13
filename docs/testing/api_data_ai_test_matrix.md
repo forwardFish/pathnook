@@ -60,6 +60,15 @@
 | API-BND134-007 | Export-light contract | Audit H5/PDF/share-light enhancement rules | Export remains an enhancement artifact and does not replace the main report |
 | API-BND134-008 | Weekly/timeline-lite contract | Audit compare/history/timeline hooks | Compare/timeline remain lightweight hooks backed by existing child history surfaces |
 | API-BND134-009 | Postpone guardrail audit | Audit authoritative Stage 1 contracts for non-scope leakage | No Stage 1 API/test contract introduces PPTX, strong whiteboard, realtime Q&A, student app, or generalized growth frontend scope |
+| API-BILL14-001 | Billing provider interface | `lib/payments/providers/base.ts` or equivalent provider interface | Checkout, portal, redirect, and webhook contracts are provider-neutral |
+| API-BILL14-002 | Billing service selection | `lib/payments/service.ts` and feature-flag selection | Service chooses Freemius by default, preserves Creem fallback, and exposes provider-neutral results |
+| API-BILL14-003 | Billing data compatibility | Billing table migrations and legacy readers | New billing tables coexist with existing subscription and billing-event reads |
+| API-BILL14-004 | Entitlement projection | Provider purchase/subscription -> local entitlement mapping | One-time, monthly, annual, cancel, expire, and upgrade transitions resolve into local snapshots |
+| API-BILL14-005 | Non-regression billing snapshot | Existing paywall and unlock consumers | Report unlock and billing snapshot consumers continue to read valid state through the new entitlement layer |
+| API-BILL14-006 | `POST /api/checkout` and checkout facade | Primary checkout flow and compatibility entry point | Public checkout resolves through the new billing service and returns provider-neutral metadata |
+| API-BILL14-007 | `POST /api/portal` and billing portal CTA | Portal route and billing-center integration | Portal opens when configured and returns a controlled unavailable state when not configured |
+| API-BILL14-008 | `POST /webhook` | Primary billing webhook receiver | Webhook events are stored, signature-checked, and applied idempotently |
+| API-BILL14-009 | Creem compatibility routes | Hidden `/api/creem/*` fallback routes | Compatibility routes remain available for rollback without defining the public primary flow |
 
 ## Data Integrity Tests
 
@@ -96,6 +105,12 @@
 | DATA-BND134-005 | Provider/jobs lifecycle | analysis runs, retry, quality-gate state | Queue/running/needs_review/done/failed/retry/degrade states remain explicit and reusable |
 | DATA-BND134-006 | Playback/export light linkage | deck linkage, playback/export metadata | Light-lane playback/export metadata stay additive to the report rather than replacing it |
 | DATA-BND134-007 | Weekly/timeline lightweight hooks | compare summaries, history pointers, snapshot-linked review hooks | Timeline and compare support stay child-scoped and lightweight |
+| DATA-BILL14-001 | Billing provider registry | provider names, flags, and service metadata | Provider selection remains explicit, auditable, and switchable |
+| DATA-BILL14-002 | `billing_provider_accounts` | Persist provider identity mapping | Local users/teams map to provider-specific account identity without leaking provider assumptions into consumers |
+| DATA-BILL14-003 | `billing_entitlements` | Persist local billing rights | Credits, recurring plan state, period-end, and upgrade state remain queryable locally |
+| DATA-BILL14-004 | `billing_webhook_events` | Persist replay-safe webhook history | Provider events are deduplicated and auditable by provider event id |
+| DATA-BILL14-005 | Entitlement snapshots | Billing snapshot projection output | Snapshot payloads can answer unlock, subscription, portal, and history-retention questions |
+| DATA-BILL14-006 | Legacy billing compatibility | Existing `subscriptions`, `billing_events`, and compatible team fields | Old records remain readable during the cutover and map cleanly into the new entitlement layer |
 
 ## AI / OCR / QC Tests
 
@@ -138,6 +153,11 @@
 | NF-DCK-004 | Degraded deck UX | Tier C/D deck playback | Degrade policy removes autoplay or hides play entry without crashing the report flow |
 | NF-DCK-005 | Deck telemetry | Generation, review, playback, export events | Deck lifecycle emits auditable telemetry suitable for release evidence |
 | NF-DCK-006 | Artifact durability | Export/share/admin evidence manifest | Required deck evidence files remain readable and linked after generation/export |
+| NF-BILL14-001 | Billing flag resilience | Provider and feature-flag switching | Freemius can be defaulted or rolled back via env flags without deleting code or breaking route contracts |
+| NF-BILL14-002 | Public brand consistency | Landing, pricing, footer, contact, legal routes | Public copy stays consistently Pathnook-branded and billing-trust aligned across routes |
+| NF-BILL14-003 | Billing cutover non-regression | Upload, analysis, report, share, deck, and build surfaces | Existing core routes remain stable while billing/provider architecture changes underneath |
+| NF-HOME15-001 | Homepage responsive stability | Desktop and mobile homepage layouts | The homepage rewrite remains readable, stable, and CTA-usable across desktop and mobile breakpoints |
+| NF-HOME15-002 | Homepage copy regression guardrail | Landing, pricing, FAQ, and footer copy | Public copy does not regress into math-only, report-only, bilingual-first, family-action-plan-first, or billing-mechanics-first framing |
 
 ## Ops And Release Tests
 

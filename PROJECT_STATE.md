@@ -1,56 +1,31 @@
-# PROJECT_STATE.md
+﻿# PROJECT_STATE.md
 
 ## Repository Status
 - Base repository: `nextjs/saas-starter`
 - Local repository path: `D:\lyh\agent\agent-frame\familyEducation`
-- Existing PRD docs preserved under `docs/`
-- This repository now has planning, traceability, and testing assets under `docs/` and `tasks/backlog_v1/`.
-- A new stage-boundary planning lane now exists at `tasks/backlog_v5_stage1_boundary_1_3_4/` for `需求文档_1.3.4`.
-- `tasks/backlog_v4_diagnosis_player_1_3_x/` remains the dependent light-lane backlog for deck/player execution under the new stage-boundary split.
+- Existing PRD docs remain preserved under `docs/`.
+- This repository now has canonical planning, traceability, and testing assets under `docs/` plus authoritative backlog roots under `tasks/`.
+- A new Freemius-primary billing lane now exists at `tasks/backlog_v6_freemius_primary_billing_1_4/` for `需求文档_1.4`.
+- The homepage rewrite lane at `tasks/backlog_v7_homepage_display_rewrite_1_5/` for `需求文档_1.5` is now implemented and accepted locally.
+- `tasks/backlog_v5_stage1_boundary_1_3_4/` remains the documented `1.3.4` boundary lane, and `tasks/backlog_v4_diagnosis_player_1_3_x/` remains the dependent deck/player lane.
 - Continuity and runtime evidence scaffolding exists under `.meta/familyEducation/continuity/` and `tasks/runtime/`.
-- `scripts/validate_planning_assets.py` can verify the requirement-to-story-to-test contract before feature work starts.
-- Sprint 0 bootstrap work is accepted with a passing planning-asset audit and a passing `pnpm build`.
-- Sprint 1 is now accepted:
-  - parent-first signup gating, password strength validation, and TOS consent are browser-verified
-  - sign-up, sign-in, redirect-back, password recovery entry, and account locale persistence all pass in demo-auth acceptance mode
-  - child CRUD routes, pages, actions, and APIs are accepted through both browser and HTTP smoke coverage
-  - `python scripts/run_sprint1_delivery.py` passes and writes Sprint 1 evidence into `tasks/runtime/`
-- Sprint 2 is now accepted:
-  - upload, upload_files, pages, analysis_runs, and reports schema are in place
-  - the upload workspace supports previews, page count gates, notes, source type, and PDF splitting
-  - the run lifecycle supports queued, running, done, failed, needs_review, retry, and timeout/support paths
-  - a local deterministic demo runtime now keeps FamilyEducation flows testable even without Docker-backed Postgres
-  - `python scripts/run_sprint2_delivery.py` passes and writes Sprint 2 evidence into `tasks/runtime/`
-- Sprint 3 is now accepted:
-  - canonical extraction bundles now persist page-level items, evidence anchors, taxonomy labels, and overall confidence
-  - `/api/runs/[runId]/process` can force and inspect extraction output for QA and traceability evidence
-  - low-confidence runs now route to `needs_review` and expose draft report messaging instead of pretending certainty
-  - the report page now renders `Diagnosis`, `Evidence`, and `7-Day Plan` tabs from the structured extraction layer
-  - `python scripts/run_sprint3_delivery.py` passes and writes Sprint 3 evidence into `tasks/runtime/`
-- Sprint 4 is now accepted:
-  - diagnosis cards now surface top findings, pattern/sporadic signals, and weekly focus guidance
-  - evidence groups can open the source page through the page artifact route
-  - the 7-day plan supports persisted `Mark Done` progress per report
-  - parent, student, and tutor report payloads are all served from the same report facts layer
-  - `python scripts/run_sprint4_delivery.py` passes and writes Sprint 4 evidence into `tasks/runtime/`
-- Sprint 5 is now accepted:
-  - reports now enforce paywall gating until one-time or monthly billing unlocks access
-  - billing supports demo checkout, Stripe-aligned session creation, and idempotent webhook handling
-  - share links now require unlocked reports and support active, expired, and revoked states
-  - child history now includes compare-to-last summaries plus persisted parent notes
-  - `python scripts/run_sprint5_delivery.py` passes and writes Sprint 5 evidence into `tasks/runtime/`
-- Sprint 6 is now accepted:
-  - admin review queue, PDF export, tutor workspace shell, reminder artifacts, EN/ES report output, and evidence highlight overlay are all closed with story evidence
-  - `python scripts/run_sprint6_delivery.py` passes and writes Sprint 6 evidence into `tasks/runtime/`
-- Sprint 7 is now accepted:
-  - child, upload, and report delete entry points now remove linked runtime access and back the local retention contract
-  - local observability now records run lifecycle events, failure events, and per-run cost artifacts
-  - release-candidate docs now include the staging runbook, fixture-pack manifest, env checklist, and cleanup audit flow
-  - `python scripts/run_sprint7_delivery.py` passes and writes Sprint 7 evidence into `tasks/runtime/`
-- Sprint 8 is now closed in the local deterministic acceptance lane:
-  - the remaining governance rows (`GOV-003`, `GOV-004`) and responsive row (`PAGE-013`) are brought to green in the traceability matrix
-  - final API/data/AI/ops coverage is stored in `tasks/runtime/final_acceptance/final_api_smoke_manifest.json`
-  - final desktop/mobile route coverage is stored in `tasks/runtime/browser_evidence/final_browser_evidence_manifest.json`
-  - the generated final local program verdict is `COMPLETE` in `tasks/runtime/final_program_acceptance/final_program_acceptance.json`
-  - final ship, document-release, retro, handoff, and evidence-pack index artifacts are stored under `tasks/runtime/`
-  - real staging deployment, Vercel hookup, production env provisioning, and live production smoke are still intentionally out of scope for this local completion lane and remain documented follow-up work
+- `scripts/validate_planning_assets.py` can now verify v1, v3, v4, v5, v6, and v7 planning roots together before feature work starts.
+- The local codebase already contains partial `1.3.x` deck/player implementation surfaces, but formal flow rows for those lanes remain planned until their acceptance stories close.
+- The local codebase now carries an accepted `1.5 v7` homepage baseline with a real `/sample-report` route and HOME15 acceptance evidence.
+
+## Accepted Delivery History
+- Sprint 0 bootstrap is accepted with a passing planning-asset audit and a passing `pnpm build`.
+- Sprint 1 through Sprint 8 of the local deterministic acceptance lane are accepted, covering auth, child CRUD, upload, run lifecycle, structured diagnosis facts, report tabs, billing/paywall, share, admin review, PDF export, tutor shell, reminders, localization, evidence highlight, retention, observability, and final local acceptance artifacts.
+- `tests/deck-playback.test.ts` and the current local `npm run build` remain the key non-regression checks for the deck/player and web shell surface.
+
+## Current Known Gaps
+- `1.4` had a requirement document but no authoritative backlog, traceability, or testing lane until the new v6 bootstrap.
+- Public `Pathnook` brand alignment is incomplete across landing, pricing, billing, footer, and support/legal surfaces.
+- Billing is still architecturally Creem-centered in the current runtime code; Freemius provider abstraction, additive billing tables, entitlement projection, and primary routes have not yet started execution.
+- `1.5` homepage rewrite is accepted locally, but future public-route polish should preserve the HOME15 copy guardrails and sample-report entry path.
+- `FE-087` through `FE-113` remain outside formal closeout for the older `1.3.x` / `1.3.4` lanes, so `1.4` must treat them as dependency and regression context rather than as newly accepted scope.
+
+## Next Best Step
+- Run `python scripts/validate_planning_assets.py` from `familyEducation/` when preparing the next lane.
+- Use `tasks/runtime/final_program_acceptance/home15_final_acceptance.md` as the latest accepted public-surface checkpoint.
+- Decide the next authoritative backlog lane before reopening `NOW.md` into an active story.

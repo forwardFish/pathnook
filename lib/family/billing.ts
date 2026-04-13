@@ -4,7 +4,6 @@ import { and, desc, eq, inArray, ne } from 'drizzle-orm';
 import { db } from '@/lib/db/drizzle';
 import {
   analysisRuns,
-  billingEvents,
   reports,
   subscriptions,
   teamMembers,
@@ -22,25 +21,20 @@ import {
   isRecurringPlanType,
   type BillingPlanType,
 } from '@/lib/payments/catalog';
+import {
+  getBillingSnapshotFromEntitlements,
+  recordProviderWebhookEvent,
+  syncBillingEntitlement,
+  syncBillingProviderAccount,
+  type BillingSnapshot,
+} from '@/lib/payments/entitlements';
 import { scheduleReportReadyReminderForReport } from '@/lib/notifications/reminders';
-
-type BillingSnapshot = {
-  activePlanType: 'free' | BillingPlanType;
-  planName: string | null;
-  subscriptionStatus: string;
-  reportCredits: number;
-  unlockedReportIds: number[];
-  accessibleReportIds: number[];
-  lockedReportIds: number[];
-  currentPeriodEndsAt: string | null;
-  plans: typeof BILLING_PLANS;
-};
 
 type CheckoutCompletionInput = {
   userId: number;
   priceId: string;
   checkoutSessionId: string;
-  provider?: 'creem' | 'stripe' | 'demo';
+  provider?: 'freemius' | 'creem' | 'stripe' | 'demo';
   stripeCustomerId?: string | null;
   stripeSubscriptionId?: string | null;
   status?: string;
@@ -48,7 +42,7 @@ type CheckoutCompletionInput = {
 };
 
 type BillingWebhookInput = {
-  source: 'creem' | 'stripe' | 'demo';
+  source: 'freemius' | 'creem' | 'stripe' | 'demo';
   eventId: string;
   eventType: string;
   payload: Record<string, unknown>;
@@ -219,6 +213,7 @@ function buildSnapshotFromDemoState(state: FamilyMockState, userId: number): Bil
       lockedReportIds: [],
       currentPeriodEndsAt: recurringSubscription.currentPeriodEndsAt,
       plans: BILLING_PLANS,
+      portalAvailable: Boolean(recurringSubscription.stripeCustomerId),
     };
   }
 
@@ -238,6 +233,7 @@ function buildSnapshotFromDemoState(state: FamilyMockState, userId: number): Bil
       lockedReportIds,
       currentPeriodEndsAt: oneTimeSubscription.currentPeriodEndsAt,
       plans: BILLING_PLANS,
+      portalAvailable: Boolean(oneTimeSubscription.stripeCustomerId),
     };
   }
 
@@ -251,6 +247,7 @@ function buildSnapshotFromDemoState(state: FamilyMockState, userId: number): Bil
     lockedReportIds: allReportIds,
     currentPeriodEndsAt: null,
     plans: BILLING_PLANS,
+    portalAvailable: false,
   };
 }
 
@@ -367,6 +364,7 @@ async function buildSnapshotFromDb(userId: number): Promise<BillingSnapshot> {
         ? recurringSubscription.currentPeriodEndsAt.toISOString()
         : null,
       plans: BILLING_PLANS,
+      portalAvailable: Boolean(recurringSubscription.stripeCustomerId),
     };
   }
 
@@ -388,6 +386,7 @@ async function buildSnapshotFromDb(userId: number): Promise<BillingSnapshot> {
         ? oneTimeSubscription.currentPeriodEndsAt.toISOString()
         : null,
       plans: BILLING_PLANS,
+      portalAvailable: Boolean(oneTimeSubscription.stripeCustomerId),
     };
   }
 
@@ -401,6 +400,7 @@ async function buildSnapshotFromDb(userId: number): Promise<BillingSnapshot> {
     lockedReportIds: allReportIds,
     currentPeriodEndsAt: null,
     plans: BILLING_PLANS,
+    portalAvailable: false,
   };
 }
 
@@ -410,7 +410,7 @@ export async function getBillingSnapshotForUser(userId: number): Promise<Billing
     return buildSnapshotFromDemoState(state, userId);
   }
 
-  return buildSnapshotFromDb(userId);
+  return getBillingSnapshotFromEntitlements(userId);
 }
 
 export async function isReportUnlockedForUser(userId: number, reportId: number) {
@@ -638,11 +638,49 @@ export async function applyCheckoutCompletionForUser(input: CheckoutCompletionIn
   }
 
   const before = await getBillingSnapshotForUser(input.userId);
-  await upsertDbSubscription({
+  const persistedSubscription = await upsertDbSubscription({
     provider: input.provider || 'creem',
     ...input,
   });
-  await applyCreditsToDbSubscription(input.userId);
+  const plan = getBillingPlanByPriceId(input.priceId);
+  const normalizedSubscription =
+    plan?.planType === 'one_time'
+      ? await applyCreditsToDbSubscription(input.userId)
+      : persistedSubscription;
+
+  const entitlementUnlockedReportIds =
+    normalizedSubscription && isRecurringPlanType(normalizedSubscription.planType as BillingPlanType)
+      ? await listUserReportIds(input.userId)
+      : ((normalizedSubscription?.unlockedReportIds as number[] | undefined) || []);
+
+  if (normalizedSubscription) {
+    await syncBillingProviderAccount({
+      teamId: normalizedSubscription.teamId,
+      userId: normalizedSubscription.userId,
+      provider: (input.provider || 'creem') as 'freemius' | 'creem' | 'demo',
+      providerCustomerId: input.stripeCustomerId || null,
+      providerSubscriptionId: input.stripeSubscriptionId || null,
+    });
+
+    await syncBillingEntitlement({
+      teamId: normalizedSubscription.teamId,
+      userId: normalizedSubscription.userId,
+      provider: (input.provider || 'creem') as 'freemius' | 'creem' | 'demo',
+      planType: normalizedSubscription.planType as BillingPlanType,
+      priceId: normalizedSubscription.priceId,
+      status: normalizedSubscription.status,
+      providerCustomerId: normalizedSubscription.stripeCustomerId,
+      providerSubscriptionId: normalizedSubscription.stripeSubscriptionId,
+      checkoutSessionId: normalizedSubscription.checkoutSessionId,
+      reportCredits: normalizedSubscription.reportCredits,
+      unlockedReportIds: entitlementUnlockedReportIds,
+      currentPeriodEndsAt: normalizedSubscription.currentPeriodEndsAt
+        ? normalizedSubscription.currentPeriodEndsAt.toISOString()
+        : null,
+      legacySubscriptionId: normalizedSubscription.id,
+    });
+  }
+
   const after = await getBillingSnapshotForUser(input.userId);
   const newlyUnlocked = after.accessibleReportIds.filter(
     (reportId) => !before.accessibleReportIds.includes(reportId)
@@ -675,22 +713,16 @@ async function recordDemoBillingEvent(
 }
 
 async function recordDbBillingEvent(input: BillingWebhookInput) {
-  const existing = await db
-    .select({ id: billingEvents.id })
-    .from(billingEvents)
-    .where(eq(billingEvents.eventId, input.eventId))
-    .limit(1);
-
-  if (existing[0]) {
-    return false;
-  }
-
-  await db.insert(billingEvents).values({
-    source: input.source,
+  const isNew = await recordProviderWebhookEvent({
+    provider: input.source,
     eventId: input.eventId,
     eventType: input.eventType,
     payload: input.payload,
   });
+
+  if (!isNew) {
+    return false;
+  }
 
   return true;
 }
@@ -749,7 +781,50 @@ export async function processBillingWebhookEvent(input: BillingWebhookInput) {
     currentPeriodEndsAt: input.currentPeriodEndsAt || null,
   });
 
-  await applyCreditsToDbSubscription(input.userId);
+  const persisted =
+    plan.planType === 'one_time'
+      ? await applyCreditsToDbSubscription(input.userId)
+      : (
+          await db
+            .select()
+            .from(subscriptions)
+            .where(and(eq(subscriptions.userId, input.userId), eq(subscriptions.planType, plan.planType)))
+            .orderBy(desc(subscriptions.updatedAt))
+            .limit(1)
+        )[0] || null;
+
+  const entitlementUnlockedReportIds = isRecurringPlanType(plan.planType)
+    ? await listUserReportIds(input.userId)
+    : ((persisted?.unlockedReportIds as number[] | undefined) || []);
+
+  if (persisted) {
+    await syncBillingProviderAccount({
+      teamId: persisted.teamId,
+      userId: persisted.userId,
+      provider: input.source,
+      providerCustomerId: input.stripeCustomerId || null,
+      providerSubscriptionId: input.stripeSubscriptionId || null,
+    });
+
+    await syncBillingEntitlement({
+      teamId: persisted.teamId,
+      userId: persisted.userId,
+      provider: input.source,
+      planType: persisted.planType as BillingPlanType,
+      priceId: persisted.priceId,
+      status: persisted.status,
+      providerCustomerId: persisted.stripeCustomerId,
+      providerSubscriptionId: persisted.stripeSubscriptionId,
+      checkoutSessionId: persisted.checkoutSessionId,
+      reportCredits: persisted.reportCredits,
+      unlockedReportIds: entitlementUnlockedReportIds,
+      currentPeriodEndsAt: persisted.currentPeriodEndsAt
+        ? persisted.currentPeriodEndsAt.toISOString()
+        : null,
+      legacySubscriptionId: persisted.id,
+    });
+  }
+
   return { applied: true, snapshot: await getBillingSnapshotForUser(input.userId) };
 }
 

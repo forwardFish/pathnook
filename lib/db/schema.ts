@@ -439,6 +439,64 @@ export const billingEvents = pgTable('billing_events', {
   processedAt: timestamp('processed_at').notNull().defaultNow(),
 });
 
+export const billingProviderAccounts = pgTable('billing_provider_accounts', {
+  id: serial('id').primaryKey(),
+  teamId: integer('team_id')
+    .notNull()
+    .references(() => teams.id),
+  userId: integer('user_id')
+    .notNull()
+    .references(() => users.id),
+  provider: varchar('provider', { length: 20 }).notNull(),
+  providerCustomerId: text('provider_customer_id'),
+  providerSubscriptionId: text('provider_subscription_id'),
+  email: varchar('email', { length: 255 }),
+  metadata: jsonb('metadata')
+    .$type<Record<string, unknown>>()
+    .notNull()
+    .default(sql`'{}'::jsonb`),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+});
+
+export const billingEntitlements = pgTable('billing_entitlements', {
+  id: serial('id').primaryKey(),
+  teamId: integer('team_id')
+    .notNull()
+    .references(() => teams.id),
+  userId: integer('user_id')
+    .notNull()
+    .references(() => users.id),
+  provider: varchar('provider', { length: 20 }).notNull(),
+  planType: varchar('plan_type', { length: 20 }).notNull(),
+  priceId: varchar('price_id', { length: 120 }).notNull(),
+  status: varchar('status', { length: 30 }).notNull().default('pending'),
+  providerCustomerId: text('provider_customer_id'),
+  providerSubscriptionId: text('provider_subscription_id'),
+  checkoutSessionId: text('checkout_session_id'),
+  reportCredits: integer('report_credits').notNull().default(0),
+  unlockedReportIds: jsonb('unlocked_report_ids')
+    .$type<number[]>()
+    .notNull()
+    .default(sql`'[]'::jsonb`),
+  currentPeriodEndsAt: timestamp('current_period_ends_at'),
+  legacySubscriptionId: integer('legacy_subscription_id').references(() => subscriptions.id),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+});
+
+export const billingWebhookEvents = pgTable('billing_webhook_events', {
+  id: serial('id').primaryKey(),
+  provider: varchar('provider', { length: 20 }).notNull(),
+  providerEventKey: varchar('provider_event_key', { length: 220 }).notNull().unique(),
+  eventId: varchar('event_id', { length: 150 }).notNull(),
+  eventType: varchar('event_type', { length: 120 }).notNull(),
+  payload: jsonb('payload')
+    .$type<Record<string, unknown>>()
+    .notNull(),
+  processedAt: timestamp('processed_at').notNull().defaultNow(),
+});
+
 // Runtime records now live in Neon on Vercel. The legacy local JSON stores remain
 // as documented fallback paths only and are no longer the production source of truth.
 export const reminderEvents = pgTable('reminder_events', {
@@ -805,6 +863,12 @@ export type Subscription = typeof subscriptions.$inferSelect;
 export type NewSubscription = typeof subscriptions.$inferInsert;
 export type BillingEvent = typeof billingEvents.$inferSelect;
 export type NewBillingEvent = typeof billingEvents.$inferInsert;
+export type BillingProviderAccount = typeof billingProviderAccounts.$inferSelect;
+export type NewBillingProviderAccount = typeof billingProviderAccounts.$inferInsert;
+export type BillingEntitlement = typeof billingEntitlements.$inferSelect;
+export type NewBillingEntitlement = typeof billingEntitlements.$inferInsert;
+export type BillingWebhookEvent = typeof billingWebhookEvents.$inferSelect;
+export type NewBillingWebhookEvent = typeof billingWebhookEvents.$inferInsert;
 export type ReminderEvent = typeof reminderEvents.$inferSelect;
 export type NewReminderEvent = typeof reminderEvents.$inferInsert;
 export type RunLifecycleEventRecord = typeof runLifecycleEvents.$inferSelect;

@@ -8,10 +8,10 @@ import { logActivity } from '@/lib/db/activity';
 import { db } from '@/lib/db/drizzle';
 import { teams, teamMembers, users, type NewTeam, type NewTeamMember } from '@/lib/db/schema';
 import { ActivityType } from '@/lib/db/schema';
-import { createHostedCheckoutSession } from '@/lib/payments/creem';
 import { isFamilyEduDemoMode } from '@/lib/family/config';
 import { toDemoUser, upsertDemoParentFromGoogle } from '@/lib/family/demo-auth';
 import { shouldUseSecureCookies } from '@/lib/auth/cookies';
+import { createBillingHostedCheckoutSession } from '@/lib/payments/service';
 
 const GOOGLE_OAUTH_COOKIE = 'google_oauth_ctx';
 const FAMILY_EDU_DEMO_MODE = isFamilyEduDemoMode();
@@ -233,9 +233,11 @@ export async function GET(request: NextRequest) {
         .limit(1);
 
       if (team[0]) {
-        const session = await createHostedCheckoutSession({
+        const session = await createBillingHostedCheckoutSession({
           team: team[0],
           priceId: context.priceId,
+          userEmail: user.email,
+          userId: user.id,
         });
         return NextResponse.redirect(session.checkoutUrl);
       }

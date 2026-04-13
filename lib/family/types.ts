@@ -293,7 +293,7 @@ export type StoredSubscription = {
   id: number;
   teamId: number;
   userId: number;
-  provider: 'creem' | 'stripe' | 'demo';
+  provider: 'freemius' | 'creem' | 'stripe' | 'demo';
   planType: BillingPlanType;
   priceId: string;
   status:
@@ -317,7 +317,7 @@ export type StoredSubscription = {
 
 export type StoredBillingEvent = {
   id: number;
-  source: 'creem' | 'stripe' | 'demo';
+  source: 'freemius' | 'creem' | 'stripe' | 'demo';
   eventId: string;
   eventType: string;
   payload: Record<string, unknown>;

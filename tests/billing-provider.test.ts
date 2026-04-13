@@ -1,0 +1,69 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import { resolveBillingProviderSelection } from '../lib/payments/provider-selection';
+
+test('Freemius remains active when it is configured', () => {
+  const selection = resolveBillingProviderSelection({
+    demoMode: false,
+    requested: 'freemius',
+    freemiusConfigured: true,
+    creemConfigured: true,
+    allowCreemFallback: true,
+  });
+
+  assert.deepEqual(selection, {
+    requested: 'freemius',
+    active: 'freemius',
+    fallbackApplied: false,
+    rollbackEnabled: true,
+  });
+});
+
+test('Creem rollback only activates when the flag is enabled', () => {
+  const selection = resolveBillingProviderSelection({
+    demoMode: false,
+    requested: 'freemius',
+    freemiusConfigured: false,
+    creemConfigured: true,
+    allowCreemFallback: true,
+  });
+
+  assert.deepEqual(selection, {
+    requested: 'freemius',
+    active: 'creem',
+    fallbackApplied: true,
+    rollbackEnabled: true,
+  });
+});
+
+test('Provider selection stays on Freemius shell when rollback is disabled', () => {
+  const selection = resolveBillingProviderSelection({
+    demoMode: false,
+    requested: 'freemius',
+    freemiusConfigured: false,
+    creemConfigured: true,
+    allowCreemFallback: false,
+  });
+
+  assert.deepEqual(selection, {
+    requested: 'freemius',
+    active: 'freemius',
+    fallbackApplied: false,
+    rollbackEnabled: false,
+  });
+});
+
+test('Public checkout entrypoints no longer import Creem directly', () => {
+  const actionSource = readFileSync(
+    new URL('../lib/payments/actions.ts', import.meta.url),
+    'utf8'
+  );
+  const routeSource = readFileSync(
+    new URL('../app/api/billing/checkout-session/route.ts', import.meta.url),
+    'utf8'
+  );
+
+  assert.equal(actionSource.includes("lib/payments/creem"), false);
+  assert.equal(routeSource.includes("lib/payments/creem"), false);
+});

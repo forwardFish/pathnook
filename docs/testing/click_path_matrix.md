@@ -344,3 +344,114 @@ Evidence to collect:
 - mid-playback screenshot
 - snapshot API request/response
 - restored state screenshot
+
+## CLICK-BILL14-001 – Pricing -> Primary Checkout Route
+
+Preconditions: public pricing page available and the default provider is Freemius
+
+Steps:
+1. Open `/pricing`.
+2. Trigger the checkout CTA for `one_time`, `monthly`, and `annual` fixtures.
+3. Inspect the request/redirect target.
+
+Expected result: checkout flows through the new primary route or compatibility facade backed by the billing service and does not expose public Creem copy.
+
+Evidence to collect:
+- pricing CTA screenshot
+- checkout request/response log
+- provider default behavior assertion
+
+## CLICK-BILL14-002 – Dashboard Billing -> Portal Entry And Unavailable State
+
+Preconditions: authenticated parent fixtures with and without a portal-ready provider account
+
+Steps:
+1. Open `/dashboard/billing`.
+2. Trigger the portal CTA on a configured fixture.
+3. Repeat on a fixture without portal readiness.
+
+Expected result: configured users reach the portal flow, while unavailable users see provider-neutral guidance rather than a Creem fallback.
+
+Evidence to collect:
+- billing-center screenshot
+- portal request/response log
+- unavailable-state screenshot
+
+## CLICK-BILL14-003 – Webhook Replay -> Entitlement Idempotency
+
+Preconditions: webhook replay fixture or deterministic local webhook payload available
+
+Steps:
+1. Submit the same billing webhook event twice.
+2. Inspect webhook event storage and entitlement state after both attempts.
+
+Expected result: the first event applies successfully, the second is idempotent, and entitlement state remains correct.
+
+Evidence to collect:
+- webhook replay log
+- stored event assertion
+- entitlement diff output
+
+## CLICK-BILL14-004 – Public Brand Surface -> Legal Footer Consistency
+
+Preconditions: public landing and pricing routes available
+
+Steps:
+1. Open `/`.
+2. Navigate through pricing, footer, contact, privacy, terms, and refunds links.
+3. Inspect public copy on each route.
+
+Expected result: all linked public routes use Pathnook branding and billing trust copy consistently with no public Creem leakage.
+
+Evidence to collect:
+- route screenshots
+- footer navigation log
+- brand consistency assertion
+
+## CLICK-HOME15-001 – Homepage -> How It Works -> Pricing Preview
+
+Preconditions: public landing route available
+
+Steps:
+1. Open `/`.
+2. Scroll through hero, positioning, why-use, Stage 1 value, and how-it-works.
+3. Continue into the pricing-preview section.
+
+Expected result: the homepage reads as one coherent Pathnook story and does not break into disconnected feature fragments.
+
+Evidence to collect:
+- section-order screenshots
+- narrative flow notes
+- pricing-preview transition screenshot
+
+## CLICK-HOME15-002 – Homepage Footer -> Pricing / Contact / Legal
+
+Preconditions: public landing route available
+
+Steps:
+1. Open `/`.
+2. Navigate through pricing preview, footer, contact, privacy, terms, and refunds links.
+3. Inspect each route for trust and brand consistency.
+
+Expected result: footer-linked routes remain reachable and consistent with the homepage rewrite and the `1.4` Pathnook public trust surface.
+
+Evidence to collect:
+- footer navigation log
+- linked route screenshots
+- trust-copy consistency notes
+
+## CLICK-HOME15-003 – Homepage CTA -> Sample Report / Pricing
+
+Preconditions: public landing route available
+
+Steps:
+1. Open `/`.
+2. Trigger the primary homepage CTA flow toward diagnosis/pricing.
+3. Trigger the sample-report CTA flow.
+
+Expected result: CTA flows remain clear, reachable, and aligned with the new homepage copy without dead ends or outdated wording.
+
+Evidence to collect:
+- CTA screenshots
+- sample-report route screenshot
+- pricing route screenshot

@@ -54,7 +54,7 @@ function LogoInner({
       >
         <Image
           src="/familyeducation-mark.svg"
-          alt="FamilyEducation logo mark"
+          alt="Pathnook logo mark"
           width={current.mark}
           height={current.mark}
           priority
@@ -68,7 +68,7 @@ function LogoInner({
             textClassName
           )}
         >
-          FamilyEducation
+          Pathnook
         </span>
         {showSubtitle ? (
           <span
@@ -77,8 +77,8 @@ function LogoInner({
               "text-slate-500",
               subtitleClassName
             )}
-          >
-            Family diagnosis workflow
+            >
+            Family learning support
           </span>
         ) : null}
       </span>

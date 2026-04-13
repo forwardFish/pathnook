@@ -1,6 +1,8 @@
 # PRD Requirement Index
 
 Source of truth:
+- `docs/需求文档_1.4.md`
+- `docs/需求文档_1.5.md`
 - `docs/需求文档.md`
 - `docs/需求文档_1.3.4.md`
 - `docs/saas-starter 一天落地实施说明.md`
@@ -43,6 +45,35 @@ This index converts the PRD into unique requirement IDs. No feature may start im
 | BND134-WEEKLY-TIMELINE-LITE | Stage Boundary 1.3.4 | 1.3.4 / Light-Do / Weekly Review And Timeline | Weekly review, compare, and timeline support may exist only as lightweight child-scoped hooks rather than a new heavy dashboard or generalized growth frontend. |
 | BND134-POSTPONE-GUARDRAIL | Stage Boundary 1.3.4 | 1.3.4 / Postpone | PPTX, strong whiteboard, realtime walkthrough Q&A, multi-agent UI, student app, and generalized growth frontend work must stay out of Stage 1 execution. |
 | BND134-FINAL-ACCEPT | Stage Boundary 1.3.4 | Sprint 24 Acceptance | The 1.3.4 boundary lane may close only when must-do and light-do rows are green or delegated with evidence and postponed work remains out of execution. |
+| BILL14-PROGRAM-LANE | Billing 1.4 | 1.4 / Delivery Strategy | `1.4` must start as a new authoritative backlog lane with continuity, traceability, and testing assets before runtime changes begin. |
+| BILL14-BASELINE | Billing 1.4 | 1.4 / Baseline Audit | The `1.4` lane must preserve explicit baseline evidence for current public-copy, provider, and billing-center gaps so later acceptance can measure the cutover. |
+| BILL14-PROVIDER-INTERFACE | Billing 1.4 | 1.4 / Provider Abstraction | Billing must expose a provider-neutral interface and service layer with Freemius and Creem implementations behind it. |
+| BILL14-DATA-LAYER | Billing 1.4 | 1.4 / Data Layer | The application must add `billing_provider_accounts`, `billing_entitlements`, and `billing_webhook_events` while keeping existing billing tables readable for compatibility. |
+| BILL14-ENTITLEMENT-LAYER | Billing 1.4 | 1.4 / Local Entitlements | Local entitlement projection must remain the authoritative source for report unlock, subscription validity, portal access, and historical rights. |
+| BILL14-CHECKOUT | Billing 1.4 | 1.4 / Checkout Route | Public checkout must move to a Freemius-first flow through a new primary `POST /api/checkout` entry point while preserving stable pricing UX. |
+| BILL14-PORTAL | Billing 1.4 | 1.4 / Portal Route | Billing portal access must flow through a new primary `POST /api/portal` entry point and expose provider-neutral status to the dashboard UI. |
+| BILL14-WEBHOOK | Billing 1.4 | 1.4 / Webhook | Public billing sync must use a new primary `POST /webhook` route with idempotent event storage and entitlement updates. |
+| BILL14-CREEM-COMPAT | Billing 1.4 | 1.4 / Compatibility Layer | Creem code, routes, env keys, and fallback wiring must remain in the repository as a hidden compatibility layer rather than being deleted. |
+| BILL14-BRAND-PUBLIC | Billing 1.4 | 1.4 / Public Brand | Public pages, SEO, pricing, trust copy, and support language must present the product as `Pathnook` rather than `FamilyEducation`. |
+| BILL14-BILLING-CENTER | Billing 1.4 | 1.4 / Billing Center | `/dashboard/billing` must become a Pathnook billing center that shows entitlements, plan state, portal entry, and provider status. |
+| BILL14-LEGAL-PUBLIC | Billing 1.4 | 1.4 / Legal And Trust | Public privacy, terms, refunds, contact, and trust copy must be reachable and consistent with the Freemius-first billing architecture. |
+| BILL14-FLAGS-ROLLBACK | Billing 1.4 | 1.4 / Flags And Rollback | Feature flags must make Freemius the default public provider, hide Creem UI, preserve compatibility routes, and allow rollback without code deletion. |
+| BILL14-NON-REGRESSION | Billing 1.4 | 1.4 / Regression Scope | Upload, analysis, report, share, deck playback, build, and existing paywall flows must remain intact through the billing/provider cutover. |
+| BILL14-FINAL-ACCEPT | Billing 1.4 | Sprint 28 Acceptance | The `1.4` lane may close only when Freemius is the primary public path, Pathnook branding is consistent, Creem stays hidden-compatible, and regression evidence is green. |
+| HOME15-PROGRAM-LANE | Homepage 1.5 | 1.5 / Delivery Strategy | `1.5` must start as a new authoritative backlog lane after `1.4 v6` closes, with continuity, traceability, and testing assets registered before runtime rewrite work begins. |
+| HOME15-BASELINE | Homepage 1.5 | 1.5 / Baseline Audit | The `1.5` lane must preserve baseline evidence for current homepage copy, section order, CTA flow, and positioning debt before the rewrite starts. |
+| HOME15-SYSTEM-DEFINITION | Homepage 1.5 | 1.5 / Brand Definition | Public homepage copy must define Pathnook as `an AI learning and growth system` rather than a narrow tool, report app, or math-only workflow. |
+| HOME15-HERO-POSITIONING | Homepage 1.5 | 1.5 / Hero And Positioning | The hero and positioning layer must explain who Pathnook is, what current value it creates, and why families should care within the first viewport. |
+| HOME15-WHY-USE | Homepage 1.5 | 1.5 / Why Families Use Pathnook | The homepage must explain clarity, next-step guidance, and follow-through in outcome language rather than feature-list language. |
+| HOME15-STAGE1-VALUE | Homepage 1.5 | 1.5 / What Families Get Today | Public homepage sections must present the current Stage 1 family-learning-support value clearly without overselling Stage 2. |
+| HOME15-PROOF-TRUST | Homepage 1.5 | 1.5 / Proof And Trust | The homepage must show proof-before-pay and trust-building language grounded in evidence-first, parent-first, share-safe, and quality-gated behavior. |
+| HOME15-STAGE2-BRIDGE | Homepage 1.5 | 1.5 / Stage 2 Bridge | The homepage may introduce a future-facing Stage 2 bridge only as a secondary layer that does not steal focus from current Stage 1 support. |
+| HOME15-HOW-IT-WORKS | Homepage 1.5 | 1.5 / How It Works | Public flow copy must explain the user journey in clear value language and avoid internal pipeline-first framing. |
+| HOME15-PRICING-PREVIEW | Homepage 1.5 | 1.5 / Pricing Preview | Homepage pricing-preview copy must stay simple, trust-aligned, and consistent with the `1.4` Pathnook billing/legal surface. |
+| HOME15-FAQ-FOOTER | Homepage 1.5 | 1.5 / FAQ And Footer | Homepage FAQ and footer must answer positioning questions, keep legal/support routes reachable, and stay aligned with Pathnook public trust copy. |
+| HOME15-RESPONSIVE-CTA | Homepage 1.5 | 1.5 / Responsive And CTA Flow | The homepage rewrite must remain usable on desktop and mobile, with working CTA routes into sample and pricing surfaces. |
+| HOME15-COPY-GUARDRAILS | Homepage 1.5 | 1.5 / Copy Guardrails | Homepage copy must not position the product as math-only, report-only, bilingual-first, family-action-plan-first, or billing-mechanics-first. |
+| HOME15-FINAL-ACCEPT | Homepage 1.5 | Sprint 31 Acceptance | The `1.5` lane may close only when traceability, copy audit, responsive evidence, route smoke, and `1.4` public-brand regression checks are all green. |
 | GOV-001 | Governance | Summary / Governance And Traceability | 实现前必须先建立 requirement index、traceability matrix 和测试矩阵。 |
 | GOV-002 | Governance | Governance And Traceability | 任何 Story 卡都必须包含 requirement_ids、test_case_ids、expected_evidence。 |
 | GOV-003 | Governance | Sprint Acceptance And Final Gate | 每个 Sprint 都必须有独立 Sprint Acceptance Story 和 traceability audit。 |

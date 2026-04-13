@@ -245,3 +245,47 @@ Primary routes:
 | PAGE-BND134-005 | Playback/export light-layer audit | Deck/player lane exists | Review player and export entry points. | Playback, voice, share-play, and export remain enhancements and do not replace the report shell. |
 | PAGE-BND134-006 | Weekly compare lite-hook audit | Child history with multiple reports exists | Review child history and compare routes. | Compare/timeline support remains lightweight and child-scoped rather than a heavy analytics dashboard. |
 | PAGE-BND134-007 | Postpone non-scope audit | Stage 1 routes loaded | Inspect core routes and menus for non-scope features. | No PPTX, strong whiteboard, realtime Q&A, student app, or generalized growth frontend entry appears in Stage 1 routes. |
+
+## Billing Provider And Pathnook Brand (`1.4`)
+
+Primary routes:
+- `/`
+- `/pricing`
+- `/dashboard/billing`
+- `/contact`
+- `/legal/privacy`
+- `/legal/terms`
+- `/legal/refunds`
+
+| Test ID | Scenario | Preconditions | Steps | Expected Result |
+| --- | --- | --- | --- | --- |
+| PAGE-BILL14-001 | Freemius-first pricing entry | Public pricing route available | Open `/pricing` and inspect checkout entry points. | Pricing uses the new public billing flow and does not expose public Creem purchase CTAs. |
+| PAGE-BILL14-002 | Pathnook brand on landing and pricing | Public landing and pricing routes available | Open `/` and `/pricing`. | Public copy, title, proof points, and CTAs use `Pathnook` instead of `FamilyEducation`. |
+| PAGE-BILL14-003 | Legal, contact, and footer trust alignment | Footer and legal routes available | Open footer links, `/contact`, and `/legal/*` routes. | Billing, trust, privacy, terms, refunds, and support copy are reachable and consistent with the new billing architecture. |
+| PAGE-BILL14-004 | Billing center entitlement status | Logged in parent with billing snapshot available | Open `/dashboard/billing`. | Billing center shows current plan, entitlement status, and purchase state using Pathnook copy. |
+| PAGE-BILL14-005 | Billing portal availability states | Logged in parent with and without portal-ready provider identity | Open `/dashboard/billing` for both fixtures. | Portal CTA opens when configured and falls back to provider-neutral guidance when unavailable. |
+| PAGE-BILL14-006 | Controlled provider-unavailable UX | Freemius env intentionally incomplete | Open `/pricing` and `/dashboard/billing`. | Public UI shows a controlled unavailable state and never falls back to public Creem copy. |
+
+## Homepage Display Rewrite (`1.5`)
+
+Primary routes:
+- `/`
+- `/pricing`
+- `/sample-report`
+- `/contact`
+- `/legal/privacy`
+- `/legal/terms`
+- `/legal/refunds`
+
+| Test ID | Scenario | Preconditions | Steps | Expected Result |
+| --- | --- | --- | --- | --- |
+| PAGE-HOME15-001 | Pathnook system definition in hero | Public landing route available | Open `/` and inspect the first viewport. | The hero defines Pathnook as an AI learning and growth system rather than a math-only or report-only tool. |
+| PAGE-HOME15-002 | Hero support line and positioning section | Public landing route available | Open `/` and review hero support line plus the next section. | The page explains that Pathnook is more than a report tool and frames the current Stage 1 focus clearly. |
+| PAGE-HOME15-003 | Why-use section outcome language | Public landing route available | Scroll to the why-use section. | The page explains clarity, next steps, and follow-through in outcome language instead of a feature list. |
+| PAGE-HOME15-004 | Stage 1 value section | Public landing route available | Review the `What families get today` section. | The homepage clearly presents current Stage 1 family-learning-support value without overselling Stage 2. |
+| PAGE-HOME15-005 | Proof and trust sections | Public landing route available | Review proof and trust sections plus sample CTA entry. | The homepage shows proof-before-pay and trust language grounded in evidence-first, parent-first, share-safe, and quality-gated behavior. |
+| PAGE-HOME15-006 | Stage 2 bridge stays secondary | Public landing route available | Scroll from Stage 1 value through the Stage 2 bridge. | Stage 2 appears only as a secondary future-facing bridge and does not replace the current Stage 1 story. |
+| PAGE-HOME15-007 | How-it-works rewrite | Public landing route available | Review the `How Pathnook works` section. | The public flow is explained in value language and avoids internal pipeline-first or billing-mechanics-first framing. |
+| PAGE-HOME15-008 | Pricing preview, FAQ, and footer consistency | Public landing and linked public routes available | Review pricing preview, FAQ, footer, and linked legal/contact routes. | These sections stay aligned with Pathnook public trust copy and the `1.4` legal/billing surface. |
+| PAGE-HOME15-009 | Desktop homepage rhythm | Desktop viewport | Open `/` and review section transitions. | Hero, positioning, why-use, value, proof, trust, bridge, pricing preview, FAQ, and footer all read clearly without awkward spacing or broken flow. |
+| PAGE-HOME15-010 | Mobile homepage usability | 390px mobile viewport | Open `/` and navigate the full homepage. | Copy, buttons, section spacing, and linked routes remain usable with no blocking overflow. |

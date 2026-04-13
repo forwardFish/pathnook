@@ -3,10 +3,10 @@ import { applyCheckoutCompletionForUser } from '@/lib/family/billing';
 import { getUser } from '@/lib/db/queries';
 import { getBillingPlanByPriceId } from '@/lib/payments/catalog';
 import {
-  getCheckoutCompletionPayload,
-  retrieveCheckout,
-  verifyCreemRedirectSignature,
-} from '@/lib/payments/creem';
+  getBillingCheckoutCompletionPayload,
+  retrieveBillingCheckout,
+  verifyBillingRedirectSignature,
+} from '@/lib/payments/service';
 
 function getDemoCurrentPeriodEnd(planType: string) {
   if (planType === 'monthly') {
@@ -56,7 +56,7 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  const signatureValid = verifyCreemRedirectSignature(
+  const signatureValid = verifyBillingRedirectSignature(
     {
       request_id: searchParams.get('request_id'),
       checkout_id: checkoutId,
@@ -73,8 +73,8 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const checkout = await retrieveCheckout(checkoutId);
-    const completion = getCheckoutCompletionPayload(checkout, priceIdParam);
+    const checkout = await retrieveBillingCheckout(checkoutId);
+    const completion = getBillingCheckoutCompletionPayload(checkout, priceIdParam);
 
     await applyCheckoutCompletionForUser({
       userId: completion.userId,

@@ -9,27 +9,30 @@ const footerColumns = [
   {
     title: "Product",
     links: [
-      { label: "Public Pricing", href: "/pricing" },
-      { label: "Create Account", href: "/sign-up?redirect=dashboard" },
+      { label: "Pricing", href: "/pricing" },
+      { label: "Sample Report", href: "/sample-report" },
+      { label: "Start a Diagnosis", href: "/sign-up?redirect=dashboard" },
       { label: "Sign In", href: "/sign-in" },
     ],
   },
   {
-    title: "Workflow",
+    title: "Homepage",
     links: [
-      { label: "Features", href: "#features" },
+      { label: "What Pathnook Is", href: "#features" },
+      { label: "Why Families Use It", href: "#why-use" },
       { label: "How It Works", href: "#how-it-works" },
-      { label: "Testimonials", href: "#testimonials" },
+      { label: "Pricing Preview", href: "#pricing-preview" },
       { label: "FAQ", href: "#faq" },
     ],
   },
   {
-    title: "What ships today",
+    title: "Trust",
     links: [
-      { label: "Bilingual reports", href: "#features" },
-      { label: "PDF export", href: "#features" },
-      { label: "Tutor handoff", href: "#testimonials" },
-      { label: "Weekly review rhythm", href: "#features" },
+      { label: "Pricing & Billing", href: "/pricing" },
+      { label: "Contact", href: "/contact" },
+      { label: "Privacy", href: "/legal/privacy" },
+      { label: "Terms", href: "/legal/terms" },
+      { label: "Refunds", href: "/legal/refunds" },
     ],
   },
 ];
@@ -50,9 +53,8 @@ export function LandingFooter() {
               subtitleClassName="text-slate-400"
             />
             <p className="mt-6 max-w-md text-lg leading-8 text-slate-300">
-              Upload recent work, inspect the evidence, export the report, and
-              share only the approved handoff. The landing should look complete,
-              but the promise stays honest.
+              Pathnook helps families turn learning evidence into diagnosis,
+              next steps, and weekly progress.
             </p>
             <a
               href={`mailto:${landingSupportEmail}`}
@@ -97,7 +99,7 @@ export function LandingFooter() {
             ))}
           </div>
           <div className="flex items-center justify-between gap-6 sm:justify-end">
-            <span>Copyright 2026 FamilyEducation. Local acceptance build.</span>
+            <span>Copyright 2026 Pathnook. Family learning support, built for trust.</span>
             <button
               type="button"
               onClick={scrollToTop}

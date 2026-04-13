@@ -1,29 +1,25 @@
 # NOW.md
 
-- Updated: 2026-04-11T19:46:51+08:00
-- Trigger: roadmap_transition
-- Current task: FamilyEducation 1.3.4 Stage Boundary Backlog Bootstrap
-- Sprint: sprint_21_boundary_bootstrap_and_traceability
-- Story: FE-100
-- Node: Planning Ready
-- Status: ready
+- Updated: 2026-04-13T00:00:00
+- Trigger: sprint_closeout
+- Current task: Homepage Display Rewrite 1.5 v7
+- Sprint: sprint_31_public_surface_completion_and_release
+- Story: FE-135
+- Node: Acceptance
+- Status: accepted
 - Blocker: none
 
 ## Next Action
-Start FE-100 from the new backlog_v5_stage1_boundary_1_3_4 lane, then continue through FE-101 and FE-102 in Sprint 21 execution order.
+Use `1.5 v7` as the accepted public baseline, then choose the next authoritative lane before reopening active implementation.
 
 ## Validate
 python scripts/validate_planning_assets.py
+pnpm build
 
 ## Artifact Refs
-- D:\lyh\agent\agent-frame\familyEducation\tasks\runtime\story_admissions\FE-100.json
-- D:\lyh\agent\agent-frame\familyEducation\tasks\runtime\story_handoffs\FE-100.md
-- D:\lyh\agent\agent-frame\familyEducation\tasks\backlog_v5_stage1_boundary_1_3_4\sprint_overview.md
-- D:\lyh\agent\agent-frame\familyEducation\tasks\backlog_v4_diagnosis_player_1_3_x\sprint_overview.md
-- D:\lyh\agent\agent-frame\agentsystem\runs\sprints\familyEducation\sprint_21_boundary_bootstrap_and_traceability\sprint_framing_artifact.json
-- D:\lyh\agent\agent-frame\agentsystem\runs\sprints\familyEducation\sprint_16_product\document_release_report.md
-- D:\lyh\agent\agent-frame\agentsystem\runs\sprints\familyEducation\sprint_16_product\retro_report.md
-- D:\lyh\agent\agent-frame\familyEducation\tasks\runtime\story_handoffs\FE-086.md
+- D:\lyh\agent\agent-frame\familyEducation\tasks\runtime\sprint_acceptance\sprint_31_acceptance_report.md
+- D:\lyh\agent\agent-frame\familyEducation\tasks\runtime\traceability_audits\sprint_31_traceability_audit.md
+- D:\lyh\agent\agent-frame\familyEducation\tasks\runtime\final_program_acceptance\home15_final_acceptance.md
 
 ## Decision Deps
 - required

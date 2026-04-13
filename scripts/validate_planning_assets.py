@@ -20,6 +20,8 @@ BACKLOG_ROOTS = [
     ROOT / "tasks" / "backlog_v3_diagnosis_1_2_2",
     ROOT / "tasks" / "backlog_v4_diagnosis_player_1_3_x",
     ROOT / "tasks" / "backlog_v5_stage1_boundary_1_3_4",
+    ROOT / "tasks" / "backlog_v6_freemius_primary_billing_1_4",
+    ROOT / "tasks" / "backlog_v7_homepage_display_rewrite_1_5",
 ]
 STATUS_REGISTRY = ROOT / "tasks" / "story_status_registry.json"
 ACCEPTANCE_REVIEWS = ROOT / "tasks" / "story_acceptance_reviews.json"
@@ -100,7 +102,7 @@ def parse_story_file(path: Path) -> dict[str, object]:
 
 
 def parse_click_test_ids(text: str) -> list[str]:
-    return re.findall(r"##\s+(CLICK(?:-DCK|-BND134)?-\d+)", text)
+    return re.findall(r"##\s+(CLICK(?:-[A-Z0-9]+)?-\d+)", text)
 
 
 def parse_story_ids_from_traceability(text: str) -> set[str]:
@@ -169,7 +171,7 @@ def main() -> int:
     api_test_ids = set(parse_markdown_table_first_column(read_text(API_MATRIX)))
     gov_test_ids = set(parse_markdown_table_first_column(read_text(GOV_MATRIX)))
     final_test_ids = set(
-        re.findall(r"\b(?:FP-\d{3}|FP-DCK-\d{3}|FP-BND134-\d{3})\b", read_text(FINAL_ACCEPTANCE))
+        re.findall(r"\b(?:FP-\d{3}|FP-[A-Z0-9]+-\d{3})\b", read_text(FINAL_ACCEPTANCE))
     )
     known_test_ids = page_test_ids | click_test_ids | api_test_ids | gov_test_ids | final_test_ids
 

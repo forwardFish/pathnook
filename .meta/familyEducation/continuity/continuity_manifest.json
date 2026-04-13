@@ -1,11 +1,13 @@
-{
+﻿{
   "project": "familyEducation",
   "repository_path": "D:\\lyh\\agent\\agent-frame\\familyEducation",
   "workflow": "agentsystem/software_engineering",
   "source_of_truth": [
-    "docs/需求文档.md",
-    "docs/需求文档_1.3.4.md",
-    "docs/saas-starter 一天落地实施说明.md",
+    "docs/需求文档_1.4.md",
+    "docs/需求文档_1.5.md",
+    "docs/闇€姹傛枃妗?md",
+    "docs/闇€姹傛枃妗1.3.4.md",
+    "docs/saas-starter 涓€澶╄惤鍦板疄鏂借鏄?md",
     "docs/requirements/prd_requirement_index.md",
     "docs/requirements/prd_traceability_matrix.md",
     "docs/testing/governance_test_matrix.md",
@@ -19,6 +21,9 @@
     "tasks/backlog_v3_diagnosis_1_2_2/sprint_overview.md",
     "tasks/backlog_v4_diagnosis_player_1_3_x/sprint_overview.md",
     "tasks/backlog_v5_stage1_boundary_1_3_4/sprint_overview.md",
+    "tasks/backlog_v6_freemius_primary_billing_1_4/sprint_overview.md",
+    "tasks/backlog_v7_homepage_display_rewrite_1_5/sprint_overview.md",
+    "tasks/compact_execution_1_4_1_5.md",
     "tasks/story_status_registry.json",
     "tasks/story_acceptance_reviews.json",
     "tasks/runtime/README.md"
@@ -34,6 +39,6 @@
     "tasks/runtime/final_acceptance",
     "tasks/runtime/review_packets"
   ],
-  "status": "backlog_v5_stage_boundary_in_progress",
-  "last_updated": "2026-04-11T19:15:00+08:00"
+  "status": "backlog_v7_accepted",
+  "last_updated": "2026-04-13T00:00:00+08:00"
 }

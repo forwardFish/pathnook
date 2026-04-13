@@ -27,6 +27,7 @@ type CheckoutRedirectParams = {
 
 export type HostedCheckoutSession = {
   mode: 'demo' | 'creem';
+  provider: 'demo' | 'creem';
   checkoutUrl: string;
   sessionId: string;
   priceId: string;
@@ -141,6 +142,7 @@ function createDemoHostedCheckout(plan: BillingPlan): HostedCheckoutSession {
 
   return {
     mode: 'demo',
+    provider: 'demo',
     checkoutUrl: previewUrl.toString(),
     sessionId,
     priceId: plan.priceId,
@@ -197,6 +199,7 @@ export async function createHostedCheckoutSession({
 
   return {
     mode: 'creem',
+    provider: 'creem',
     checkoutUrl: checkout.checkoutUrl,
     sessionId: checkout.id,
     priceId: plan.priceId,

@@ -4,14 +4,14 @@ import {
   formatBillingInterval,
   getAnnualSavings,
 } from '@/lib/payments/catalog';
-import { getConfiguredBillingPlans } from '@/lib/payments/creem';
+import { getConfiguredBillingPlans } from '@/lib/payments/service';
 import { SubmitButton } from './submit-button';
 
 export const revalidate = 3600;
 
 const proofPoints = [
   'Evidence-backed diagnosis',
-  'Creem-hosted secure checkout',
+  'Hosted secure checkout',
   'PDF export and tutor handoff',
   'EN / ES parent report output',
 ];
@@ -59,14 +59,14 @@ export default async function PricingPage() {
         <div className="mx-auto max-w-4xl text-center">
           <div className="inline-flex items-center gap-2 rounded-full border border-orange-200 bg-white/80 px-5 py-2 text-sm font-semibold text-orange-700 shadow-sm backdrop-blur">
             <Wallet className="h-4 w-4" />
-            FamilyEducation Pricing
+            Pathnook Pricing
           </div>
           <h1 className="mt-8 text-5xl font-semibold tracking-[-0.04em] text-slate-950 sm:text-6xl lg:text-7xl">
-            Choose the payment path that matches your family workflow.
+            Choose the Pathnook plan that matches your family workflow.
           </h1>
           <p className="mx-auto mt-6 max-w-3xl text-xl leading-9 text-slate-600 sm:text-2xl">
             Start with one diagnosis, stay monthly for a weekly parent rhythm, or lock in the
-            founding annual price for the full FamilyEducation workflow.
+            annual Pathnook workflow for ongoing family learning support.
           </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3 text-sm font-medium text-slate-700">
             {proofPoints.map((point) => (
@@ -172,8 +172,9 @@ export default async function PricingPage() {
               <div className="flex items-start gap-3">
                 <ShieldCheck className="mt-1 h-5 w-5 text-emerald-600" />
                 <p className="text-base leading-7 text-slate-700">
-                  Checkout is hosted by Creem, which keeps card handling outside the app and gives
-                  parents a billing portal for subscription management.
+                  Checkout is handled through the active billing provider, which keeps card
+                  handling outside the core app and preserves a managed billing portal path
+                  for subscription management.
                 </p>
               </div>
               <div className="flex items-start gap-3">

@@ -71,6 +71,13 @@
       "when": 1775902200000,
       "tag": "0009_guided_walkthrough_decks",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1776009600000,
+      "tag": "0010_curious_freemius_foundation",
+      "breakpoints": true
     }
   ]
 }
