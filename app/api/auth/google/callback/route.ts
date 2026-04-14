@@ -1,6 +1,5 @@
 import crypto from 'node:crypto';
 import { and, eq, isNull, or } from 'drizzle-orm';
-import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 import {
   exchangeGoogleCodeForTokens,
@@ -8,7 +7,7 @@ import {
   parseGoogleOAuthState,
   verifyGoogleIdToken,
 } from '@/lib/auth/google';
-import { hashPassword, setSession } from '@/lib/auth/session';
+import { buildSessionCookie, hashPassword } from '@/lib/auth/session';
 import { logActivity } from '@/lib/db/activity';
 import { db } from '@/lib/db/drizzle';
 import { teams, teamMembers, users, type NewTeam, type NewTeamMember } from '@/lib/db/schema';
@@ -39,6 +38,24 @@ function getCookieOptions() {
     path: '/',
     maxAge: 0,
   };
+}
+
+function clearGoogleOAuthCookie(response: NextResponse) {
+  response.cookies.set(GOOGLE_OAUTH_COOKIE, '', getCookieOptions());
+  return response;
+}
+
+async function applySessionCookie(
+  response: NextResponse,
+  user: { id: number }
+) {
+  const sessionCookie = await buildSessionCookie(user);
+  response.cookies.set(
+    sessionCookie.name,
+    sessionCookie.value,
+    sessionCookie.options
+  );
+  return response;
 }
 
 function getRequestOrigin(request: NextRequest) {
@@ -163,17 +180,14 @@ async function findOrCreateGoogleUser(identity: {
 }
 
 export async function GET(request: NextRequest) {
-  const cookieStore = await cookies();
-  const storedContext = cookieStore.get(GOOGLE_OAUTH_COOKIE)?.value;
+  const storedContext = request.cookies.get(GOOGLE_OAUTH_COOKIE)?.value;
   const stateParam = request.nextUrl.searchParams.get('state');
   const stateContext = parseGoogleOAuthState(stateParam);
 
-  cookieStore.set(GOOGLE_OAUTH_COOKIE, '', getCookieOptions());
-
   if (!storedContext && !stateContext) {
-    return NextResponse.redirect(
+    return clearGoogleOAuthCookie(NextResponse.redirect(
       getLoginUrl(request, 'signin', 'google_session_missing')
-    );
+    ));
   }
 
   let context: GoogleOAuthContext | null = stateContext;
@@ -183,28 +197,32 @@ export async function GET(request: NextRequest) {
       context = JSON.parse(storedContext) as GoogleOAuthContext;
     } catch {
       if (!stateContext) {
-        return NextResponse.redirect(
+        return clearGoogleOAuthCookie(NextResponse.redirect(
           getLoginUrl(request, 'signin', 'google_session_invalid')
-        );
+        ));
       }
     }
   }
 
   if (!context) {
-    return NextResponse.redirect(
+    return clearGoogleOAuthCookie(NextResponse.redirect(
       getLoginUrl(request, 'signin', 'google_session_invalid')
-    );
+    ));
   }
 
   const code = request.nextUrl.searchParams.get('code');
   const oauthError = request.nextUrl.searchParams.get('error');
 
   if (oauthError) {
-    return NextResponse.redirect(getLoginUrl(request, context.mode, 'google_access_denied'));
+    return clearGoogleOAuthCookie(
+      NextResponse.redirect(getLoginUrl(request, context.mode, 'google_access_denied'))
+    );
   }
 
   if (!code || !stateContext || stateContext.state !== context.state) {
-    return NextResponse.redirect(getLoginUrl(request, context.mode, 'google_state_invalid'));
+    return clearGoogleOAuthCookie(
+      NextResponse.redirect(getLoginUrl(request, context.mode, 'google_state_invalid'))
+    );
   }
 
   try {
@@ -219,25 +237,26 @@ export async function GET(request: NextRequest) {
         name: identity.name,
       });
 
-      await setSession(toDemoUser(demoProfile));
-
       if (context.redirectTo === 'checkout' && context.priceId) {
         const checkoutUrl = new URL('/dashboard/billing/demo-checkout', getRequestOrigin(request));
         checkoutUrl.searchParams.set('priceId', context.priceId);
         checkoutUrl.searchParams.set('session_id', `demo_google_${Date.now()}`);
-        return NextResponse.redirect(checkoutUrl);
+        const response = clearGoogleOAuthCookie(NextResponse.redirect(checkoutUrl));
+        return applySessionCookie(response, toDemoUser(demoProfile));
       }
 
-      return NextResponse.redirect(
-        new URL(context.redirectTo || '/dashboard', getRequestOrigin(request))
+      const response = clearGoogleOAuthCookie(
+        NextResponse.redirect(
+          new URL(context.redirectTo || '/dashboard', getRequestOrigin(request))
+        )
       );
+      return applySessionCookie(response, toDemoUser(demoProfile));
     }
 
     const user = await findOrCreateGoogleUser(identity);
     const teamId = await ensureUserTeam(user.id, user.name || identity.name || '', user.email);
 
     await Promise.all([
-      setSession({ id: user.id }),
       logActivity(teamId, user.id, ActivityType.SIGN_IN),
     ]);
 
@@ -255,17 +274,25 @@ export async function GET(request: NextRequest) {
           userEmail: user.email,
           userId: user.id,
         });
-        return NextResponse.redirect(session.checkoutUrl);
+        const response = clearGoogleOAuthCookie(
+          NextResponse.redirect(session.checkoutUrl)
+        );
+        return applySessionCookie(response, { id: user.id });
       }
     }
 
-    return NextResponse.redirect(
-      new URL(context.redirectTo || '/dashboard', getRequestOrigin(request))
+    const response = clearGoogleOAuthCookie(
+      NextResponse.redirect(
+        new URL(context.redirectTo || '/dashboard', getRequestOrigin(request))
+      )
     );
+    return applySessionCookie(response, { id: user.id });
   } catch (error) {
     console.error('Google OAuth callback failed:', error);
-    return NextResponse.redirect(
-      getLoginUrl(request, context.mode, 'google_sign_in_failed')
+    return clearGoogleOAuthCookie(
+      NextResponse.redirect(
+        getLoginUrl(request, context.mode, 'google_sign_in_failed')
+      )
     );
   }
 }

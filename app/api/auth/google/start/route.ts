@@ -1,4 +1,3 @@
-import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 import {
   buildGoogleAuthorizationUrl,
@@ -60,7 +59,7 @@ export async function GET(request: NextRequest) {
   });
 
   const response = NextResponse.redirect(buildGoogleAuthorizationUrl(context));
-  (await cookies()).set(
+  response.cookies.set(
     GOOGLE_OAUTH_COOKIE,
     JSON.stringify(context),
     getCookieOptions()
