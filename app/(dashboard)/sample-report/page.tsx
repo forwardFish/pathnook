@@ -8,6 +8,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { PUBLIC_CONTACT_EMAIL } from "@/lib/site/public-trust";
 
 const sampleSections = [
   {
@@ -61,19 +62,21 @@ export default function SampleReportPage() {
             Sample Report
           </p>
           <h1 className="mt-4 text-4xl font-semibold tracking-tight text-slate-950 sm:text-5xl">
-            See what a real Pathnook family review looks like before you pay.
+            See a representative Pathnook family review before you pay.
           </h1>
           <p className="mt-5 text-lg leading-8 text-slate-600">
-            This public sample shows a representative preview of the product
-            workflow and report structure: diagnosis, evidence, the shortest
-            next path, output checkpoints, and tutor-ready sharing. Actual
-            output depends on the quality and relevance of the uploaded
-            learning materials.
+            This public sample is a deliberate proof page for the product
+            workflow: diagnosis, evidence, the shortest next path, output
+            checkpoints, compare-ready continuity, and tutor-ready sharing.
+            Actual output depends on the quality and relevance of the uploaded
+            learning materials, but the delivery structure shown here reflects
+            the kind of family decision support Pathnook is built to provide.
           </p>
           <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-500">
             Representative preview only. The exact report content depends on the
-            uploaded learning evidence, the family account history, and the plan
-            that unlocks the workflow.
+            uploaded learning evidence, family account history, and the plan
+            that unlocks the workflow, but this page is intentionally published
+            as product proof rather than a placeholder.
           </p>
         </div>
 
@@ -116,9 +119,9 @@ export default function SampleReportPage() {
                 that another adult can follow without re-reading the raw upload.
               </p>
               <p>
-                If no stable downloadable example is available yet, Pathnook
-                shows the structure and disclaimers openly instead of pretending
-                there is a live sample file.
+                Families should be able to inspect the shape of the output
+                before buying. This sample therefore shows the delivery logic
+                openly instead of hiding trust behind checkout.
               </p>
             </div>
           </section>
@@ -140,6 +143,15 @@ export default function SampleReportPage() {
                 <p className="mt-2 text-sm leading-7 text-slate-600">
                   Shared output is designed to preserve the same diagnosis frame,
                   evidence summary, and next-step sequencing.
+                </p>
+              </div>
+              <div className="rounded-[1.3rem] border border-slate-200 bg-white p-5">
+                <h2 className="text-xl font-semibold text-slate-950">Billing and trust stay visible</h2>
+                <p className="mt-2 text-sm leading-7 text-slate-600">
+                  Pricing, refund rules, billing management, and support contact
+                  remain public so families can judge the service before buying.
+                  For questions about access, refunds, or privacy handling, use{" "}
+                  {PUBLIC_CONTACT_EMAIL}.
                 </p>
               </div>
             </div>

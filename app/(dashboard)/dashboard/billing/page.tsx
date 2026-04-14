@@ -4,6 +4,7 @@ import { getUser } from '@/lib/db/queries';
 import { getBillingSnapshotForUser } from '@/lib/family/billing';
 import { formatBillingInterval, isRecurringPlanType } from '@/lib/payments/catalog';
 import { getPortalSupportLabel } from '@/lib/payments/service';
+import { FREEMIUS_BILLING_ROLE_LINE, PUBLIC_CONTACT_EMAIL } from '@/lib/site/public-trust';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
@@ -37,7 +38,7 @@ function getCheckoutMessage(checkout: string | undefined, plan: string | undefin
   }
 
   if (checkout === 'unavailable') {
-    return 'Billing is temporarily unavailable. Please try again shortly or contact admin@pathnook.com for help.';
+    return `Billing is temporarily unavailable. Please try again shortly or contact ${PUBLIC_CONTACT_EMAIL} for help.`;
   }
 
   return null;
@@ -68,9 +69,7 @@ export default async function BillingPage({ searchParams }: PageProps) {
           Billing and account management
         </h1>
         <p className="mt-2 max-w-3xl text-sm text-gray-600">
-          Freemius manages checkout, renewals, invoices, and subscription
-          cancellation. Pathnook manages your local report access, history, and
-          household entitlements inside the product.
+          {FREEMIUS_BILLING_ROLE_LINE}
         </p>
       </div>
 
@@ -139,10 +138,11 @@ export default async function BillingPage({ searchParams }: PageProps) {
             <div className="rounded-2xl border border-slate-200 bg-white p-4">
               <p className="font-medium text-slate-950">Cancellation and support</p>
               <p className="mt-2 text-sm leading-7 text-slate-600">
-                Use the Freemius billing portal to cancel recurring billing,
-                review invoices, and manage renewals. For refund review,
-                entitlement questions, or access mismatches, contact Pathnook
-                support directly.
+                This page is Pathnook billing management. Review local access and
+                entitlements here, then open the Freemius billing portal when you
+                need invoices, payment-method updates, renewals, or cancellation.
+                For refund review, entitlement questions, or access mismatches,
+                contact Pathnook directly.
               </p>
               <div className="mt-4 flex flex-wrap gap-3">
                 <Button asChild variant="outline" size="sm">
@@ -167,9 +167,10 @@ export default async function BillingPage({ searchParams }: PageProps) {
             <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm leading-7 text-slate-600">
               <p className="font-medium text-slate-950">Freemius billing portal</p>
               <p className="mt-2">
-                Renewals, invoices, payment methods, and subscription cancellation
-                are handled through Freemius. Pathnook keeps your report access and
-                plan effects in sync locally after payment events arrive.
+                Renewals, invoices, payment methods, and subscription
+                cancellation are handled through Freemius. Pathnook keeps your
+                report access, billing history, and plan effects in sync locally
+                after payment events arrive.
               </p>
             </div>
 

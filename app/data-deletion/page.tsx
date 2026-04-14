@@ -1,3 +1,5 @@
+import { PUBLIC_CONTACT_EMAIL } from '@/lib/site/public-trust';
+
 export default function DataDeletionPage() {
   return (
     <main className="mx-auto max-w-4xl px-4 py-16 sm:px-6 lg:px-8">
@@ -11,12 +13,13 @@ export default function DataDeletionPage() {
         <div className="mt-6 space-y-5 text-base leading-8 text-slate-600">
           <p>
             To request deletion of your Pathnook account data, email
-            <strong> admin@pathnook.com</strong> and include the account email
+            <strong> {PUBLIC_CONTACT_EMAIL}</strong> and include the account email
             address you use to sign in.
           </p>
           <p>
-            If your request concerns privacy-specific handling, you may also use
-            the designated privacy contact listed as <strong>privacy@pathnook.com</strong>.
+            Use the same inbox for privacy-specific deletion, correction, export,
+            or access requests so Pathnook can route the request through one
+            monitored support channel.
           </p>
           <p>
             Deletion requests may cover account records, uploads, report artifacts,

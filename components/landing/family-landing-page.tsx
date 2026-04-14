@@ -114,7 +114,7 @@ const faqItems = [
   {
     question: "How does billing work?",
     answer:
-      "Secure checkout is powered by Freemius as Merchant of Record. Families can use the Freemius customer portal for subscription management, cancellation, and billing records.",
+      "Secure checkout is powered by Freemius as Merchant of Record. Families start from Pathnook billing management to review local access, then open the Freemius billing portal when they need invoices, payment methods, renewals, or cancellation.",
   },
   {
     question: "How is Pathnook different from a normal AI study tool?",

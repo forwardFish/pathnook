@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { ArrowUp, Mail } from "lucide-react";
 import { FamilyLogoStatic } from "@/components/branding/family-logo";
+import { PUBLIC_OPERATOR_SHORT } from "@/lib/site/public-trust";
 import { landingNavItems, landingSupportEmail } from "./landing-nav";
 
 const footerColumns = [
@@ -22,7 +23,7 @@ const footerColumns = [
   {
     title: "Trust",
     links: [
-      { label: "Billing Portal", href: "/sign-in?redirect=%2Fdashboard%2Fbilling" },
+      { label: "Billing Management", href: "/sign-in?redirect=%2Fdashboard%2Fbilling" },
       { label: "Help Center", href: "/help" },
       { label: "FAQ", href: "/faq" },
       { label: "Data Deletion", href: "/data-deletion" },
@@ -59,7 +60,8 @@ export function LandingFooter() {
               next steps, and weekly progress.
             </p>
             <p className="mt-4 max-w-md text-sm leading-7 text-slate-400">
-              Pathnook is software for parents who want clearer learning decisions,
+              Brand/Product: Pathnook. Operator: {PUBLIC_OPERATOR_SHORT}. Pathnook
+              is software for parents who want clearer learning decisions,
               evidence-backed review, and a steadier weekly follow-through workflow.
             </p>
             <a
@@ -105,7 +107,7 @@ export function LandingFooter() {
             ))}
           </div>
           <div className="flex items-center justify-between gap-6 sm:justify-end">
-            <span>Copyright 2026 Pathnook. Family learning support, built for trust.</span>
+            <span>Copyright 2026 Pathnook. Operated by {PUBLIC_OPERATOR_SHORT}.</span>
             <button
               type="button"
               onClick={scrollToTop}

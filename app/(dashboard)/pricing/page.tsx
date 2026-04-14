@@ -3,6 +3,11 @@ import { Check, ShieldCheck } from 'lucide-react';
 import { checkoutAction } from '@/lib/payments/actions';
 import { formatBillingInterval, getAnnualSavings } from '@/lib/payments/catalog';
 import { getConfiguredBillingPlans } from '@/lib/payments/service';
+import {
+  FREEMIUS_BILLING_ROLE_LINE,
+  ONE_TIME_REFUND_WINDOW_DAYS,
+  SUBSCRIPTION_REFUND_WINDOW_DAYS,
+} from '@/lib/site/public-trust';
 import { SubmitButton } from './submit-button';
 
 export const revalidate = 3600;
@@ -16,22 +21,22 @@ const billingFaq = [
   {
     question: 'How do renewals work?',
     answer:
-      'Recurring plans renew automatically through Freemius until you cancel. Renewal timing and invoices are managed in the Freemius customer portal.',
+      'Recurring plans renew automatically through Freemius until you cancel. Renewal timing, invoices, and payment methods are managed in the Freemius billing portal that you can open from Pathnook billing management.',
   },
   {
     question: 'How do I cancel?',
     answer:
-      'Use the Freemius customer portal to cancel recurring billing. Cancellation stops future renewals and your household keeps any historically retained access allowed by the product rules.',
+      'Use Pathnook billing management to open the Freemius billing portal when you need to cancel recurring billing. Cancellation stops future renewals and your household keeps any historically retained access allowed by the product rules.',
   },
   {
     question: 'Where do I manage billing?',
     answer:
-      'Billing records, subscription management, and cancellation all route through the Freemius customer portal.',
+      'Start from Pathnook billing management to review local access and entitlements. From there you can open the Freemius billing portal for invoices, payment methods, renewals, and cancellation.',
   },
   {
     question: 'What is refundable and what is not?',
     answer:
-      'Unused one-time diagnosis credits may qualify within the refund window. Once a diagnosis credit has been consumed or a report has already been generated, refunds are generally not available except for duplicate charges, technical failures, billing mistakes, or legal requirements.',
+      `Unused one-time diagnosis credits may be reviewed for refund within ${ONE_TIME_REFUND_WINDOW_DAYS} days of purchase. For recurring plans, refund review is generally limited to the first ${SUBSCRIPTION_REFUND_WINDOW_DAYS} days of the initial billing cycle, subject to actual usage and local law. After a diagnosis credit has been consumed or a recurring plan has already delivered substantial access, refunds are generally limited to duplicate charges, technical failures, billing mistakes, unauthorized charges confirmed after review, or legal requirements.`,
   },
 ] as const;
 
@@ -148,11 +153,7 @@ export default async function PricingPage() {
               <div className="flex items-start gap-3">
                 <ShieldCheck className="mt-1 h-5 w-5 text-emerald-600" />
                 <p className="text-base leading-7 text-slate-700">
-                  Payments are processed by Freemius as Merchant of Record. That
-                  means checkout, tax handling where applicable, and subscription
-                  billing are managed through Freemius. Customers can manage
-                  billing, cancellations, and billing records through the
-                  Freemius customer portal.
+                  {FREEMIUS_BILLING_ROLE_LINE}
                 </p>
               </div>
               <div className="flex items-start gap-3">
@@ -177,16 +178,17 @@ export default async function PricingPage() {
             <div className="rounded-[1.4rem] border border-slate-200 bg-slate-50 p-5 text-sm leading-7 text-slate-600">
               <p className="font-semibold text-slate-950">Need help after purchase?</p>
               <p className="mt-2">
-                Use the Freemius billing portal for invoices, renewal control, and
-                cancellation. Use Pathnook support for entitlement questions,
-                refund review, and product access issues.
+                Use Pathnook billing management to review local access and open
+                the Freemius billing portal for invoices, renewal control,
+                payment methods, and cancellation. Use Pathnook support for
+                entitlement questions, refund review, and product access issues.
               </p>
               <div className="mt-4 flex flex-wrap gap-3">
                 <Link
                   href="/sign-in?redirect=%2Fdashboard%2Fbilling"
                   className="rounded-full bg-slate-950 px-4 py-2 text-sm font-medium text-white"
                 >
-                  Open billing portal
+                  Open billing management
                 </Link>
                 <Link
                   href="/legal/refunds"

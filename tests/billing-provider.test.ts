@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { resolveBillingProviderSelection } from '../lib/payments/provider-selection';
-import { BILLING_PLANS, getAnnualSavings } from '../lib/payments/catalog';
+import { resolveBillingProviderSelection } from '../lib/payments/provider-selection.ts';
+import { BILLING_PLANS, getAnnualSavings } from '../lib/payments/catalog.ts';
 
 test('Freemius remains active when it is configured', () => {
   const selection = resolveBillingProviderSelection({

@@ -1,3 +1,8 @@
+import {
+  ONE_TIME_REFUND_WINDOW_DAYS,
+  SUBSCRIPTION_REFUND_WINDOW_DAYS,
+} from '@/lib/site/public-trust';
+
 const faqItems = [
   {
     question: 'Who can use Pathnook?',
@@ -12,7 +17,7 @@ const faqItems = [
   {
     question: 'Who handles billing?',
     answer:
-      'Freemius handles checkout, invoices, recurring billing, and portal access as Merchant of Record. Pathnook handles report access, entitlements, and product support.',
+      'Freemius handles checkout, invoices, recurring billing, and the billing portal as Merchant of Record. Pathnook handles report access, entitlements, product support, and the billing-management page that opens the Freemius portal when billing actions are needed.',
   },
   {
     question: 'How do I cancel a subscription?',
@@ -22,7 +27,7 @@ const faqItems = [
   {
     question: 'What if I need a refund?',
     answer:
-      'Unused one-time credits may qualify during the refund window. After a diagnosis has been completed or recurring access has already been substantially used, refunds are generally limited to exceptions like duplicate charge, technical failure, billing error, or legal requirement.',
+      `Unused one-time credits may be reviewed within ${ONE_TIME_REFUND_WINDOW_DAYS} days of purchase. Recurring-plan refund review is generally limited to the first ${SUBSCRIPTION_REFUND_WINDOW_DAYS} days of the initial billing cycle. After a diagnosis has been completed or recurring access has already been substantially used, refunds are generally limited to duplicate charge, technical failure, billing error, unauthorized charge confirmed after review, or legal requirement.`,
   },
   {
     question: 'Can I share a report with a tutor?',
