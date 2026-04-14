@@ -114,7 +114,7 @@ export default function PrivacyPage() {
             <h2 className="text-2xl font-semibold text-slate-950">10. Contact</h2>
             <p className="mt-3">
               General support: <strong>admin@pathnook.com</strong>. Privacy
-              requests: <strong>[PRIVACY EMAIL]</strong>. For billing records,
+              requests: <strong>privacy@pathnook.com</strong>. For billing records,
               invoices, and subscription management, users may also interact with
               Freemius through the billing portal.
             </p>

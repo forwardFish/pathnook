@@ -21,5 +21,6 @@ test('public pages use Pathnook and Freemius language without legacy placeholder
     assert.equal(source.includes('Creem'), false, `${relativePath} should not mention Creem`);
     assert.equal(source.includes('active billing provider'), false, `${relativePath} should not mention active billing provider`);
     assert.equal(source.includes('will start working'), false, `${relativePath} should not contain unfinished login copy`);
+    assert.equal(source.includes('[PRIVACY EMAIL]'), false, `${relativePath} should not contain unresolved privacy-email placeholders`);
   }
 });

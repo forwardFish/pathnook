@@ -113,8 +113,8 @@ export default function TermsPage() {
               To the extent permitted by law, Pathnook is not liable for indirect,
               incidental, special, or consequential damages. General support
               inquiries may be sent to <strong>admin@pathnook.com</strong>. Legal
-              and privacy contact placeholders may be listed separately where
-              required.
+              and privacy inquiries may be sent to <strong>privacy@pathnook.com</strong>
+              where required.
             </p>
           </section>
         </div>

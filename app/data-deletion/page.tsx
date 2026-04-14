@@ -16,7 +16,7 @@ export default function DataDeletionPage() {
           </p>
           <p>
             If your request concerns privacy-specific handling, you may also use
-            the designated privacy contact listed as <strong>[PRIVACY EMAIL]</strong>.
+            the designated privacy contact listed as <strong>privacy@pathnook.com</strong>.
           </p>
           <p>
             Deletion requests may cover account records, uploads, report artifacts,

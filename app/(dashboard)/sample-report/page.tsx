@@ -4,30 +4,51 @@ import {
   FileSearch,
   GitCompareArrows,
   Layers3,
+  ListChecks,
   ShieldCheck,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const sampleSections = [
   {
-    title: "Skeleton Focus",
-    body: "A compact diagnosis frame that names the main learning issue, the secondary issue, and what the family should focus on first.",
+    title: "Sample Diagnosis",
+    body: "Primary issue, secondary issue, repeated pattern, what not to overreact to, and what matters most this week.",
     icon: FileSearch,
   },
   {
-    title: "Shortest Ability Path",
-    body: "The report translates raw evidence into the next smallest useful move, so the family sees where progress can start right now.",
+    title: "Skeleton Focus",
+    body: "This section shows the skeleton focus, why it matters now, and what to ignore for now so the family does not overreact to surface mistakes.",
     icon: Layers3,
   },
   {
-    title: "Output Gate",
-    body: "Each recommendation stays tied to source evidence and confidence language so Pathnook does not overstate what the upload can prove.",
+    title: "Sample Evidence",
+    body: "Every important finding stays attached to real student work so the diagnosis stays grounded instead of vague.",
+    icon: ShieldCheck,
+  },
+  {
+    title: "Shortest Ability Path",
+    body: "This section shows what to do first, why it comes first, the current stage goal, and what comes next.",
+    icon: GitCompareArrows,
+  },
+  {
+    title: "Sample 7-Day Plan",
+    body: "A short weekly plan turns the diagnosis into the next week of action instead of a one-time review.",
+    icon: ListChecks,
+  },
+  {
+    title: "Example Output Gate",
+    body: "A small task that reveals whether the learning is really holding: gate title, required output, pass condition, and common failure pattern.",
     icon: ShieldCheck,
   },
   {
     title: "Compare / Resume Preview",
-    body: "Recurring families can compare across runs, keep continuity, and share the same grounded context with tutors or another adult helper.",
+    body: "This preview shows what improved, what stayed the same, and what still needs correction so the next review continues instead of restarting.",
     icon: GitCompareArrows,
+  },
+  {
+    title: "Tutor-ready summary",
+    body: "A share-safe handoff preserves the same family context when outside support is useful.",
+    icon: ArrowRight,
   },
 ] as const;
 
@@ -40,12 +61,14 @@ export default function SampleReportPage() {
             Sample Report
           </p>
           <h1 className="mt-4 text-4xl font-semibold tracking-tight text-slate-950 sm:text-5xl">
-            A representative preview of the Pathnook software output.
+            See what a real Pathnook family review looks like before you pay.
           </h1>
           <p className="mt-5 text-lg leading-8 text-slate-600">
-            This public sample shows the structure families can expect from a
-            completed diagnosis flow: grounded diagnosis, evidence-backed
-            findings, clear next steps, and a share-safe handoff layer.
+            This public sample shows a representative preview of the product
+            workflow and report structure: diagnosis, evidence, the shortest
+            next path, output checkpoints, and tutor-ready sharing. Actual
+            output depends on the quality and relevance of the uploaded
+            learning materials.
           </p>
           <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-500">
             Representative preview only. The exact report content depends on the

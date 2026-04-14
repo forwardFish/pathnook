@@ -71,26 +71,26 @@ export function Login({
         </h2>
         <p className="mt-3 text-center text-sm text-gray-600">
           {mode === 'signin'
-            ? 'Return to Pathnook and pick up where you left off.'
+            ? 'Sign in to continue your Pathnook household workflow.'
             : 'You are creating an adult account for parent, guardian, or other authorized adult use. Children may not create accounts directly.'}
         </p>
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="mb-6 space-y-3">
-          <a
-            href={googleHref}
-            className="inline-flex h-11 w-full items-center justify-center gap-3 rounded-full border border-gray-300 bg-white px-4 text-sm font-medium text-gray-800 shadow-xs transition-colors hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-orange-500"
-          >
-            <GoogleIcon />
-            Continue with Google
-          </a>
-          <p className="text-center text-xs text-gray-500">
-            {googleAuthAvailable
-              ? 'Use your Google account to sign in or create an account in one step.'
-              : 'Use email and password if your Google sign-in session cannot be completed right now.'}
-          </p>
-        </div>
+        {googleAuthAvailable ? (
+          <div className="mb-6 space-y-3">
+            <a
+              href={googleHref}
+              className="inline-flex h-11 w-full items-center justify-center gap-3 rounded-full border border-gray-300 bg-white px-4 text-sm font-medium text-gray-800 shadow-xs transition-colors hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-orange-500"
+            >
+              <GoogleIcon />
+              Continue with Google
+            </a>
+            <p className="text-center text-xs text-gray-500">
+              Use your Google account to sign in or create an account in one step.
+            </p>
+          </div>
+        ) : null}
 
         <form className="space-y-6" action={formAction}>
           <input type="hidden" name="redirect" value={redirectTo || ''} />
@@ -212,8 +212,7 @@ export function Login({
                   className="mt-1 h-4 w-4 rounded border-gray-300 text-orange-600 focus:ring-orange-500"
                 />
                 <span>
-                  I agree to the Terms of Service and Privacy Policy for
-                  Pathnook.
+                  I agree to the Pathnook Terms of Service and Privacy Policy.
                 </span>
               </label>
             </div>

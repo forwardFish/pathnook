@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { resolveBillingProviderSelection } from '../lib/payments/provider-selection';
+import { BILLING_PLANS, getAnnualSavings } from '../lib/payments/catalog';
 
 test('Freemius remains active when it is configured', () => {
   const selection = resolveBillingProviderSelection({
@@ -75,4 +76,15 @@ test('.env.example documents Freemius pricing ids and Pathnook admin email', () 
   assert.equal(envSource.includes('FREEMIUS_PRICING_MONTHLY_ID='), true);
   assert.equal(envSource.includes('FREEMIUS_PRICING_ANNUAL_ID='), true);
   assert.equal(envSource.includes('SUPPORT_EMAIL=admin@pathnook.com'), true);
+});
+
+test('public pricing uses the 1.5.2 Freemius price ladder', () => {
+  const oneTime = BILLING_PLANS.find((plan) => plan.planType === 'one_time');
+  const monthly = BILLING_PLANS.find((plan) => plan.planType === 'monthly');
+  const annual = BILLING_PLANS.find((plan) => plan.planType === 'annual');
+
+  assert.equal(oneTime?.unitAmount, 1900);
+  assert.equal(monthly?.unitAmount, 2900);
+  assert.equal(annual?.unitAmount, 19900);
+  assert.equal(getAnnualSavings(), 14900);
 });

@@ -1,6 +1,5 @@
 import Link from "next/link";
 import {
-  BadgeCheck,
   Compass,
   FileSearch,
   GraduationCap,
@@ -14,9 +13,9 @@ import { BILLING_PLANS, formatBillingInterval, getAnnualSavings } from "@/lib/pa
 import { Button } from "@/components/ui/button";
 
 const proofPoints = [
-  "Clear diagnosis",
-  "Evidence-backed findings",
-  "Weekly growth guidance",
+  "See the real bottleneck",
+  "Find the shortest next path",
+  "Turn review into weekly follow-through",
 ] as const;
 
 const heroCards = [
@@ -26,13 +25,13 @@ const heroCards = [
     icon: FileSearch,
   },
   {
-    title: "Evidence",
-    body: "Real student work tied to every important finding.",
+    title: "Skeleton Focus",
+    body: "The real learning bottleneck and why it matters more than surface mistakes.",
     icon: Layers3,
   },
   {
-    title: "This week",
-    body: "A weekly focus with clear next steps and what can wait.",
+    title: "Shortest Path",
+    body: "A clear next step, what to do first, and what can wait.",
     icon: Target,
   },
   {
@@ -44,27 +43,39 @@ const heroCards = [
 
 const whyUseCards = [
   {
-    title: "See clearly",
-    body: "Stop guessing what the problem is. See the main issue, the repeated pattern, and what does not need overreaction.",
+    title: "See the real bottleneck",
+    body: "Do not stop at surface mistakes. See where the learning process is actually breaking down and what matters most now.",
     icon: Compass,
   },
   {
-    title: "Know what to do next",
-    body: "Get a weekly focus, not just a list of mistakes. Know what to do now and what to leave for later.",
+    title: "Follow the shortest next path",
+    body: "Get a focused next step that builds the right ability first, instead of a generic weekly checklist.",
     icon: Target,
   },
   {
-    title: "Keep progress moving",
-    body: "Turn one review into steadier follow-through at home and a cleaner tutor handoff when support is needed.",
+    title: "Carry progress forward",
+    body: "Use weekly follow-through, compare, and tutor-ready sharing so each review becomes the next step instead of a one-time report drop.",
     icon: GraduationCap,
   },
 ];
 
 const stageOneCards = [
-  "See the main issue, the secondary issue, and what matters most this week.",
-  "Keep every important finding attached to real student work.",
-  "Get next-step guidance that families can actually use at home.",
-  "Carry each review into weekly follow-through instead of a one-time report drop.",
+  {
+    title: "See the real learning bottleneck",
+    body: "Not just which questions went wrong, but where the learning process is actually breaking down.",
+  },
+  {
+    title: "Get the shortest next path",
+    body: "See what to work on first, why it comes first, and what can wait.",
+  },
+  {
+    title: "Use small output checkpoints",
+    body: "Do not stay in passive review. Use small tasks that reveal whether the learning is really holding.",
+  },
+  {
+    title: "Carry progress forward week by week",
+    body: "Every review should make the next week clearer, not disappear as a one-time report.",
+  },
 ] as const;
 
 const trustCards = [
@@ -105,6 +116,11 @@ const faqItems = [
     answer:
       "Secure checkout is powered by Freemius as Merchant of Record. Families can use the Freemius customer portal for subscription management, cancellation, and billing records.",
   },
+  {
+    question: "How is Pathnook different from a normal AI study tool?",
+    answer:
+      "Pathnook is not built to generate shortcut answers or generic study plans. It is built to help families see the real bottleneck, choose the most valuable next step, and keep progress moving from week to week.",
+  },
 ];
 
 function SectionIntro({
@@ -117,7 +133,7 @@ function SectionIntro({
   body: string;
 }) {
   return (
-    <div className="max-w-3xl">
+    <div className="mx-auto max-w-3xl text-center">
       <p className="text-sm font-semibold uppercase tracking-[0.24em] text-teal-700">
         {eyebrow}
       </p>
@@ -139,46 +155,52 @@ export function FamilyLandingPage() {
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(20,184,166,0.18),transparent_28%),radial-gradient(circle_at_top_right,rgba(249,115,22,0.14),transparent_22%),linear-gradient(180deg,#f4fffc_0%,rgba(244,255,252,0)_100%)]" />
           <div className="relative mx-auto grid max-w-7xl gap-12 px-4 sm:px-6 lg:grid-cols-[1.05fr,0.95fr] lg:items-center lg:px-8">
             <div>
-              <div className="inline-flex items-center rounded-full border border-teal-200 bg-white px-4 py-2 text-sm font-medium text-teal-800 shadow-sm">
-                <BadgeCheck className="mr-2 h-4 w-4" />
-                For families who want clearer learning decisions and steadier progress
-              </div>
-              <h1 className="mt-7 max-w-4xl text-5xl font-semibold tracking-tight text-slate-950 sm:text-6xl lg:text-[5.3rem] lg:leading-[0.98]">
-                Pathnook is an{" "}
-                <span className="bg-[linear-gradient(135deg,#115e59_0%,#0f766e_36%,#2563eb_70%,#ea580c_100%)] bg-clip-text text-transparent">
-                  AI learning and growth system.
-                </span>
-              </h1>
-              <p className="mt-6 max-w-3xl text-2xl leading-9 text-slate-700">
-                AI-driven clarity, next-step guidance, and family learning
-                follow-through.
-              </p>
-              <p className="mt-5 max-w-3xl text-lg leading-8 text-slate-600">
-                Built for families first, starting with education diagnosis,
-                evidence-backed review, and weekly learning guidance.
-              </p>
-              <p className="mt-4 max-w-3xl text-base leading-8 text-slate-600">
-                Pathnook is software for parents who want clearer learning decisions,
-                evidence-backed review, and a steadier weekly follow-through workflow.
-              </p>
-              <p className="mt-3 max-w-3xl text-base leading-8 text-slate-600">
-                Today, Pathnook focuses on parent-facing family learning support. It
-                does not provide direct answer generation for children or replace a
-                tutor or school teacher.
-              </p>
-
-              <div className="mt-8 flex flex-wrap gap-3">
-                {proofPoints.map((item) => (
-                  <span
-                    key={item}
-                    className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm"
-                  >
-                    {item}
+              <div className="mx-auto mt-7 max-w-4xl text-center">
+                <h1 className="text-4xl font-semibold tracking-[-0.04em] text-slate-950 sm:text-5xl lg:text-6xl lg:leading-[1.02]">
+                  Pathnook is an{" "}
+                  <span className="bg-[linear-gradient(135deg,#115e59_0%,#0f766e_36%,#2563eb_70%,#ea580c_100%)] bg-clip-text text-transparent">
+                    AI learning and growth system
                   </span>
-                ))}
+                </h1>
+                <p className="mx-auto mt-6 max-w-3xl text-xl leading-8 text-slate-700 sm:text-2xl sm:leading-9">
+                  AI-driven clarity, the shortest next path, and steady family
+                  follow-through.
+                </p>
+                <p className="mx-auto mt-5 max-w-3xl text-base leading-8 text-slate-600 sm:text-lg">
+                  Built for families first, starting with education diagnosis,
+                  evidence-backed review, and weekly learning guidance.
+                </p>
+                <p className="mx-auto mt-4 max-w-3xl text-base leading-8 text-slate-600">
+                  Pathnook is software for parents who want clearer learning
+                  decisions, evidence-backed review, and a steadier weekly
+                  follow-through workflow.
+                </p>
+                <p className="mx-auto mt-3 max-w-3xl text-base leading-8 text-slate-600">
+                  Today, Pathnook focuses on parent-facing family learning
+                  support. It does not provide direct answer generation for
+                  children or replace a tutor or school teacher.
+                </p>
               </div>
 
-              <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+              <div className="mx-auto mt-8 max-w-5xl overflow-hidden rounded-[1.75rem] border border-slate-200 bg-white/92 shadow-[0_14px_40px_rgba(15,23,42,0.07)]">
+                <div className="grid gap-px bg-slate-200/80 sm:grid-cols-3">
+                  {proofPoints.map((item, index) => (
+                  <div
+                    key={item}
+                    className="bg-white px-6 py-5 text-center"
+                  >
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-slate-400">
+                      0{index + 1}
+                    </p>
+                    <p className="mt-2 text-base font-semibold leading-6 text-slate-800">
+                      {item}
+                    </p>
+                  </div>
+                ))}
+                </div>
+              </div>
+
+              <div className="mt-9 flex flex-col items-center gap-3 sm:flex-row sm:flex-wrap sm:justify-center">
                 <Button
                   asChild
                   size="lg"
@@ -277,18 +299,19 @@ export function FamilyLandingPage() {
             <SectionIntro
               eyebrow="Stage 1 Value"
               title="What families get today"
-              body="Today, Pathnook is intentionally focused on family learning support. The public value is diagnosis, evidence, next-step guidance, and weekly follow-through."
+              body="Today, Pathnook is intentionally focused on family learning support. The public value is clearer judgment, the shortest next path, small output checkpoints, and steadier weekly follow-through."
             />
             <div className="mt-12 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-              {stageOneCards.map((copy, index) => (
+              {stageOneCards.map((card, index) => (
                 <article
-                  key={copy}
+                  key={card.title}
                   className="rounded-[1.7rem] border border-slate-200 bg-white p-6 shadow-[0_14px_40px_rgba(15,23,42,0.05)]"
                 >
                   <p className="text-sm font-semibold uppercase tracking-[0.22em] text-slate-500">
                     0{index + 1}
                   </p>
-                  <p className="mt-4 text-base leading-8 text-slate-600">{copy}</p>
+                  <h3 className="mt-4 text-xl font-semibold text-slate-950">{card.title}</h3>
+                  <p className="mt-3 text-base leading-8 text-slate-600">{card.body}</p>
                 </article>
               ))}
             </div>
@@ -297,22 +320,22 @@ export function FamilyLandingPage() {
 
         <section className="bg-slate-950 py-20 text-white sm:py-24">
           <div className="mx-auto grid max-w-7xl gap-8 px-4 sm:px-6 lg:grid-cols-[1fr,1fr] lg:px-8">
-            <div className="rounded-[2rem] border border-white/10 bg-white/5 p-7">
+            <div className="rounded-[2rem] border border-white/10 bg-white/5 p-7 text-center">
               <p className="text-sm font-semibold uppercase tracking-[0.24em] text-teal-200">
                 Proof before pay
               </p>
               <h2 className="mt-4 text-3xl font-semibold tracking-tight">
-                Families should understand the value before pricing becomes the story.
+                See the output before you pay
               </h2>
               <div className="mt-6 space-y-4 text-base leading-7 text-slate-200">
                 <p>
-                  Evidence anchors stay attached to the diagnosis instead of being hidden behind generic summary text.
+                  Sample diagnosis shows the main issue, repeated pattern, and what not to overreact to.
                 </p>
                 <p>
-                  Parents get a weekly focus that is easier to act on than a raw stack of corrections.
+                  Sample shortest path shows what to do first, why it comes first, and what can wait.
                 </p>
                 <p>
-                  Sample output is visible before purchase so the value is clear before billing becomes relevant.
+                  Sample weekly plan and output checkpoint make the workflow visible before purchase.
                 </p>
                 <p>
                   Pricing, refund, privacy, contact, and billing management routes stay visible so trust is not hidden behind checkout.
@@ -356,14 +379,14 @@ export function FamilyLandingPage() {
 
         <section className="py-20 sm:py-24">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="rounded-[2rem] border border-teal-100 bg-[linear-gradient(135deg,#ecfeff_0%,#f8fafc_100%)] p-8 sm:p-10">
+            <div className="rounded-[2rem] border border-teal-100 bg-[linear-gradient(135deg,#ecfeff_0%,#f8fafc_100%)] p-8 text-center sm:p-10">
               <p className="text-sm font-semibold uppercase tracking-[0.24em] text-teal-700">
                 Stage 2 Bridge
               </p>
               <h2 className="mt-4 text-3xl font-semibold tracking-tight text-slate-950 sm:text-4xl">
                 Pathnook starts with family learning and grows into a learning and growth system.
               </h2>
-              <p className="mt-5 max-w-4xl text-lg leading-8 text-slate-700">
+              <p className="mx-auto mt-5 max-w-4xl text-lg leading-8 text-slate-700">
                 Today, Pathnook helps families turn schoolwork into diagnosis,
                 next steps, and weekly follow-through. Over time, every review
                 becomes part of a larger learning and growth system: clearer
@@ -423,7 +446,7 @@ export function FamilyLandingPage() {
 
         <section id="pricing-preview" className="py-20 sm:py-24">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="max-w-3xl">
+            <div className="mx-auto max-w-3xl text-center">
               <p className="text-sm font-semibold uppercase tracking-[0.24em] text-teal-700">
                 Pricing
               </p>
@@ -440,7 +463,7 @@ export function FamilyLandingPage() {
               {BILLING_PLANS.map((plan) => (
                 <article
                   key={plan.priceId}
-                  className={`rounded-[1.8rem] border bg-white p-6 shadow-sm ${
+                  className={`flex h-full flex-col rounded-[1.8rem] border bg-white p-6 shadow-sm ${
                     plan.featured
                       ? "border-emerald-300 ring-2 ring-emerald-200"
                       : "border-slate-200"
@@ -463,18 +486,23 @@ export function FamilyLandingPage() {
                   </div>
                   {plan.planType === "annual" ? (
                     <p className="mt-2 text-sm font-medium text-emerald-700">
-                      Save ${annualSavings / 100} vs monthly.
+                      Saves ${(annualSavings / 100).toFixed(0)} compared with 12 monthly renewals.
                     </p>
                   ) : null}
-                  <ul className="mt-6 space-y-3 text-sm leading-7 text-slate-600">
-                    {plan.features.slice(0, 3).map((feature) => (
+                  {plan.planType === "one_time" ? (
+                    <p className="mt-2 text-sm text-slate-500">
+                      Limited early access: first review discount may apply at checkout.
+                    </p>
+                  ) : null}
+                  <ul className="mt-6 flex-1 space-y-3 text-sm leading-7 text-slate-600">
+                    {plan.features.map((feature) => (
                       <li key={feature}>{feature}</li>
                     ))}
                   </ul>
-                  <div className="mt-6">
+                  <div className="mt-6 pt-2">
                     <Button
                       asChild
-                      className={`w-full rounded-full ${
+                      className={`h-14 w-full rounded-full text-base ${
                         plan.featured
                           ? "bg-slate-950 text-white hover:bg-slate-800"
                           : "bg-white text-slate-950 border border-slate-300 hover:bg-slate-50"

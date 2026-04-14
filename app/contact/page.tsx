@@ -11,9 +11,8 @@ export default function ContactPage() {
           Contact Pathnook
         </h1>
         <p className="mt-4 text-lg leading-8 text-slate-600">
-          Pathnook is software for parent-facing family learning support. For
-          product support, refund review, trust questions, or billing help that
-          is not resolved inside the Freemius portal, contact the team directly.
+          Pathnook is an AI learning and growth system that currently starts
+          with family learning support and structured weekly follow-through.
         </p>
 
         <div className="mt-8 grid gap-4 md:grid-cols-2">
@@ -27,29 +26,31 @@ export default function ContactPage() {
             </p>
           </div>
           <div className="rounded-3xl bg-slate-50 p-6">
-            <p className="text-sm font-medium text-slate-500">Admin email</p>
+            <p className="text-sm font-medium text-slate-500">Product support</p>
             <a
-              href="mailto:admin@pathnook.com"
+              href="mailto:support@pathnook.com"
               className="mt-2 inline-block text-lg font-semibold text-slate-950"
             >
-              admin@pathnook.com
+              support@pathnook.com
             </a>
             <p className="mt-4 text-sm leading-7 text-slate-600">
-              Typical response window: within 2 business days for support,
-              billing review, and trust questions.
+              Typical response time: within 2 business days.
             </p>
           </div>
         </div>
 
         <div className="mt-6 rounded-3xl border border-slate-200 p-6">
           <p className="text-sm font-medium text-slate-500">Privacy contact</p>
-          <p className="mt-2 text-lg font-semibold text-slate-950">[PRIVACY EMAIL]</p>
+          <p className="mt-2 text-lg font-semibold text-slate-950">privacy@pathnook.com</p>
           <p className="mt-4 text-sm leading-7 text-slate-600">
-            Freemius acts as Merchant of Record for checkout, recurring billing,
-            invoices, and related payment operations. If you need invoice access,
-            renewal control, or cancellation, start from the billing portal. If
-            you need help with Pathnook entitlements, local access, privacy, or
-            refund review, email Pathnook directly.
+            Payments are processed by Freemius as Merchant of Record. Pathnook
+            manages product access, report entitlements, uploads, and household
+            workflow history inside the app.
+          </p>
+          <p className="mt-4 text-sm leading-7 text-slate-600">
+            For billing and subscription management, please use the Freemius
+            customer portal where available, or contact us if you need help
+            locating the correct billing record.
           </p>
         </div>
 

@@ -6,7 +6,12 @@ import { SWRConfig } from 'swr';
 export const metadata: Metadata = {
   title: 'Pathnook',
   description:
-    'Parent-first learning diagnosis, evidence review, and weekly planning with Pathnook.'
+    'Parent-first learning diagnosis, evidence review, and weekly planning with Pathnook.',
+  icons: {
+    icon: '/icon.png',
+    apple: '/apple-icon.png',
+    shortcut: '/favicon.ico'
+  }
 };
 
 export const viewport: Viewport = {

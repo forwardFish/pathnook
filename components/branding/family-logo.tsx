@@ -53,7 +53,7 @@ function LogoInner({
         style={{ width: current.mark, height: current.mark }}
       >
         <Image
-          src="/pathnook-mark.svg"
+          src="/pathnook-mark-ui.png"
           alt="Pathnook logo mark"
           width={current.mark}
           height={current.mark}
