@@ -58,5 +58,6 @@ export async function setSession(user: Pick<NewUser, 'id'>) {
     httpOnly: true,
     secure: shouldUseSecureCookies(),
     sameSite: 'lax',
+    path: '/',
   });
 }

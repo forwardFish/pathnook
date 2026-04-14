@@ -2,6 +2,7 @@ import 'server-only';
 
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
+import { isRunningOnVercel } from '@/lib/family/config';
 import { FamilyMockState } from '@/lib/family/types';
 
 const runtimeRoot = path.join(
@@ -12,6 +13,10 @@ const runtimeRoot = path.join(
 );
 const statePath = path.join(runtimeRoot, 'family_mock_state.json');
 const uploadsRoot = path.join(runtimeRoot, 'uploads');
+
+function shouldTreatRuntimeStorageAsEphemeral() {
+  return isRunningOnVercel();
+}
 
 function createEmptyState(): FamilyMockState {
   return {
@@ -102,8 +107,20 @@ function normalizeState(parsed: Partial<FamilyMockState>): FamilyMockState {
 }
 
 async function ensureRuntimeDirs() {
-  await mkdir(runtimeRoot, { recursive: true });
-  await mkdir(uploadsRoot, { recursive: true });
+  try {
+    await mkdir(runtimeRoot, { recursive: true });
+    await mkdir(uploadsRoot, { recursive: true });
+    return true;
+  } catch (error) {
+    if (shouldTreatRuntimeStorageAsEphemeral()) {
+      console.warn(
+        '[familyEducation] Runtime mock storage is unavailable in this environment; continuing without local persistence.',
+        error
+      );
+      return false;
+    }
+    throw error;
+  }
 }
 
 export async function getFamilyRuntimePaths() {
@@ -116,21 +133,47 @@ export async function getFamilyRuntimePaths() {
 }
 
 export async function readFamilyMockState(): Promise<FamilyMockState> {
-  await ensureRuntimeDirs();
+  const empty = createEmptyState();
+  const runtimeReady = await ensureRuntimeDirs();
+  if (!runtimeReady) {
+    return empty;
+  }
 
   try {
     const existing = await readFile(statePath, 'utf8');
     return normalizeState(JSON.parse(existing) as Partial<FamilyMockState>);
-  } catch {
-    const empty = createEmptyState();
+  } catch (error) {
+    if (shouldTreatRuntimeStorageAsEphemeral()) {
+      console.warn(
+        '[familyEducation] Runtime mock state read/write fell back to in-memory defaults.',
+        error
+      );
+      return empty;
+    }
+
     await writeFile(statePath, JSON.stringify(empty, null, 2), 'utf8');
     return empty;
   }
 }
 
 export async function writeFamilyMockState(state: FamilyMockState) {
-  await ensureRuntimeDirs();
-  await writeFile(statePath, JSON.stringify(state, null, 2), 'utf8');
+  const runtimeReady = await ensureRuntimeDirs();
+  if (!runtimeReady) {
+    return;
+  }
+
+  try {
+    await writeFile(statePath, JSON.stringify(state, null, 2), 'utf8');
+  } catch (error) {
+    if (shouldTreatRuntimeStorageAsEphemeral()) {
+      console.warn(
+        '[familyEducation] Runtime mock state could not be persisted; continuing with the current request state only.',
+        error
+      );
+      return;
+    }
+    throw error;
+  }
 }
 
 export async function updateFamilyMockState<T>(

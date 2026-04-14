@@ -43,6 +43,7 @@ export async function middleware(request: NextRequest) {
         httpOnly: true,
         secure: shouldUseSecureCookies(),
         sameSite: 'lax',
+        path: '/',
         expires: expiresInOneDay
       });
     } catch (error) {

@@ -18,6 +18,11 @@ export type GoogleOAuthContext = {
   mode: 'signin' | 'signup';
 };
 
+type GoogleOAuthStateEnvelope = {
+  ctx: GoogleOAuthContext;
+  sig: string;
+};
+
 type GoogleTokenResponse = {
   access_token?: string;
   expires_in?: number;
@@ -57,6 +62,12 @@ function getRequiredEnv(name: string) {
     throw new Error(`${name} is not configured.`);
   }
   return normalizedValue;
+}
+
+function getOAuthStateSecret() {
+  return (
+    process.env.AUTH_SECRET?.trim() || 'family-education-dev-auth-secret'
+  );
 }
 
 export function isGoogleAuthConfigured() {
@@ -100,6 +111,12 @@ function createCodeChallenge(codeVerifier: string) {
   return toBase64Url(crypto.createHash('sha256').update(codeVerifier).digest());
 }
 
+function signGoogleOAuthStatePayload(payload: string) {
+  return toBase64Url(
+    crypto.createHmac('sha256', getOAuthStateSecret()).update(payload).digest()
+  );
+}
+
 export function buildGoogleOAuthContext(
   input: Partial<Pick<GoogleOAuthContext, 'redirectTo' | 'priceId' | 'inviteId' | 'mode'>>
 ): GoogleOAuthContext {
@@ -127,13 +144,68 @@ export function buildGoogleAuthorizationUrl(context: GoogleOAuthContext) {
   url.searchParams.set('redirect_uri', getGoogleCallbackUrl());
   url.searchParams.set('response_type', 'code');
   url.searchParams.set('scope', GOOGLE_SCOPES.join(' '));
-  url.searchParams.set('state', context.state);
+  url.searchParams.set('state', serializeGoogleOAuthState(context));
   url.searchParams.set('nonce', context.nonce);
   url.searchParams.set('prompt', 'select_account');
   url.searchParams.set('access_type', 'offline');
   url.searchParams.set('code_challenge', createCodeChallenge(context.codeVerifier));
   url.searchParams.set('code_challenge_method', 'S256');
   return url.toString();
+}
+
+export function serializeGoogleOAuthState(context: GoogleOAuthContext) {
+  const payload = toBase64Url(Buffer.from(JSON.stringify(context), 'utf8'));
+  const envelope: GoogleOAuthStateEnvelope = {
+    ctx: context,
+    sig: signGoogleOAuthStatePayload(payload),
+  };
+
+  return `${payload}.${envelope.sig}`;
+}
+
+export function parseGoogleOAuthState(value: string | null | undefined) {
+  if (!value) {
+    return null;
+  }
+
+  const [payload, signature] = value.split('.');
+  if (!payload || !signature) {
+    return null;
+  }
+
+  const expectedSignature = signGoogleOAuthStatePayload(payload);
+  if (
+    signature.length !== expectedSignature.length ||
+    !crypto.timingSafeEqual(
+      Buffer.from(signature),
+      Buffer.from(expectedSignature)
+    )
+  ) {
+    return null;
+  }
+
+  try {
+    const parsed = JSON.parse(
+      Buffer.from(payload, 'base64url').toString('utf8')
+    ) as GoogleOAuthContext;
+
+    if (
+      !parsed ||
+      typeof parsed.state !== 'string' ||
+      typeof parsed.nonce !== 'string' ||
+      typeof parsed.codeVerifier !== 'string' ||
+      typeof parsed.redirectTo !== 'string' ||
+      typeof parsed.priceId !== 'string' ||
+      typeof parsed.inviteId !== 'string' ||
+      (parsed.mode !== 'signin' && parsed.mode !== 'signup')
+    ) {
+      return null;
+    }
+
+    return parsed;
+  } catch {
+    return null;
+  }
 }
 
 export async function exchangeGoogleCodeForTokens(code: string, codeVerifier: string) {

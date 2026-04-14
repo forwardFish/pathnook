@@ -2,7 +2,12 @@ import crypto from 'node:crypto';
 import { and, eq, isNull, or } from 'drizzle-orm';
 import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
-import { exchangeGoogleCodeForTokens, extractGoogleIdentity, verifyGoogleIdToken } from '@/lib/auth/google';
+import {
+  exchangeGoogleCodeForTokens,
+  extractGoogleIdentity,
+  parseGoogleOAuthState,
+  verifyGoogleIdToken,
+} from '@/lib/auth/google';
 import { hashPassword, setSession } from '@/lib/auth/session';
 import { logActivity } from '@/lib/db/activity';
 import { db } from '@/lib/db/drizzle';
@@ -160,34 +165,45 @@ async function findOrCreateGoogleUser(identity: {
 export async function GET(request: NextRequest) {
   const cookieStore = await cookies();
   const storedContext = cookieStore.get(GOOGLE_OAUTH_COOKIE)?.value;
+  const stateParam = request.nextUrl.searchParams.get('state');
+  const stateContext = parseGoogleOAuthState(stateParam);
 
   cookieStore.set(GOOGLE_OAUTH_COOKIE, '', getCookieOptions());
 
-  if (!storedContext) {
+  if (!storedContext && !stateContext) {
     return NextResponse.redirect(
       getLoginUrl(request, 'signin', 'google_session_missing')
     );
   }
 
-  let context: GoogleOAuthContext;
+  let context: GoogleOAuthContext | null = stateContext;
 
-  try {
-    context = JSON.parse(storedContext) as GoogleOAuthContext;
-  } catch {
+  if (storedContext) {
+    try {
+      context = JSON.parse(storedContext) as GoogleOAuthContext;
+    } catch {
+      if (!stateContext) {
+        return NextResponse.redirect(
+          getLoginUrl(request, 'signin', 'google_session_invalid')
+        );
+      }
+    }
+  }
+
+  if (!context) {
     return NextResponse.redirect(
       getLoginUrl(request, 'signin', 'google_session_invalid')
     );
   }
 
   const code = request.nextUrl.searchParams.get('code');
-  const state = request.nextUrl.searchParams.get('state');
   const oauthError = request.nextUrl.searchParams.get('error');
 
   if (oauthError) {
     return NextResponse.redirect(getLoginUrl(request, context.mode, 'google_access_denied'));
   }
 
-  if (!code || !state || state !== context.state) {
+  if (!code || !stateContext || stateContext.state !== context.state) {
     return NextResponse.redirect(getLoginUrl(request, context.mode, 'google_state_invalid'));
   }
 
