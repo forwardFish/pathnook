@@ -67,12 +67,12 @@ export function Login({
         <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
           {mode === 'signin'
             ? 'Sign in to continue your Pathnook household workflow.'
-            : 'Create your account'}
+            : 'Start with Google or create your account'}
         </h2>
         <p className="mt-3 text-center text-sm text-gray-600">
           {mode === 'signin'
-            ? 'Sign in to continue your Pathnook household workflow.'
-            : 'You are creating an adult account for parent, guardian, or other authorized adult use. Children may not create accounts directly.'}
+            ? 'Google sign-in is the fastest path. Email and password remain available if you prefer a standard sign-in.'
+            : 'Google sign-in is recommended for the fastest setup. Email and password remain available for parent, guardian, or other authorized adult use. Children may not create accounts directly.'}
         </p>
       </div>
 
@@ -84,7 +84,7 @@ export function Login({
               className="inline-flex h-11 w-full items-center justify-center gap-3 rounded-full border border-gray-300 bg-white px-4 text-sm font-medium text-gray-800 shadow-xs transition-colors hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-orange-500"
             >
               <GoogleIcon />
-              Continue with Google
+              {mode === 'signin' ? 'Sign in with Google' : 'Continue with Google'}
             </a>
             <p className="text-center text-xs text-gray-500">
               Use your Google account to sign in or create an account in one step.
@@ -263,9 +263,10 @@ export function Login({
             </div>
             <div className="relative flex justify-center text-sm">
               <span className="px-2 bg-gray-50 text-gray-500">
+                {googleAuthAvailable ? 'Or continue with email' : ''}
                 {mode === 'signin'
-                  ? 'New to our platform?'
-                  : 'Already have an account?'}
+                  ? (googleAuthAvailable ? '' : 'New to our platform?')
+                  : (googleAuthAvailable ? '' : 'Already have an account?')}
               </span>
             </div>
           </div>

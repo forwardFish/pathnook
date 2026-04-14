@@ -52,14 +52,18 @@ type GoogleTokenInfoResponse = {
 
 function getRequiredEnv(name: string) {
   const value = process.env[name];
-  if (!value) {
+  const normalizedValue = value?.trim();
+  if (!normalizedValue) {
     throw new Error(`${name} is not configured.`);
   }
-  return value;
+  return normalizedValue;
 }
 
 export function isGoogleAuthConfigured() {
-  return Boolean(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET);
+  return Boolean(
+    process.env.GOOGLE_CLIENT_ID?.trim() &&
+      process.env.GOOGLE_CLIENT_SECRET?.trim()
+  );
 }
 
 export function getGoogleClientId() {
@@ -71,7 +75,7 @@ function getGoogleClientSecret() {
 }
 
 export function getGoogleCallbackUrl() {
-  const configuredRedirectUri = process.env.GOOGLE_REDIRECT_URI;
+  const configuredRedirectUri = process.env.GOOGLE_REDIRECT_URI?.trim();
   if (configuredRedirectUri) {
     return configuredRedirectUri;
   }

@@ -32,7 +32,15 @@ export async function getUser() {
       : null;
   }
 
-  const sessionData = await verifyToken(sessionCookie.value);
+  let sessionData;
+  try {
+    sessionData = await verifyToken(sessionCookie.value);
+  } catch {
+    return FAMILY_EDU_DEMO_MODE && FAMILY_EDU_DEMO_AUTO_AUTH
+      ? await createDemoUser()
+      : null;
+  }
+
   if (
     !sessionData ||
     !sessionData.user ||
