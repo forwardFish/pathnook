@@ -62,8 +62,9 @@ export function LandingFooter() {
             </p>
             <p className="mt-4 max-w-md text-sm leading-7 text-slate-400">
               Brand/Product: Pathnook. Operator: {PUBLIC_OPERATOR_SHORT}. Pathnook
-              is software for parents who want clearer learning decisions,
-              evidence-backed review, and a steadier weekly follow-through workflow.
+              is a parent-facing AI learning and growth system for clearer
+              learning decisions, evidence-backed review, and steadier weekly
+              follow-through.
             </p>
             <a
               href={`mailto:${landingSupportEmail}`}

@@ -111,7 +111,7 @@ export default function PrivacyPage() {
               product, adult users control whether they export or share a
               report. Shared report views are designed to preserve the diagnosis
               context without exposing more raw material than is reasonably
-              needed for the intended handoff.
+              needed for the intended share summary.
             </p>
           </section>
 

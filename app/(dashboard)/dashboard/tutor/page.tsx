@@ -18,15 +18,15 @@ export default async function TutorWorkspacePage() {
       <div className="flex flex-col gap-4 rounded-3xl bg-[linear-gradient(135deg,#f0fdf4_0%,#ecfeff_50%,#ffffff_100%)] p-6 shadow-sm ring-1 ring-emerald-100 lg:flex-row lg:items-end lg:justify-between">
         <div className="space-y-3">
           <p className="text-sm font-medium uppercase tracking-[0.18em] text-emerald-700">
-            Tutor Workspace
+            Tutor-ready Share
           </p>
-          <h1 className="text-3xl font-semibold text-gray-900">Tutor handoff foundation</h1>
+          <h1 className="text-3xl font-semibold text-gray-900">Tutor-ready share foundation</h1>
           <p className="max-w-3xl text-sm text-gray-700">
-            This should-scope workspace gives parents a clean place to see which reports are ready
-            to hand to a tutor, whether a share link is active, and which focus areas matter most.
+            This owner-scoped view gives parents a clean place to see which reports are ready
+            to share with a tutor, whether a share summary is active, and which focus areas matter most.
           </p>
           <p className="max-w-3xl text-xs uppercase tracking-[0.14em] text-emerald-700">
-            Owner-scoped shell only. This workspace does not create a separate tutor login or show
+            Owner-scoped view only. This page does not create a separate tutor login or show
             cross-household data.
           </p>
         </div>
@@ -46,7 +46,7 @@ export default async function TutorWorkspacePage() {
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle>Active tutor links</CardTitle>
+            <CardTitle>Active tutor shares</CardTitle>
           </CardHeader>
           <CardContent className="text-3xl font-semibold text-gray-900">
             {items.filter((item) => item.shareStatus === 'active').length}
@@ -87,7 +87,7 @@ export default async function TutorWorkspacePage() {
                   <p className="mt-2">{item.secondaryFocus || 'Not captured yet'}</p>
                 </div>
                 <div className="rounded-2xl bg-gray-50 p-4 text-sm text-gray-700">
-                  <p className="font-medium text-gray-900">Tutor share</p>
+                  <p className="font-medium text-gray-900">Tutor-ready share</p>
                   <p className="mt-2">Status: {item.shareStatus.replace('_', ' ')}</p>
                   {item.activeShareUrl ? (
                     <Button asChild variant="outline" size="sm" className="mt-3">
@@ -101,7 +101,7 @@ export default async function TutorWorkspacePage() {
         ) : (
           <Card>
             <CardContent className="p-6 text-sm text-gray-600">
-              Tutor-ready briefs will appear here after reports are generated and unlocked.
+              Tutor-ready share summaries will appear here after reports are generated and unlocked.
             </CardContent>
           </Card>
         )}

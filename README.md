@@ -1,18 +1,42 @@
-# Pathnook Parent Dashboard
+# Pathnook
 
-Pathnook is a parent-first web product for turning 5-10 pages of math homework, quizzes, and corrections into:
+Pathnook is a parent-facing AI learning and growth system for family learning support.
+
+It helps families turn recent student work into:
 - an evidence-backed diagnosis
-- a 7-day action plan
-- a weekly review trend
-- a tutor share link
+- a clearer weekly focus
+- the shortest next step
+- a practical 7-day plan
+- a tutor-ready share summary
+- compare and continuity across reviews
 
-This repository is bootstrapped from `nextjs/saas-starter`, but delivery is governed by the `agentsystem` software engineering workflow and the traceability-first backlog under `tasks/`.
+## What Pathnook does
 
-## Current Status
-- base starter repository imported
-- PRD source documents preserved under `docs/`
-- backlog, traceability, and testing assets generated
-- Sprint 1 through Sprint 8 are accepted in the local demo/runtime delivery lane
-- provider abstraction, entitlement projection, and the Pathnook public-brand alignment work are implemented locally
-- final acceptance, ship, release, retro, and handoff artifacts live under `tasks/runtime/`
-- live remote validation and production operations should continue to be reported from real deployment evidence only
+Pathnook is designed for parents, guardians, and other authorized adults who want clearer learning decisions and steadier weekly follow-through.
+
+The current product workflow supports:
+- uploading recent homework, quizzes, tests, and corrections
+- capturing the parent's goal and current concern
+- generating an evidence-backed review
+- turning that review into a weekly action path
+- carrying progress forward across future reviews
+
+## Tech stack
+
+- Next.js
+- TypeScript
+- Tailwind CSS
+- Drizzle ORM
+- Neon
+- Vercel
+
+## Local development
+
+1. Copy `.env.example` to `.env.local`
+2. Install dependencies
+3. Run the development server
+4. Apply database migrations if needed
+
+## Product status
+
+Pathnook is an actively developed web product. Public positioning, billing, and legal pages are aligned to the live product at pathnook.com.

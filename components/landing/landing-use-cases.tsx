@@ -35,17 +35,17 @@ const useCases: {
     description:
       "Export or share only the approved report sections that help a tutor pick up the story quickly.",
     icon: Route,
-    bullets: ["Owner-scoped share", "Focus areas", "No second login required"],
+    bullets: ["Owner-scoped share summary", "Focus areas", "No second login required"],
   },
 ];
 
 const searchIntentPhrases = [
-  "math diagnosis for parents",
-  "worksheet mistake analysis",
-  "weekly review for family math practice",
+  "learning diagnosis for parents",
+  "student work mistake analysis",
+  "weekly review for family learning support",
   "bilingual parent report for tutoring",
   "evidence-based student error summary",
-  "parent dashboard for uploaded homework pages",
+  "parent dashboard for uploaded student work",
 ];
 
 export function LandingUseCasesSection() {
@@ -67,7 +67,7 @@ export function LandingUseCasesSection() {
           <p className="mt-5 text-xl leading-9 text-slate-600">
             This section fills the role of the SEO-style landing content in the
             reference design while staying grounded in the Pathnook
-            workflow and vocabulary.
+            product story and vocabulary.
           </p>
         </motion.div>
 

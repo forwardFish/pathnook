@@ -28,7 +28,7 @@ export default function DashboardLayout({
     { href: '/dashboard', icon: Home, label: 'Overview' },
     { href: '/dashboard/children', icon: Users, label: 'Children' },
     { href: '/dashboard/general', icon: UserRound, label: 'Parent Account' },
-    { href: '/dashboard/tutor', icon: Sparkles, label: 'Tutor Workspace' },
+    { href: '/dashboard/tutor', icon: Sparkles, label: 'Tutor Share' },
     { href: '/dashboard/activity', icon: Activity, label: 'Activity' },
     { href: '/dashboard/security', icon: Shield, label: 'Security' },
     { href: '/dashboard/billing', icon: CreditCard, label: 'Billing' }
@@ -67,7 +67,7 @@ export default function DashboardLayout({
         >
           <div className="pn-surface h-full p-3">
             <div className="rounded-[1.5rem] border border-[var(--pn-border)] bg-white p-4">
-              <p className="pn-kicker">Parent Workspace</p>
+              <p className="pn-kicker">Parent Dashboard</p>
               <h2 className="mt-2 text-2xl font-black tracking-[-0.04em] text-[#111827]">
                 Household dashboard
               </h2>
@@ -111,7 +111,7 @@ export default function DashboardLayout({
                 </h1>
               </div>
               <div className="rounded-full border border-[var(--pn-soft-border)] bg-[var(--pn-soft)] px-4 py-2 text-sm font-semibold text-[var(--pn-violet)]">
-                Pathnook household workspace
+                Pathnook household dashboard
               </div>
             </div>
           </div>

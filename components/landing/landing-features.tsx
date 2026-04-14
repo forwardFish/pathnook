@@ -44,10 +44,10 @@ const features: {
   },
   {
     icon: UsersRound,
-    title: "Tutor workspace foundation",
+    title: "Tutor-ready share foundation",
     description:
-      "Prepare a tutor-ready brief without spinning up a separate tutor account or exposing unrelated household data.",
-    bullets: ["Owner-scoped shell", "Active share status", "Focus areas at a glance"],
+      "Prepare a tutor-ready share summary without spinning up a separate tutor account or exposing unrelated household data.",
+    bullets: ["Owner-scoped share view", "Active share status", "Focus areas at a glance"],
     accentClass: "from-emerald-100 to-teal-50 text-emerald-700",
   },
   {
@@ -55,7 +55,7 @@ const features: {
     title: "Weekly review rhythm",
     description:
       "Track the next review moment through reminder artifacts and keep the diagnosis flow tied to a parent cadence.",
-    bullets: ["Report-ready reminder", "Weekly review reminder", "Runtime evidence logged"],
+    bullets: ["Report-ready reminder", "Weekly review reminder", "Progress evidence logged"],
     accentClass: "from-rose-100 to-pink-50 text-rose-700",
   },
   {
@@ -90,7 +90,7 @@ export function LandingFeaturesSection() {
           </h2>
           <p className="mt-5 text-xl leading-9 text-slate-600">
             The structure mirrors a strong SaaS landing page, but the product
-            promise is specific: turn family math confusion into a clear review
+            promise is specific: turn recent student work into a clear review
             loop backed by evidence.
           </p>
         </motion.div>

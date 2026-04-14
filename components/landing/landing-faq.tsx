@@ -20,7 +20,7 @@ const faqItems = [
   {
     question: "Can I share the report with a tutor?",
     answer:
-      "Yes. Once the report is unlocked, you can create a tutor-ready handoff while keeping the workspace owner-scoped and read-only for the recipient.",
+      "Yes. Once the report is unlocked, you can create a tutor-ready share summary while keeping the shared view owner-scoped and read-only for the recipient.",
   },
   {
     question: "Can I switch the report into Spanish?",

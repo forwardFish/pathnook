@@ -41,7 +41,7 @@ const heroCards = [
   },
   {
     title: "Share",
-    body: "Tutor-ready handoff without losing family context.",
+    body: "Tutor-ready share summary without losing family context.",
     icon: Handshake,
   },
 ] as const;
@@ -104,7 +104,7 @@ const faqItems = [
   {
     question: "Can I share the result with a tutor?",
     answer:
-      "Yes. The workflow keeps the evidence and parent context intact when a tutor handoff is useful.",
+      "Yes. The workflow keeps the evidence and parent context intact when a tutor-ready share summary is useful.",
   },
   {
     question: "What happens if the upload is unclear?",
@@ -114,7 +114,7 @@ const faqItems = [
   {
     question: "Is Pathnook only for math?",
     answer:
-      "No. Stage 1 starts with education diagnosis for families, and the public story is broader than a math-only worksheet tool.",
+      "No. Pathnook supports parent-facing family learning support and is broader than a subject-specific worksheet tool.",
   },
   {
     question: "How does billing work?",
@@ -195,7 +195,7 @@ export function FamilyLandingPage() {
               <div className="rounded-[1.7rem] border border-[#dfe4ec] bg-[#fcfcfe] px-6 py-7 sm:px-8 sm:py-8">
                 <div className="font-mono text-[1rem] leading-[2.2] tracking-[0.01em] text-[#334155] sm:text-[1.1rem]">
                   My child understands the ideas in class, but still breaks down
-                  on mixed math work. I want to know the real bottleneck and
+                  on mixed schoolwork. I want to know the real bottleneck and
                   what we should focus on this week.
                 </div>
 

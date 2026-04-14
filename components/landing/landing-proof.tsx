@@ -7,18 +7,18 @@ const stats = [
   { value: "5 to 10 pages", label: "Supported upload size" },
   { value: "EN / ES", label: "Report and PDF output" },
   { value: "PDF export", label: "Unlock-aware download flow" },
-  { value: "Tutor-ready", label: "Owner-scoped collaboration handoff" },
+  { value: "Tutor-ready", label: "Owner-scoped share summary" },
 ];
 
 const proofCards = [
   {
-    title: "Weekly homework review",
+    title: "Weekly learning review",
     role: "Parent workflow snapshot",
     content:
       "Instead of staring at a red-marked packet and guessing, the parent can see which exact pages triggered the diagnosis and what to do during the next seven days.",
   },
   {
-    title: "Bilingual household handoff",
+    title: "Bilingual household sharing",
     role: "Report delivery snapshot",
     content:
       "The family can switch the report between English and Spanish on the same page and export the PDF in that same language without rebuilding the diagnosis.",
@@ -27,7 +27,7 @@ const proofCards = [
     title: "Tutor prep without data sprawl",
     role: "Share workflow snapshot",
     content:
-      "The tutor workspace shell shows the approved brief, share status, and focus areas while keeping owner-only household information out of the handoff.",
+      "The tutor-ready share view shows the approved brief, share status, and focus areas while keeping owner-only household information out of the summary.",
   },
 ];
 

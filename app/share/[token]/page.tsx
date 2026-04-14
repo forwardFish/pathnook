@@ -25,7 +25,7 @@ export default async function SharedReportPage({ params }: PageProps) {
             </CardTitle>
           </CardHeader>
           <CardContent className="text-sm text-gray-600">
-            Ask the parent to generate a new tutor share link if they still want to collaborate.
+            Ask the parent to generate a new tutor-ready share summary if they still want to collaborate.
           </CardContent>
         </Card>
       </main>
@@ -41,7 +41,7 @@ export default async function SharedReportPage({ params }: PageProps) {
     <main className="mx-auto min-h-screen max-w-5xl space-y-6 px-4 py-12">
       <div>
         <p className="text-sm font-medium uppercase tracking-[0.18em] text-orange-600">
-          Tutor Share
+          Tutor-ready Share
         </p>
         <h1 className="text-3xl font-semibold text-gray-900">
           {payload.report.child?.nickname || 'Student'} intake snapshot

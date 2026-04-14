@@ -1,6 +1,5 @@
 import {
   PUBLIC_CONTACT_EMAIL,
-  PUBLIC_OPERATOR_LINE,
 } from '@/lib/site/public-trust';
 
 export default function TermsPage() {
@@ -23,12 +22,14 @@ export default function TermsPage() {
             <p className="mt-3">
               These Terms of Service govern your use of Pathnook, a software
               product operated by Yanhui Lin, an individual software maker based
-              in Mainland China. {PUBLIC_OPERATOR_LINE} Pathnook is software for
-              parent-facing family learning support, including upload handling,
+              in Mainland China. Pathnook provides parent-facing family
+              learning support software, including upload handling,
               AI-assisted diagnosis, report generation, workflow continuity, and
-              billing-linked access control. Pathnook is not a school,
-              therapist, law firm, medical provider, or official educational
-              authority.
+              billing-linked access control.
+            </p>
+            <p className="mt-3">
+              Pathnook is not a school, therapist, law firm, medical provider,
+              or official educational authority.
             </p>
           </section>
 

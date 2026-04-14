@@ -52,7 +52,7 @@ export function ReportShareClient({
 
       setShareLinks((current) => [payload, ...current]);
       setLastCreatedUrl(payload.shareUrl || buildShareUrl(payload.token));
-      setFeedback(labels.shareLinkCreated || 'Tutor share link created.');
+      setFeedback(labels.shareLinkCreated || 'Tutor-ready share summary created.');
     });
   }
 
@@ -77,7 +77,7 @@ export function ReportShareClient({
           item.token === token ? { ...item, revokedAt: payload.revokedAt } : item
         )
       );
-      setFeedback(labels.shareLinkRevoked || 'Tutor share link revoked.');
+      setFeedback(labels.shareLinkRevoked || 'Tutor-ready share summary revoked.');
     });
   }
 
@@ -92,13 +92,13 @@ export function ReportShareClient({
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Link2 className="h-4 w-4" />
-          {labels.shareWithTutor || 'Share With Tutor'}
+          {labels.shareWithTutor || 'Tutor-ready Share Summary'}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4 text-sm text-gray-700">
         <p>
           {labels.shareDescription ||
-            'Create a read-only tutor link with no parent-only notes.'}
+            'Create a read-only tutor-ready share summary with no parent-only notes.'}
         </p>
         <div className="flex flex-wrap gap-3">
           <Button type="button" onClick={createShareLink} disabled={isPending}>
@@ -108,7 +108,7 @@ export function ReportShareClient({
                 Working...
               </>
             ) : (
-              labels.createTutorLink || 'Create Tutor Link'
+              labels.createTutorLink || 'Create Tutor-ready Summary'
             )}
           </Button>
           {lastCreatedUrl ? (
@@ -167,7 +167,7 @@ export function ReportShareClient({
             })
           ) : (
             <p className="text-sm text-gray-600">
-              {labels.noTutorLinks || 'No tutor links created yet.'}
+              {labels.noTutorLinks || 'No tutor-ready share summaries created yet.'}
             </p>
           )}
         </div>

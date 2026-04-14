@@ -21,7 +21,7 @@ const proofPoints = [
   },
   {
     value: "Tutor-ready",
-    label: "Owner-scoped handoff without a second login",
+    label: "Owner-scoped share summary without a second login",
     icon: UsersRound,
   },
 ];

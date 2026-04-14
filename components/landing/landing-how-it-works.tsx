@@ -34,7 +34,7 @@ const steps: {
     number: "04",
     title: "Export or hand off",
     description:
-      "Once unlocked, export a PDF in the selected language or create a tutor-ready share without losing the owner boundary.",
+      "Once unlocked, export a PDF in the selected language or create a tutor-ready share summary without losing the owner boundary.",
     icon: Share2,
   },
 ];
@@ -158,7 +158,7 @@ export function LandingHowItWorksSection() {
                     <div className="flex items-center justify-between gap-3">
                       <div>
                         <p className="text-base font-medium text-white">
-                          Tutor handoff foundation
+                          Tutor-ready share foundation
                         </p>
                         <p className="mt-1 text-base text-slate-300">
                           Share only the owner-approved brief.
