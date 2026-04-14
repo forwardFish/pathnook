@@ -169,6 +169,18 @@ export function verifyBillingRedirectSignature(
   );
 }
 
+export function getBillingRedirectCompletionPayload(
+  url: string,
+  fallbackPriceId?: string | null,
+  providerName?: BillingProviderName
+) {
+  const targetProvider = providerName || getBillingProviderSelection().active;
+  return getCompatibilityBillingProvider(targetProvider).getRedirectCompletionPayload(
+    url,
+    fallbackPriceId
+  );
+}
+
 export async function retrieveBillingCheckout(
   checkoutId: string,
   providerName: BillingProviderName = 'creem'
@@ -217,15 +229,13 @@ export async function getConfiguredBillingPlans() {
 export function getPortalSupportLabel() {
   const selection = getBillingProviderSelection();
 
-  if (selection.active === 'creem') {
-    return selection.fallbackApplied
-      ? 'Manage Billing In Backup Portal'
-      : 'Manage Billing In Portal';
+  if (selection.active === 'freemius') {
+    return 'Open Freemius Billing Portal';
   }
 
-  return selection.provider.isConfigured()
-    ? 'Billing Portal Coming Soon'
-    : 'Portal unavailable until Creem rollback is enabled';
+  return selection.fallbackApplied
+    ? 'Open Billing Portal'
+    : 'Billing Portal Unavailable';
 }
 
 export function getBillingProviderStatusSummary() {

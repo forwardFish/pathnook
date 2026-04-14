@@ -11,29 +11,70 @@ export default function ContactPage() {
           Contact Pathnook
         </h1>
         <p className="mt-4 text-lg leading-8 text-slate-600">
-          Pathnook is an AI learning and growth system that currently starts with
-          family learning support. For support, billing questions, refund requests,
-          or trust and policy questions, email the team directly.
+          Pathnook is software for parent-facing family learning support. For
+          product support, refund review, trust questions, or billing help that
+          is not resolved inside the Freemius portal, contact the team directly.
         </p>
 
-        <div className="mt-8 rounded-3xl bg-slate-50 p-6">
-          <p className="text-sm font-medium text-slate-500">Support email</p>
-          <a
-            href="mailto:support@pathnook.com"
-            className="mt-2 inline-block text-lg font-semibold text-slate-950"
-          >
-            support@pathnook.com
-          </a>
+        <div className="mt-8 grid gap-4 md:grid-cols-2">
+          <div className="rounded-3xl bg-slate-50 p-6">
+            <p className="text-sm font-medium text-slate-500">Operator</p>
+            <p className="mt-2 text-lg font-semibold text-slate-950">[LEGAL ENTITY NAME]</p>
+            <p className="mt-3 text-sm leading-7 text-slate-600">
+              Pathnook runs at <span className="font-medium">www.pathnook.com</span>.
+              This public contact structure is provided for product, privacy, and
+              billing-support escalation.
+            </p>
+          </div>
+          <div className="rounded-3xl bg-slate-50 p-6">
+            <p className="text-sm font-medium text-slate-500">Admin email</p>
+            <a
+              href="mailto:admin@pathnook.com"
+              className="mt-2 inline-block text-lg font-semibold text-slate-950"
+            >
+              admin@pathnook.com
+            </a>
+            <p className="mt-4 text-sm leading-7 text-slate-600">
+              Typical response window: within 2 business days for support,
+              billing review, and trust questions.
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-6 rounded-3xl border border-slate-200 p-6">
+          <p className="text-sm font-medium text-slate-500">Privacy contact</p>
+          <p className="mt-2 text-lg font-semibold text-slate-950">[PRIVACY EMAIL]</p>
           <p className="mt-4 text-sm leading-7 text-slate-600">
-            Billing flows may be handled through the active payment provider while
-            product access, entitlements, and support remain managed by Pathnook.
+            Freemius acts as Merchant of Record for checkout, recurring billing,
+            invoices, and related payment operations. If you need invoice access,
+            renewal control, or cancellation, start from the billing portal. If
+            you need help with Pathnook entitlements, local access, privacy, or
+            refund review, email Pathnook directly.
           </p>
         </div>
 
         <div className="mt-8 flex flex-wrap gap-3">
           <Link
-            href="/pricing"
+            href="/sign-in?redirect=%2Fdashboard%2Fbilling"
             className="rounded-full bg-slate-950 px-5 py-3 text-sm font-medium text-white"
+          >
+            Open billing portal
+          </Link>
+          <Link
+            href="/faq"
+            className="rounded-full border border-slate-300 px-5 py-3 text-sm font-medium text-slate-900"
+          >
+            FAQ
+          </Link>
+          <Link
+            href="/help"
+            className="rounded-full border border-slate-300 px-5 py-3 text-sm font-medium text-slate-900"
+          >
+            Help center
+          </Link>
+          <Link
+            href="/pricing"
+            className="rounded-full border border-slate-300 px-5 py-3 text-sm font-medium text-slate-900"
           >
             View pricing
           </Link>
@@ -54,6 +95,12 @@ export default function ContactPage() {
             className="rounded-full border border-slate-300 px-5 py-3 text-sm font-medium text-slate-900"
           >
             Refund policy
+          </Link>
+          <Link
+            href="/data-deletion"
+            className="rounded-full border border-slate-300 px-5 py-3 text-sm font-medium text-slate-900"
+          >
+            Data deletion
           </Link>
         </div>
       </div>

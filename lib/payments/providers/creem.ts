@@ -102,6 +102,17 @@ export const creemProvider: BillingProvider = {
     params: CheckoutRedirectParams,
     signature: string | null | undefined
   ) => verifyCreemRedirectSignature(params, signature),
+  async getRedirectCompletionPayload(url: string, fallbackPriceId?: string | null) {
+    const requestUrl = new URL(url);
+    const checkoutId = requestUrl.searchParams.get('checkout_id');
+
+    if (!checkoutId) {
+      return null;
+    }
+
+    const checkout = await retrieveCheckout(checkoutId);
+    return getCheckoutCompletionPayload(checkout, fallbackPriceId);
+  },
   retrieveCheckout,
   getCheckoutCompletionPayload,
   verifyWebhookSignature: (

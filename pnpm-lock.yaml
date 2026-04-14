@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@freemius/sdk':
+        specifier: ^0.3.0
+        version: 0.3.0(@freemius/checkout@1.4.1)(zod@4.3.6)
       '@neondatabase/serverless':
         specifier: ^1.0.2
         version: 1.0.2
@@ -105,8 +108,8 @@ importers:
         specifier: ^5.8.3
         version: 5.8.3
       zod:
-        specifier: ^3.24.4
-        version: 3.24.4
+        specifier: ^4.3.6
+        version: 4.3.6
     devDependencies:
       playwright-core:
         specifier: ^1.59.1
@@ -432,6 +435,15 @@ packages:
 
   '@floating-ui/utils@0.2.9':
     resolution: {integrity: sha512-MDWhGtE+eHw5JW7lq4qhc5yRLS11ERl1c7Z6Xd0a58DozHES6EnNNwUWbMiG4J9Cgj053Bhk8zvlhFYKVhULwg==}
+
+  '@freemius/checkout@1.4.1':
+    resolution: {integrity: sha512-NAQouqGG9PNmGqU45HfnUB6fk3IDUudJpye6nLMthJvZaYWGPbMb0xzfu1v/+35avzH5BgcRBoNcQkgxGh8Tjg==}
+
+  '@freemius/sdk@0.3.0':
+    resolution: {integrity: sha512-/WHitAgqk9mWg1lzKin7WVCoZb5yiz/Uqbi9oDzQ/836wfya6OBBIVxXiNH6BXYYxIcXOz02kxuZzqmXgs9m9g==}
+    peerDependencies:
+      '@freemius/checkout': ^1.4.0
+      zod: ^4.0.0
 
   '@hono/node-server@1.19.13':
     resolution: {integrity: sha512-TsQLe4i2gvoTtrHje625ngThGBySOgSK3Xo2XRYOdqGN1teR8+I7vchQC46uLJi8OF62YTYA3AhSpumtkhsaKQ==}
@@ -2127,6 +2139,12 @@ packages:
   once@1.4.0:
     resolution: {integrity: sha512-lNaJgI+2Q5URQBkccEKHTQOPaXdUxnZZElQTZY0MFUAuaEqe1E+Nyvgdz/aIyNi6Z9MzO5dv1H8n58/GELp3+w==}
 
+  openapi-fetch@0.14.1:
+    resolution: {integrity: sha512-l7RarRHxlEZYjMLd/PR0slfMVse2/vvIAGm75/F7J6MlQ8/b9uUQmUF2kCPrQhJqMXSxmYWObVgeYXbFYzZR+A==}
+
+  openapi-typescript-helpers@0.0.15:
+    resolution: {integrity: sha512-opyTPaunsklCBpTK8JGef6mfPhLSnyy5a0IN9vKtx3+4aExf+KxEqYwIy3hqkedXIB97u357uLMJsOnm3GVjsw==}
+
   pako@1.0.11:
     resolution: {integrity: sha512-4hLB8Py4zZce5s4yd9XzopqwVv/yGNhV1Bl8NTmCq1763HeK2+EwVTv+leGeL13Dnh2wfbqowVPXCIO0z4taYw==}
 
@@ -2487,11 +2505,11 @@ packages:
     peerDependencies:
       zod: ^3.25.28 || ^4
 
-  zod@3.24.4:
-    resolution: {integrity: sha512-OdqJE9UDRPwWsrHjLN2F8bPxvwJBK22EHLWtanu0LSYr5YqzsaaW3RMgmjwr8Rypg5k+meEJdSPXJZXE/yqOMg==}
-
   zod@3.25.76:
     resolution: {integrity: sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ==}
+
+  zod@4.3.6:
+    resolution: {integrity: sha512-rftlrkhHZOcjDwkGlnUtZZkvaPHCsDATp4pGpuOOMDaTdDDXF91wuVDJoWoPsKX/3YPQ5fHuF3STjcYyKr+Qhg==}
 
 snapshots:
 
@@ -2676,6 +2694,14 @@ snapshots:
       react-dom: 19.1.0(react@19.1.0)
 
   '@floating-ui/utils@0.2.9': {}
+
+  '@freemius/checkout@1.4.1': {}
+
+  '@freemius/sdk@0.3.0(@freemius/checkout@1.4.1)(zod@4.3.6)':
+    dependencies:
+      '@freemius/checkout': 1.4.1
+      openapi-fetch: 0.14.1
+      zod: 4.3.6
 
   '@hono/node-server@1.19.13(hono@4.12.12)':
     dependencies:
@@ -4257,6 +4283,12 @@ snapshots:
     dependencies:
       wrappy: 1.0.2
 
+  openapi-fetch@0.14.1:
+    dependencies:
+      openapi-typescript-helpers: 0.0.15
+
+  openapi-typescript-helpers@0.0.15: {}
+
   pako@1.0.11: {}
 
   parseurl@1.3.3: {}
@@ -4663,6 +4695,6 @@ snapshots:
     dependencies:
       zod: 3.25.76
 
-  zod@3.24.4: {}
-
   zod@3.25.76: {}
+
+  zod@4.3.6: {}

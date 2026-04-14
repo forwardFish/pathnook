@@ -138,6 +138,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     pathname === '/pricing' ||
     pathname === '/sample-report' ||
     pathname === '/contact' ||
+    pathname === '/help' ||
+    pathname === '/faq' ||
+    pathname === '/data-deletion' ||
     pathname.startsWith('/legal/');
   const showHeader = !isMarketingRoute;
 

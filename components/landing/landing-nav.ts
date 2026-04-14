@@ -6,4 +6,4 @@ export const landingNavItems = [
   { href: "#faq", label: "FAQ" },
 ] as const;
 
-export const landingSupportEmail = "support@pathnook.com";
+export const landingSupportEmail = "admin@pathnook.com";

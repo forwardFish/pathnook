@@ -3,8 +3,7 @@ import { applyCheckoutCompletionForUser } from '@/lib/family/billing';
 import { getUser } from '@/lib/db/queries';
 import { getBillingPlanByPriceId } from '@/lib/payments/catalog';
 import {
-  getBillingCheckoutCompletionPayload,
-  retrieveBillingCheckout,
+  getBillingRedirectCompletionPayload,
   verifyBillingRedirectSignature,
 } from '@/lib/payments/service';
 
@@ -56,7 +55,7 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  const signatureValid = verifyBillingRedirectSignature(
+  const signatureValid = await Promise.resolve(verifyBillingRedirectSignature(
     {
       request_id: searchParams.get('request_id'),
       checkout_id: checkoutId,
@@ -64,17 +63,26 @@ export async function GET(request: NextRequest) {
       customer_id: searchParams.get('customer_id'),
       subscription_id: searchParams.get('subscription_id'),
       product_id: searchParams.get('product_id'),
+      raw_url: request.url,
     },
-    signature
-  );
+    signature,
+    'creem'
+  ));
 
   if (!signatureValid) {
     return NextResponse.redirect(new URL('/dashboard/billing?checkout=invalid', request.url));
   }
 
   try {
-    const checkout = await retrieveBillingCheckout(checkoutId);
-    const completion = getBillingCheckoutCompletionPayload(checkout, priceIdParam);
+    const completion = await getBillingRedirectCompletionPayload(
+      request.url,
+      priceIdParam,
+      'creem'
+    );
+
+    if (!completion?.userId) {
+      throw new Error('Creem checkout completion did not resolve a local user id.');
+    }
 
     await applyCheckoutCompletionForUser({
       userId: completion.userId,

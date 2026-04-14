@@ -1,23 +1,27 @@
 import { eq } from 'drizzle-orm';
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db/drizzle';
+import {
+  getTeamByStripeCustomerId,
+  getUserByEmail,
+} from '@/lib/db/queries';
 import { teamMembers } from '@/lib/db/schema';
-import { getTeamByStripeCustomerId } from '@/lib/db/queries';
 import { processBillingWebhookEvent } from '@/lib/family/billing';
+import { getBillingPlanByPriceId } from '@/lib/payments/catalog';
 import {
-  getBillingPlanByPriceId,
-  getBillingPlanByProductId,
-  isRecurringPlanType,
-} from '@/lib/payments/catalog';
-import {
+  getBillingProviderSelection,
   normalizeBillingWebhookPayload,
   verifyBillingWebhookSignature,
 } from '@/lib/payments/service';
 
-type CreemWebhookEvent = {
+type BillingWebhookProvider = 'freemius' | 'creem';
+
+type DemoWebhookEvent = {
   id?: string;
   eventType?: string;
   object?: Record<string, unknown>;
+  userId?: number;
+  priceId?: string;
 };
 
 function asObject(value: unknown) {
@@ -30,81 +34,15 @@ function getObjectId(value: unknown) {
     return typeof value === 'string' ? value : null;
   }
 
-  return typeof object.id === 'string' ? object.id : null;
+  return typeof object.id === 'string' || typeof object.id === 'number'
+    ? String(object.id)
+    : null;
 }
 
 function getMetadata(value: unknown) {
   const object = asObject(value);
   const metadata = asObject(object?.metadata);
   return metadata || {};
-}
-
-function getProductId(value: Record<string, unknown>) {
-  return getObjectId(value.product);
-}
-
-function getCustomerId(value: Record<string, unknown>) {
-  return getObjectId(value.customer);
-}
-
-function getSubscriptionId(value: Record<string, unknown>) {
-  return getObjectId(value.subscription) || getObjectId(value);
-}
-
-function getStatusFromEvent(
-  eventType: string,
-  value: Record<string, unknown>,
-  priceId: string
-) {
-  const plan = getBillingPlanByPriceId(priceId);
-  if (!plan || !isRecurringPlanType(plan.planType)) {
-    return 'active';
-  }
-
-  const rawStatus = typeof value.status === 'string' ? value.status : null;
-  if (rawStatus) {
-    return rawStatus;
-  }
-
-  switch (eventType) {
-    case 'subscription.trialing':
-      return 'trialing';
-    case 'subscription.canceled':
-      return 'canceled';
-    case 'subscription.expired':
-      return 'expired';
-    case 'subscription.paused':
-      return 'paused';
-    case 'subscription.scheduled_cancel':
-      return 'scheduled_cancel';
-    case 'subscription.past_due':
-      return 'unpaid';
-    default:
-      return 'active';
-  }
-}
-
-function getCurrentPeriodEndsAt(value: Record<string, unknown>) {
-  const candidates = [value.currentPeriodEndDate, value.current_period_end_date];
-
-  for (const candidate of candidates) {
-    if (candidate instanceof Date) {
-      return candidate.toISOString();
-    }
-
-    if (typeof candidate === 'string' && candidate) {
-      return new Date(candidate).toISOString();
-    }
-  }
-
-  return null;
-}
-
-function getUserIdFromMetadata(metadata: Record<string, unknown>) {
-  const rawValue =
-    metadata.userId || metadata.referenceId || metadata.internal_customer_id;
-  const userId = Number(rawValue);
-  return Number.isInteger(userId) && userId > 0 ? userId : null;
 }
 
 async function getTeamOwnerUserId(teamId: number) {
@@ -117,15 +55,18 @@ async function getTeamOwnerUserId(teamId: number) {
   return rows[0]?.userId || null;
 }
 
-async function resolveUserId(
-  metadata: Record<string, unknown>,
-  customerId: string | null
-) {
-  const metadataUserId = getUserIdFromMetadata(metadata);
-  if (metadataUserId) {
+async function resolveCreemUserId(rawEvent: Record<string, unknown>) {
+  const object = asObject(rawEvent.object) || {};
+  const metadata = getMetadata(object);
+  const metadataUserId = Number(
+    metadata.userId || metadata.referenceId || metadata.internal_customer_id
+  );
+
+  if (Number.isInteger(metadataUserId) && metadataUserId > 0) {
     return metadataUserId;
   }
 
+  const customerId = getObjectId(object.customer);
   if (!customerId) {
     return null;
   }
@@ -138,108 +79,114 @@ async function resolveUserId(
   return getTeamOwnerUserId(team.id);
 }
 
-export async function handlePrimaryBillingWebhook(request: NextRequest) {
-  if (
-    process.env['FAMILY_EDU_DEMO_MODE'] === '1' ||
-    !process.env.CREEM_WEBHOOK_SECRET
-  ) {
-    const payload = (await request.json().catch(() => null)) as
-      | (CreemWebhookEvent & { userId?: number; priceId?: string })
-      | null;
-    const object = asObject(payload?.object) || {};
-    const userId = Number(object.userId || payload?.userId);
-    const priceId = String(object.priceId || payload?.priceId || '');
+async function resolveFreemiusUserId(rawEvent: Record<string, unknown>) {
+  const objects = asObject(rawEvent.objects) || {};
+  const user = asObject(objects.user);
+  const email = typeof user?.email === 'string' ? user.email : null;
 
-    if (!Number.isInteger(userId) || !getBillingPlanByPriceId(priceId)) {
-      return NextResponse.json(
-        { error: 'Demo webhook requires userId and a supported priceId.' },
-        { status: 400 }
-      );
-    }
-
-    const result = await processBillingWebhookEvent({
-      source: 'demo',
-      eventId: String(payload?.id || `demo_event_${Date.now()}`),
-      eventType: String(payload?.eventType || 'checkout.completed'),
-      payload: payload || {},
-      userId,
-      priceId,
-      checkoutSessionId:
-        typeof object.checkoutSessionId === 'string' ? object.checkoutSessionId : null,
-      stripeCustomerId:
-        typeof object.stripeCustomerId === 'string' ? object.stripeCustomerId : null,
-      stripeSubscriptionId:
-        typeof object.stripeSubscriptionId === 'string' ? object.stripeSubscriptionId : null,
-      status: typeof object.status === 'string' ? object.status : 'active',
-      currentPeriodEndsAt:
-        typeof object.currentPeriodEndsAt === 'string' ? object.currentPeriodEndsAt : null,
-    });
-
-    return NextResponse.json({
-      received: true,
-      applied: result.applied,
-      snapshot: result.snapshot,
-    });
+  if (!email) {
+    return null;
   }
 
-  const payloadText = await request.text();
-  const signature = request.headers.get('creem-signature');
+  const localUser = await getUserByEmail(email);
+  return localUser?.id || null;
+}
 
-  if (!verifyBillingWebhookSignature(payloadText, signature)) {
+function getSignatureHeader(request: NextRequest, provider: BillingWebhookProvider) {
+  return provider === 'freemius'
+    ? request.headers.get('x-signature')
+    : request.headers.get('creem-signature');
+}
+
+async function handleDemoWebhook(request: NextRequest) {
+  const payload = (await request.json().catch(() => null)) as DemoWebhookEvent | null;
+  const object = asObject(payload?.object) || {};
+  const userId = Number(object.userId || payload?.userId);
+  const priceId = String(object.priceId || payload?.priceId || '');
+
+  if (!Number.isInteger(userId) || !getBillingPlanByPriceId(priceId)) {
+    return NextResponse.json(
+      { error: 'Demo webhook requires userId and a supported priceId.' },
+      { status: 400 }
+    );
+  }
+
+  const result = await processBillingWebhookEvent({
+    source: 'demo',
+    eventId: String(payload?.id || `demo_event_${Date.now()}`),
+    eventType: String(payload?.eventType || 'checkout.completed'),
+    payload: payload || {},
+    userId,
+    priceId,
+    checkoutSessionId:
+      typeof object.checkoutSessionId === 'string' ? object.checkoutSessionId : null,
+    stripeCustomerId:
+      typeof object.stripeCustomerId === 'string' ? object.stripeCustomerId : null,
+    stripeSubscriptionId:
+      typeof object.stripeSubscriptionId === 'string' ? object.stripeSubscriptionId : null,
+    status: typeof object.status === 'string' ? object.status : 'active',
+    currentPeriodEndsAt:
+      typeof object.currentPeriodEndsAt === 'string' ? object.currentPeriodEndsAt : null,
+  });
+
+  return NextResponse.json({
+    received: true,
+    applied: result.applied,
+    snapshot: result.snapshot,
+  });
+}
+
+export async function handlePrimaryBillingWebhook(
+  request: NextRequest,
+  providerName?: BillingWebhookProvider
+) {
+  if (process.env['FAMILY_EDU_DEMO_MODE'] === '1') {
+    return handleDemoWebhook(request);
+  }
+
+  const provider = providerName || getBillingProviderSelection().active;
+  const payloadText = await request.text();
+  const signature = getSignatureHeader(request, provider);
+
+  if (!verifyBillingWebhookSignature(payloadText, signature, provider)) {
     return NextResponse.json({ error: 'Invalid billing signature.' }, { status: 401 });
   }
 
-  let event: CreemWebhookEvent;
+  let event: Record<string, unknown>;
 
   try {
-    event = JSON.parse(payloadText) as CreemWebhookEvent;
+    event = JSON.parse(payloadText) as Record<string, unknown>;
   } catch {
     return NextResponse.json({ error: 'Invalid JSON payload.' }, { status: 400 });
   }
 
-  const eventType = String(event.eventType || '');
-  const object = asObject(event.object);
-
-  if (!eventType || !object) {
-    return NextResponse.json({ error: 'Malformed billing webhook event.' }, { status: 400 });
-  }
-
   try {
-    const normalized = normalizeBillingWebhookPayload(event as Record<string, unknown>);
-    const metadata = getMetadata(object);
-    const productId = getProductId(object);
-    const plan =
-      getBillingPlanByPriceId(normalized.priceId || String(metadata.priceId || '')) ||
-      getBillingPlanByProductId(productId);
-
-    if (!plan) {
+    const normalized = normalizeBillingWebhookPayload(event, provider);
+    if (!normalized.priceId || !getBillingPlanByPriceId(normalized.priceId)) {
       return NextResponse.json({ received: true, ignored: true });
     }
 
-    const customerId = getCustomerId(object);
-    const userId = await resolveUserId(metadata, customerId);
+    const resolvedUserId =
+      provider === 'freemius'
+        ? await resolveFreemiusUserId(event)
+        : await resolveCreemUserId(event);
 
-    if (!userId) {
+    if (!resolvedUserId) {
       return NextResponse.json({ received: true, ignored: true });
     }
-
-    const subscriptionValue =
-      eventType === 'checkout.completed' ? asObject(object.subscription) || object : object;
 
     const result = await processBillingWebhookEvent({
-      source: 'creem',
+      source: provider,
       eventId: normalized.eventId,
       eventType: normalized.eventType,
-      payload: event as Record<string, unknown>,
-      userId,
-      priceId: plan.priceId,
+      payload: event,
+      userId: resolvedUserId,
+      priceId: normalized.priceId,
       checkoutSessionId: normalized.checkoutSessionId,
-      stripeCustomerId: normalized.providerCustomerId || customerId,
-      stripeSubscriptionId:
-        normalized.providerSubscriptionId || getSubscriptionId(subscriptionValue),
-      status: normalized.status || getStatusFromEvent(eventType, subscriptionValue, plan.priceId),
-      currentPeriodEndsAt:
-        normalized.currentPeriodEndsAt || getCurrentPeriodEndsAt(subscriptionValue),
+      stripeCustomerId: normalized.providerCustomerId,
+      stripeSubscriptionId: normalized.providerSubscriptionId,
+      status: normalized.status,
+      currentPeriodEndsAt: normalized.currentPeriodEndsAt,
     });
 
     return NextResponse.json({

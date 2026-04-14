@@ -3,10 +3,7 @@ import { checkoutAction, customerPortalAction } from '@/lib/payments/actions';
 import { getUser } from '@/lib/db/queries';
 import { getBillingSnapshotForUser } from '@/lib/family/billing';
 import { formatBillingInterval, isRecurringPlanType } from '@/lib/payments/catalog';
-import {
-  getBillingProviderStatusSummary,
-  getPortalSupportLabel,
-} from '@/lib/payments/service';
+import { getPortalSupportLabel } from '@/lib/payments/service';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
@@ -40,7 +37,7 @@ function getCheckoutMessage(checkout: string | undefined, plan: string | undefin
   }
 
   if (checkout === 'unavailable') {
-    return 'The active billing provider is not configured yet. Enable the Creem rollback flag or finish the Freemius cutover before retrying checkout.';
+    return 'Billing is temporarily unavailable. Please try again shortly or contact admin@pathnook.com for help.';
   }
 
   return null;
@@ -56,7 +53,10 @@ export default async function BillingPage({ searchParams }: PageProps) {
   const snapshot = await getBillingSnapshotForUser(user.id);
   const checkoutMessage = getCheckoutMessage(params.checkout, params.plan);
   const hasRecurringPlan = isRecurringPlanType(snapshot.activePlanType);
-  const providerStatus = getBillingProviderStatusSummary();
+  const renewalLabel =
+    snapshot.currentPeriodEndsAt ||
+    (hasRecurringPlan ? 'Renews in the Freemius portal' : 'Not applicable');
+  const portalCta = snapshot.portalAvailable ? getPortalSupportLabel() : 'Open Freemius billing portal';
 
   return (
     <section className="flex-1 space-y-6 p-4 lg:p-8">
@@ -65,11 +65,12 @@ export default async function BillingPage({ searchParams }: PageProps) {
           Billing
         </p>
         <h1 className="text-3xl font-semibold tracking-tight text-gray-900">
-          Billing and unlock status
+          Billing and account management
         </h1>
         <p className="mt-2 max-w-3xl text-sm text-gray-600">
-          Billing runs through the active provider service. One-time purchases unlock a diagnosis
-          credit, while recurring plans unlock current reports and keep the weekly review flow open.
+          Freemius manages checkout, renewals, invoices, and subscription
+          cancellation. Pathnook manages your local report access, history, and
+          household entitlements inside the product.
         </p>
       </div>
 
@@ -82,9 +83,8 @@ export default async function BillingPage({ searchParams }: PageProps) {
       {params.portal === 'unavailable' ? (
         <Card className="border-amber-200 bg-amber-50">
           <CardContent className="pt-6 text-sm text-amber-900">
-            The Creem customer portal is not available yet for this household. Complete a live
-            billing portal is not available yet for this household. Complete a live checkout first
-            so a customer record can be created.
+            A Freemius billing portal record is not available for this household
+            yet. Complete a live checkout first so billing management can be opened.
           </CardContent>
         </Card>
       ) : null}
@@ -92,24 +92,32 @@ export default async function BillingPage({ searchParams }: PageProps) {
       <div className="grid gap-6 xl:grid-cols-[1.2fr,0.8fr]">
         <Card>
           <CardHeader>
-            <CardTitle>Current unlock snapshot</CardTitle>
+            <CardTitle>Current account snapshot</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4 text-sm text-gray-700">
             <div className="rounded-2xl bg-gray-50 p-4">
-              <p className="font-medium text-gray-900">Active plan</p>
+              <p className="font-medium text-gray-900">Current plan</p>
               <p className="mt-1">{snapshot.planName || 'Free setup state'}</p>
             </div>
             <div className="rounded-2xl bg-gray-50 p-4">
-              <p className="font-medium text-gray-900">Subscription status</p>
+              <p className="font-medium text-gray-900">Status</p>
               <p className="mt-1">{snapshot.subscriptionStatus}</p>
             </div>
             <div className="rounded-2xl bg-gray-50 p-4">
-              <p className="font-medium text-gray-900">Current period end</p>
-              <p className="mt-1">{snapshot.currentPeriodEndsAt || 'Not applicable yet'}</p>
+              <p className="font-medium text-gray-900">Renewal or period end</p>
+              <p className="mt-1">{renewalLabel}</p>
             </div>
             <div className="rounded-2xl bg-gray-50 p-4">
               <p className="font-medium text-gray-900">Unlocked reports</p>
               <p className="mt-1">{snapshot.accessibleReportIds.length}</p>
+            </div>
+            <div className="rounded-2xl bg-gray-50 p-4">
+              <p className="font-medium text-gray-900">Historical access retained</p>
+              <p className="mt-1">
+                {snapshot.accessibleReportIds.length > 0
+                  ? 'Yes, previously unlocked items remain visible according to local entitlement rules.'
+                  : 'No retained reports yet.'}
+              </p>
             </div>
             <div className="rounded-2xl bg-gray-50 p-4">
               <p className="font-medium text-gray-900">Locked reports</p>
@@ -123,39 +131,45 @@ export default async function BillingPage({ searchParams }: PageProps) {
             {hasRecurringPlan ? (
               <form action={customerPortalAction}>
                 <Button type="submit" variant="outline" className="w-full">
-                  {getPortalSupportLabel()}
+                  {portalCta}
                 </Button>
               </form>
             ) : null}
 
-            <p className="text-xs text-gray-500">
-              This view is the acceptance source for billing lock and unlock behavior.
-            </p>
+            <div className="rounded-2xl border border-slate-200 bg-white p-4">
+              <p className="font-medium text-slate-950">Cancellation and support</p>
+              <p className="mt-2 text-sm leading-7 text-slate-600">
+                Use the Freemius billing portal to cancel recurring billing,
+                review invoices, and manage renewals. For refund review,
+                entitlement questions, or access mismatches, contact Pathnook
+                support directly.
+              </p>
+              <div className="mt-4 flex flex-wrap gap-3">
+                <Button asChild variant="outline" size="sm">
+                  <Link href="/legal/refunds">Refund policy</Link>
+                </Button>
+                <Button asChild variant="outline" size="sm">
+                  <Link href="/help">Help center</Link>
+                </Button>
+                <Button asChild variant="outline" size="sm">
+                  <Link href="/contact">Contact</Link>
+                </Button>
+              </div>
+            </div>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle>Billing center</CardTitle>
+            <CardTitle>Available plans</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700">
-              <p className="font-medium text-slate-950">Provider status</p>
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm leading-7 text-slate-600">
+              <p className="font-medium text-slate-950">Freemius billing portal</p>
               <p className="mt-2">
-                Requested provider: <span className="font-medium">{providerStatus.requestedProvider}</span>
-              </p>
-              <p className="mt-1">
-                Active provider: <span className="font-medium">{providerStatus.activeProvider}</span>
-              </p>
-              <p className="mt-1">
-                Rollback active: <span className="font-medium">{providerStatus.fallbackApplied ? 'yes' : 'no'}</span>
-              </p>
-              <p className="mt-1">
-                Rollback enabled: <span className="font-medium">{providerStatus.rollbackEnabled ? 'yes' : 'no'}</span>
-              </p>
-              <p className="mt-3 text-xs text-slate-500">
-                Public routes stay provider-neutral, while the billing center keeps the
-                household-visible operational status for regression checks.
+                Renewals, invoices, payment methods, and subscription cancellation
+                are handled through Freemius. Pathnook keeps your report access and
+                plan effects in sync locally after payment events arrive.
               </p>
             </div>
 

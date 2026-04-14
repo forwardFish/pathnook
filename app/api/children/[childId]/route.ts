@@ -54,7 +54,7 @@ export async function PATCH(request: Request, context: RouteContext) {
 
   if (!result.success) {
     return Response.json(
-      { error: result.error.errors[0]?.message || 'Invalid child payload.' },
+      { error: result.error.issues[0]?.message || 'Invalid child payload.' },
       { status: 400 }
     );
   }

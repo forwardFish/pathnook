@@ -10,6 +10,7 @@ import {
   Sparkles,
   Target,
 } from "lucide-react";
+import { BILLING_PLANS, formatBillingInterval, getAnnualSavings } from "@/lib/payments/catalog";
 import { Button } from "@/components/ui/button";
 
 const proofPoints = [
@@ -67,10 +68,10 @@ const stageOneCards = [
 ] as const;
 
 const trustCards = [
-  "Parent-first framing, not child-answer generation.",
-  "Evidence-first findings instead of guess-heavy output.",
-  "Share-safe tutor handoff with context preserved.",
-  "Quality-gated delivery rather than instant overclaiming.",
+  "Adults only account creation.",
+  "Parent-controlled uploads and sharing.",
+  "Secure billing through Freemius.",
+  "Clear refund, privacy, and support routes.",
 ] as const;
 
 const faqItems = [
@@ -102,7 +103,7 @@ const faqItems = [
   {
     question: "How does billing work?",
     answer:
-      "The homepage keeps pricing, support, and legal routes visible so families can evaluate trust and value before purchase.",
+      "Secure checkout is powered by Freemius as Merchant of Record. Families can use the Freemius customer portal for subscription management, cancellation, and billing records.",
   },
 ];
 
@@ -129,6 +130,8 @@ function SectionIntro({
 }
 
 export function FamilyLandingPage() {
+  const annualSavings = getAnnualSavings();
+
   return (
     <>
       <main className="overflow-x-clip bg-[linear-gradient(180deg,#f8fcfb_0%,#ffffff_22%,#f9fafb_100%)]">
@@ -153,6 +156,15 @@ export function FamilyLandingPage() {
               <p className="mt-5 max-w-3xl text-lg leading-8 text-slate-600">
                 Built for families first, starting with education diagnosis,
                 evidence-backed review, and weekly learning guidance.
+              </p>
+              <p className="mt-4 max-w-3xl text-base leading-8 text-slate-600">
+                Pathnook is software for parents who want clearer learning decisions,
+                evidence-backed review, and a steadier weekly follow-through workflow.
+              </p>
+              <p className="mt-3 max-w-3xl text-base leading-8 text-slate-600">
+                Today, Pathnook focuses on parent-facing family learning support. It
+                does not provide direct answer generation for children or replace a
+                tutor or school teacher.
               </p>
 
               <div className="mt-8 flex flex-wrap gap-3">
@@ -224,7 +236,7 @@ export function FamilyLandingPage() {
             <SectionIntro
               eyebrow="What Pathnook Is"
               title="More than a report tool. The first layer of an AI learning and growth system."
-              body="Pathnook does more than summarize schoolwork. It helps families understand what is actually happening in learning, decide what to focus on next, and keep growth moving week by week."
+              body="Pathnook does more than summarize schoolwork. It helps families understand what is actually happening in learning, decide what to focus on next, and keep growth moving week by week as a parent-facing software workflow."
             />
           </div>
         </section>
@@ -302,6 +314,9 @@ export function FamilyLandingPage() {
                 <p>
                   Sample output is visible before purchase so the value is clear before billing becomes relevant.
                 </p>
+                <p>
+                  Pricing, refund, privacy, contact, and billing management routes stay visible so trust is not hidden behind checkout.
+                </p>
               </div>
               <Button
                 asChild
@@ -320,6 +335,10 @@ export function FamilyLandingPage() {
               <h2 className="mt-4 text-3xl font-semibold tracking-tight">
                 Built for trust, not just output
               </h2>
+              <p className="mt-4 text-base leading-7 text-slate-300">
+                The public Pathnook story is software-first, parent-first, and explicit
+                about billing, privacy, and support routes.
+              </p>
               <div className="mt-6 grid gap-4 sm:grid-cols-2">
                 {trustCards.map((item) => (
                   <div
@@ -404,63 +423,80 @@ export function FamilyLandingPage() {
 
         <section id="pricing-preview" className="py-20 sm:py-24">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="grid gap-8 lg:grid-cols-[1fr,0.9fr] lg:items-center">
-              <div>
-                <p className="text-sm font-semibold uppercase tracking-[0.24em] text-teal-700">
-                  Pricing Preview
-                </p>
-                <h2 className="mt-4 text-3xl font-semibold tracking-tight text-slate-950 sm:text-4xl">
-                  Keep pricing visible, simple, and trust-aligned.
-                </h2>
-                <p className="mt-4 text-lg leading-8 text-slate-600">
-                  The homepage should preview the decision clearly, then send
-                  families to the full pricing surface without mixing in
-                  billing-mechanics noise.
-                </p>
-                <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-                  <Button
-                    asChild
-                    size="lg"
-                    className="rounded-full bg-slate-950 px-8 text-base text-white hover:bg-slate-800"
-                  >
-                    <Link href="/pricing">See pricing</Link>
-                  </Button>
-                  <Button
-                    asChild
-                    size="lg"
-                    variant="outline"
-                    className="rounded-full border-slate-300 bg-white px-8 text-base text-slate-900 hover:bg-slate-50"
-                  >
-                    <Link href="/contact">Talk to support</Link>
-                  </Button>
-                </div>
-              </div>
-              <div className="grid gap-4">
-                <article className="rounded-[1.7rem] border border-slate-200 bg-white p-6 shadow-sm">
-                  <div className="inline-flex rounded-2xl bg-orange-100 p-3 text-orange-700">
-                    <Sparkles className="h-5 w-5" />
+            <div className="max-w-3xl">
+              <p className="text-sm font-semibold uppercase tracking-[0.24em] text-teal-700">
+                Pricing
+              </p>
+              <h2 className="mt-4 text-3xl font-semibold tracking-tight text-slate-950 sm:text-4xl">
+                Simple pricing.
+              </h2>
+              <p className="mt-4 text-lg leading-8 text-slate-600">
+                Start with one diagnosis or choose ongoing access. Billing and
+                cancellation are handled through Freemius.
+              </p>
+            </div>
+
+            <div className="mt-12 grid gap-6 lg:grid-cols-3">
+              {BILLING_PLANS.map((plan) => (
+                <article
+                  key={plan.priceId}
+                  className={`rounded-[1.8rem] border bg-white p-6 shadow-sm ${
+                    plan.featured
+                      ? "border-emerald-300 ring-2 ring-emerald-200"
+                      : "border-slate-200"
+                  }`}
+                >
+                  {plan.badge ? (
+                    <span className="inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-slate-600">
+                      {plan.badge}
+                    </span>
+                  ) : null}
+                  <h3 className="mt-5 text-2xl font-semibold text-slate-950">{plan.name}</h3>
+                  <p className="mt-3 text-base leading-7 text-slate-600">{plan.description}</p>
+                  <div className="mt-6 flex items-end gap-2">
+                    <p className="text-5xl font-semibold tracking-[-0.04em] text-slate-950">
+                      ${plan.unitAmount / 100}
+                    </p>
+                    <p className="pb-2 text-base text-slate-500">
+                      {formatBillingInterval(plan.interval)}
+                    </p>
                   </div>
-                  <h3 className="mt-4 text-xl font-semibold text-slate-950">
-                    Start with the value
-                  </h3>
-                  <p className="mt-3 text-base leading-8 text-slate-600">
-                    Review the public sample first, then choose a plan when the
-                    diagnosis workflow feels useful for your family.
-                  </p>
-                </article>
-                <article className="rounded-[1.7rem] border border-slate-200 bg-white p-6 shadow-sm">
-                  <div className="inline-flex rounded-2xl bg-orange-100 p-3 text-orange-700">
-                    <Sparkles className="h-5 w-5" />
+                  {plan.planType === "annual" ? (
+                    <p className="mt-2 text-sm font-medium text-emerald-700">
+                      Save ${annualSavings / 100} vs monthly.
+                    </p>
+                  ) : null}
+                  <ul className="mt-6 space-y-3 text-sm leading-7 text-slate-600">
+                    {plan.features.slice(0, 3).map((feature) => (
+                      <li key={feature}>{feature}</li>
+                    ))}
+                  </ul>
+                  <div className="mt-6">
+                    <Button
+                      asChild
+                      className={`w-full rounded-full ${
+                        plan.featured
+                          ? "bg-slate-950 text-white hover:bg-slate-800"
+                          : "bg-white text-slate-950 border border-slate-300 hover:bg-slate-50"
+                      }`}
+                      variant={plan.featured ? "default" : "outline"}
+                    >
+                      <Link href="/pricing">{plan.ctaLabel}</Link>
+                    </Button>
                   </div>
-                  <h3 className="mt-4 text-xl font-semibold text-slate-950">
-                    Keep trust simple
-                  </h3>
-                  <p className="mt-3 text-base leading-8 text-slate-600">
-                    Pricing, contact, privacy, refund, and terms routes stay
-                    reachable from the homepage so nothing critical is hidden.
-                  </p>
                 </article>
-              </div>
+              ))}
+            </div>
+
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Button
+                asChild
+                size="lg"
+                variant="outline"
+                className="rounded-full border-slate-300 bg-white px-8 text-base text-slate-900 hover:bg-slate-50"
+              >
+                <Link href="/contact">Talk to support</Link>
+              </Button>
             </div>
           </div>
         </section>

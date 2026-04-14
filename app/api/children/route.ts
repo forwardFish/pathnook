@@ -34,7 +34,7 @@ export async function POST(request: Request) {
 
   if (!result.success) {
     return Response.json(
-      { error: result.error.errors[0]?.message || 'Invalid child payload.' },
+      { error: result.error.issues[0]?.message || 'Invalid child payload.' },
       { status: 400 }
     );
   }

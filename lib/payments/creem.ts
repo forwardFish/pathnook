@@ -349,6 +349,7 @@ export function getCheckoutCompletionPayload(
 
   return {
     userId,
+    userEmail: null,
     priceId: plan.priceId,
     checkoutSessionId: checkout.id,
     provider: 'creem' as const,

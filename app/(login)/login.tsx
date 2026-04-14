@@ -15,7 +15,7 @@ import { FAMILY_EDU_SUPPORT_EMAIL } from '@/lib/family/config';
 function getOauthErrorMessage(errorCode?: string) {
   switch (errorCode) {
     case 'google_not_configured':
-      return 'Google sign-in is not available in this environment yet. You can keep using email and password until Google OAuth is configured.';
+      return 'Google sign-in is unavailable right now. Please try again later or use email and password.';
     case 'google_session_missing':
     case 'google_session_invalid':
     case 'google_state_invalid':
@@ -66,13 +66,13 @@ export function Login({
         </div>
         <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
           {mode === 'signin'
-            ? 'Sign in to your account'
+            ? 'Sign in to continue your Pathnook household workflow.'
             : 'Create your account'}
         </h2>
         <p className="mt-3 text-center text-sm text-gray-600">
           {mode === 'signin'
             ? 'Return to Pathnook and pick up where you left off.'
-            : 'Start with a standard account now and add student details later when you need them.'}
+            : 'You are creating an adult account for parent, guardian, or other authorized adult use. Children may not create accounts directly.'}
         </p>
       </div>
 
@@ -88,7 +88,7 @@ export function Login({
           <p className="text-center text-xs text-gray-500">
             {googleAuthAvailable
               ? 'Use your Google account to sign in or create an account in one step.'
-              : 'Google sign-in is supported here and will start working as soon as this environment is connected to Google OAuth.'}
+              : 'Use email and password if your Google sign-in session cannot be completed right now.'}
           </p>
         </div>
 
@@ -199,7 +199,10 @@ export function Login({
                   defaultChecked={Boolean(state.is18PlusConfirmed)}
                   className="mt-1 h-4 w-4 rounded border-gray-300 text-orange-600 focus:ring-orange-500"
                 />
-                <span>I confirm that I am at least 18 years old.</span>
+                <span>
+                  I confirm that I am at least 18 years old and I am creating
+                  this account for parent, guardian, or other authorized adult use.
+                </span>
               </label>
               <label className="flex items-start gap-3 text-sm text-gray-700">
                 <input

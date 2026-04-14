@@ -30,8 +30,9 @@ export default async function DemoCheckoutPage({ searchParams }: PageProps) {
           Review the selected Pathnook plan
         </h1>
         <p className="mt-2 max-w-2xl text-sm text-gray-600">
-          This sandbox preview mirrors the Creem handoff so we can verify checkout success and
-          cancel return paths without depending on a live merchant account during testing.
+          This sandbox preview mirrors the billing handoff so we can verify
+          checkout success and cancel return paths without depending on a live
+          merchant account during testing.
         </p>
       </div>
 
@@ -65,7 +66,7 @@ export default async function DemoCheckoutPage({ searchParams }: PageProps) {
               <input type="hidden" name="priceId" value={plan.priceId} />
               <input type="hidden" name="sessionId" value={sessionId} />
               <Button type="submit" className="w-full">
-                Complete Demo Creem Checkout
+                Complete Demo Checkout
               </Button>
             </form>
 

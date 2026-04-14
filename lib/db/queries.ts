@@ -66,6 +66,26 @@ export async function getUser() {
   return user[0];
 }
 
+export async function getUserByEmail(email: string) {
+  const normalizedEmail = email.trim().toLowerCase();
+  if (!normalizedEmail) {
+    return null;
+  }
+
+  if (FAMILY_EDU_DEMO_MODE) {
+    const demoUser = await createDemoUser();
+    return demoUser.email.toLowerCase() === normalizedEmail ? demoUser : null;
+  }
+
+  const result = await db
+    .select()
+    .from(users)
+    .where(and(eq(users.email, normalizedEmail), isNull(users.deletedAt)))
+    .limit(1);
+
+  return result[0] || null;
+}
+
 export async function getTeamByStripeCustomerId(customerId: string) {
   const result = await db
     .select()

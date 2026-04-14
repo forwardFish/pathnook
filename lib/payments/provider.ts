@@ -39,6 +39,7 @@ export type CheckoutRedirectParams = {
   customer_id?: string | null;
   subscription_id?: string | null;
   product_id?: string | null;
+  raw_url?: string | null;
 };
 
 export type NormalizedWebhookPayload = {
@@ -55,7 +56,8 @@ export type NormalizedWebhookPayload = {
 };
 
 export type CheckoutCompletionPayload = {
-  userId: number;
+  userId: number | null;
+  userEmail: string | null;
   priceId: string;
   checkoutSessionId: string;
   provider: BillingRuntimeProvider;
@@ -90,7 +92,12 @@ export interface BillingProvider {
   verifyRedirectSignature(
     params: CheckoutRedirectParams,
     signature: string | null | undefined
-  ): boolean;
+  ): Promise<boolean> | boolean;
+
+  getRedirectCompletionPayload(
+    url: string,
+    fallbackPriceId?: string | null
+  ): Promise<CheckoutCompletionPayload | null>;
 
   retrieveCheckout(checkoutId: string): Promise<unknown>;
 

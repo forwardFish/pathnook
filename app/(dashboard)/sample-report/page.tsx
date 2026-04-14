@@ -2,32 +2,32 @@ import Link from "next/link";
 import {
   ArrowRight,
   FileSearch,
+  GitCompareArrows,
   Layers3,
-  MessageSquareShare,
-  Target,
+  ShieldCheck,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const sampleSections = [
   {
-    title: "Diagnosis",
-    body: "A short explanation of the main issue, the secondary issue, and what matters most right now.",
+    title: "Skeleton Focus",
+    body: "A compact diagnosis frame that names the main learning issue, the secondary issue, and what the family should focus on first.",
     icon: FileSearch,
   },
   {
-    title: "Evidence",
-    body: "Every important finding stays attached to real student work so the summary is grounded instead of vague.",
+    title: "Shortest Ability Path",
+    body: "The report translates raw evidence into the next smallest useful move, so the family sees where progress can start right now.",
     icon: Layers3,
   },
   {
-    title: "This week",
-    body: "The weekly plan keeps the family focused on what to do now and what can wait.",
-    icon: Target,
+    title: "Output Gate",
+    body: "Each recommendation stays tied to source evidence and confidence language so Pathnook does not overstate what the upload can prove.",
+    icon: ShieldCheck,
   },
   {
-    title: "Share",
-    body: "A tutor-ready handoff preserves the same context when outside support is useful.",
-    icon: MessageSquareShare,
+    title: "Compare / Resume Preview",
+    body: "Recurring families can compare across runs, keep continuity, and share the same grounded context with tutors or another adult helper.",
+    icon: GitCompareArrows,
   },
 ] as const;
 
@@ -40,12 +40,17 @@ export default function SampleReportPage() {
             Sample Report
           </p>
           <h1 className="mt-4 text-4xl font-semibold tracking-tight text-slate-950 sm:text-5xl">
-            A preview of the Pathnook family review output.
+            A representative preview of the Pathnook software output.
           </h1>
           <p className="mt-5 text-lg leading-8 text-slate-600">
-            This public sample shows the structure families can expect:
-            grounded diagnosis, evidence-backed findings, clear next steps, and
-            a share-safe handoff layer.
+            This public sample shows the structure families can expect from a
+            completed diagnosis flow: grounded diagnosis, evidence-backed
+            findings, clear next steps, and a share-safe handoff layer.
+          </p>
+          <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-500">
+            Representative preview only. The exact report content depends on the
+            uploaded learning evidence, the family account history, and the plan
+            that unlocks the workflow.
           </p>
         </div>
 
@@ -71,6 +76,53 @@ export default function SampleReportPage() {
           })}
         </div>
 
+        <div className="mt-10 grid gap-6 lg:grid-cols-[1.1fr,0.9fr]">
+          <section className="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-sm">
+            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-500">
+              What families actually receive
+            </p>
+            <div className="mt-6 space-y-5 text-base leading-8 text-slate-600">
+              <p>
+                A Pathnook report is not just a narrative summary. It is a
+                software-generated decision layer that stays tied to the
+                evidence the parent uploaded.
+              </p>
+              <p>
+                Each completed run can include a diagnosis summary, evidence
+                anchors, suggested next step ordering, and a handoff-safe view
+                that another adult can follow without re-reading the raw upload.
+              </p>
+              <p>
+                If no stable downloadable example is available yet, Pathnook
+                shows the structure and disclaimers openly instead of pretending
+                there is a live sample file.
+              </p>
+            </div>
+          </section>
+
+          <section className="rounded-[2rem] border border-slate-200 bg-slate-50 p-8 shadow-sm">
+            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-500">
+              Share-safe workflow
+            </p>
+            <div className="mt-6 space-y-4">
+              <div className="rounded-[1.3rem] border border-slate-200 bg-white p-5">
+                <h2 className="text-xl font-semibold text-slate-950">Parents stay in control</h2>
+                <p className="mt-2 text-sm leading-7 text-slate-600">
+                  Uploads, interpretation, and any later sharing are controlled
+                  by the adult account holder.
+                </p>
+              </div>
+              <div className="rounded-[1.3rem] border border-slate-200 bg-white p-5">
+                <h2 className="text-xl font-semibold text-slate-950">Tutors see context, not chaos</h2>
+                <p className="mt-2 text-sm leading-7 text-slate-600">
+                  Shared output is designed to preserve the same diagnosis frame,
+                  evidence summary, and next-step sequencing.
+                </p>
+              </div>
+            </div>
+          </section>
+        </div>
+
         <div className="mt-12 rounded-[2rem] border border-slate-200 bg-slate-950 px-8 py-10 text-white">
           <h2 className="text-3xl font-semibold tracking-tight">
             The goal is not just a report. The goal is a clearer next step for
@@ -89,7 +141,7 @@ export default function SampleReportPage() {
               className="rounded-full bg-white px-8 text-base text-slate-950 hover:bg-slate-100"
             >
               <Link href="/sign-up?redirect=dashboard">
-                Start a diagnosis
+                Get started
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </Button>

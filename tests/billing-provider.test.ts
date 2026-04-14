@@ -67,3 +67,12 @@ test('Public checkout entrypoints no longer import Creem directly', () => {
   assert.equal(actionSource.includes("lib/payments/creem"), false);
   assert.equal(routeSource.includes("lib/payments/creem"), false);
 });
+
+test('.env.example documents Freemius pricing ids and Pathnook admin email', () => {
+  const envSource = readFileSync(new URL('../.env.example', import.meta.url), 'utf8');
+
+  assert.equal(envSource.includes('FREEMIUS_PRICING_ONE_TIME_ID='), true);
+  assert.equal(envSource.includes('FREEMIUS_PRICING_MONTHLY_ID='), true);
+  assert.equal(envSource.includes('FREEMIUS_PRICING_ANNUAL_ID='), true);
+  assert.equal(envSource.includes('SUPPORT_EMAIL=admin@pathnook.com'), true);
+});

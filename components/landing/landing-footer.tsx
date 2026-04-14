@@ -11,24 +11,21 @@ const footerColumns = [
     links: [
       { label: "Pricing", href: "/pricing" },
       { label: "Sample Report", href: "/sample-report" },
-      { label: "Start a Diagnosis", href: "/sign-up?redirect=dashboard" },
+      { label: "Get Started", href: "/sign-up?redirect=dashboard" },
       { label: "Sign In", href: "/sign-in" },
     ],
   },
   {
     title: "Homepage",
-    links: [
-      { label: "What Pathnook Is", href: "#features" },
-      { label: "Why Families Use It", href: "#why-use" },
-      { label: "How It Works", href: "#how-it-works" },
-      { label: "Pricing Preview", href: "#pricing-preview" },
-      { label: "FAQ", href: "#faq" },
-    ],
+    links: landingNavItems,
   },
   {
     title: "Trust",
     links: [
-      { label: "Pricing & Billing", href: "/pricing" },
+      { label: "Billing Portal", href: "/sign-in?redirect=%2Fdashboard%2Fbilling" },
+      { label: "Help Center", href: "/help" },
+      { label: "FAQ", href: "/faq" },
+      { label: "Data Deletion", href: "/data-deletion" },
       { label: "Contact", href: "/contact" },
       { label: "Privacy", href: "/legal/privacy" },
       { label: "Terms", href: "/legal/terms" },
@@ -45,16 +42,25 @@ export function LandingFooter() {
   return (
     <footer className="bg-slate-950 text-white" data-testid="landing-footer">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="grid gap-10 border-b border-white/10 py-16 lg:grid-cols-[1.2fr,1fr,1fr,1fr]">
+        <div className="grid gap-10 border-b border-white/10 py-16 md:grid-cols-2 xl:grid-cols-[1.2fr,1fr,1fr,1fr]">
           <div>
-            <FamilyLogoStatic
-              size="md"
-              textClassName="text-white"
-              subtitleClassName="text-slate-400"
-            />
+            <div className="flex flex-wrap items-center gap-4">
+              <FamilyLogoStatic
+                size="md"
+                showSubtitle={false}
+                textClassName="text-white"
+              />
+              <span className="text-xl text-slate-400">
+                Family learning support
+              </span>
+            </div>
             <p className="mt-6 max-w-md text-lg leading-8 text-slate-300">
               Pathnook helps families turn learning evidence into diagnosis,
               next steps, and weekly progress.
+            </p>
+            <p className="mt-4 max-w-md text-sm leading-7 text-slate-400">
+              Pathnook is software for parents who want clearer learning decisions,
+              evidence-backed review, and a steadier weekly follow-through workflow.
             </p>
             <a
               href={`mailto:${landingSupportEmail}`}
@@ -88,10 +94,10 @@ export function LandingFooter() {
 
         <div className="flex flex-col gap-6 py-6 text-sm text-slate-400 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-wrap gap-4">
-            {landingNavItems.map((item) => (
-              <Link
-                key={`footer-${item.href}`}
-                href={item.href}
+              {landingNavItems.map((item) => (
+                <Link
+                  key={`footer-${item.href}`}
+                  href={item.href}
                 className="transition hover:text-white"
               >
                 {item.label}
