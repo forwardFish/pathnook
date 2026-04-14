@@ -38,17 +38,17 @@ const faqItems = [
 
 export default function FaqPage() {
   return (
-    <main className="mx-auto max-w-4xl px-4 py-16 sm:px-6 lg:px-8">
-      <section className="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-sm">
-        <p className="text-sm font-semibold uppercase tracking-[0.18em] text-sky-700">FAQ</p>
-        <h1 className="mt-4 text-4xl font-semibold tracking-tight text-slate-950">
+    <main className="pn-doc-shell">
+      <section className="pn-doc-card">
+        <p className="pn-kicker">FAQ</p>
+        <h1 className="mt-4 text-4xl font-black tracking-tight text-[#111827]">
           Common Pathnook questions
         </h1>
         <div className="mt-8 space-y-4">
           {faqItems.map((item) => (
-            <article key={item.question} className="rounded-[1.4rem] border border-slate-200 bg-slate-50 p-5">
-              <h2 className="text-xl font-semibold text-slate-950">{item.question}</h2>
-              <p className="mt-2 text-base leading-8 text-slate-600">{item.answer}</p>
+            <article key={item.question} className="rounded-[1.4rem] border border-[var(--pn-border)] bg-[linear-gradient(180deg,var(--pn-soft-2)_0%,white_100%)] p-5">
+              <h2 className="text-xl font-semibold text-[#111827]">{item.question}</h2>
+              <p className="mt-2 text-base leading-8 text-[var(--pn-muted)]">{item.answer}</p>
             </article>
           ))}
         </div>

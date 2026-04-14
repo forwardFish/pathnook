@@ -18,7 +18,7 @@ export function SubmitButton({
       type="submit"
       disabled={pending}
       variant={featured ? 'default' : 'outline'}
-      className={`h-14 w-full rounded-full text-base ${featured ? 'bg-orange-600 hover:bg-orange-700' : ''}`}
+      className="h-14 w-full rounded-[1rem] text-base"
     >
       {pending ? (
         <>

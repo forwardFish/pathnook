@@ -6,21 +6,21 @@ import {
 
 export default function RefundsPage() {
   return (
-    <main className="mx-auto max-w-4xl px-4 py-16 sm:px-6 lg:px-8">
-      <article className="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-sm">
-        <p className="text-sm font-semibold uppercase tracking-[0.18em] text-sky-700">
+    <main className="pn-doc-shell">
+      <article className="pn-doc-card">
+        <p className="pn-kicker">
           Refunds
         </p>
-        <h1 className="mt-4 text-4xl font-semibold tracking-tight text-slate-950">
+        <h1 className="mt-4 text-4xl font-black tracking-tight text-[#111827]">
           Pathnook Refund Policy
         </h1>
-        <p className="mt-4 text-sm leading-7 text-slate-500">
+        <p className="mt-4 text-sm leading-7 text-[var(--pn-muted)]">
           Effective date: April 14, 2026
         </p>
 
-        <div className="mt-8 space-y-8 text-base leading-8 text-slate-600">
+        <div className="pn-doc-prose mt-8 space-y-8">
           <section>
-            <h2 className="text-2xl font-semibold text-slate-950">1. Policy approach</h2>
+            <h2>1. Policy approach</h2>
             <p className="mt-3">
               Pathnook uses a consumptive-usage approach. Refund eligibility
               depends on whether a diagnosis credit, generated report, or
@@ -32,7 +32,7 @@ export default function RefundsPage() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold text-slate-950">2. One-time diagnosis purchases</h2>
+            <h2>2. One-time diagnosis purchases</h2>
             <p className="mt-3">
               Unused one-time diagnosis credits may be reviewed for refund
               within <strong>{ONE_TIME_REFUND_WINDOW_DAYS} days</strong> of purchase.
@@ -45,7 +45,7 @@ export default function RefundsPage() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold text-slate-950">3. Subscription plans</h2>
+            <h2>3. Subscription plans</h2>
             <p className="mt-3">
               Monthly and annual plans renew automatically until canceled.
               Refund review for recurring plans is generally limited to the
@@ -58,7 +58,7 @@ export default function RefundsPage() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold text-slate-950">4. Exceptions and review factors</h2>
+            <h2>4. Exceptions and review factors</h2>
             <p className="mt-3">
               Pathnook may review refunds outside the standard rule for
               duplicate charges, technical failures that blocked normal use,
@@ -71,7 +71,7 @@ export default function RefundsPage() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold text-slate-950">5. Freemius coordination</h2>
+            <h2>5. Freemius coordination</h2>
             <p className="mt-3">
               Freemius acts as Merchant of Record for checkout, invoicing,
               payment methods, renewals, and cancellation. If the payment was
@@ -84,7 +84,7 @@ export default function RefundsPage() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold text-slate-950">6. How to request a refund</h2>
+            <h2>6. How to request a refund</h2>
             <p className="mt-3">
               Email <strong>{PUBLIC_CONTACT_EMAIL}</strong> with the purchase
               email, order date, and a short description of the issue. Pathnook

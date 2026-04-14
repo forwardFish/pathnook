@@ -29,9 +29,6 @@ function getOauthErrorMessage(errorCode?: string) {
   }
 }
 
-const selectClassName =
-  'mt-1 flex h-10 w-full rounded-full border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500';
-
 export function Login({
   mode = 'signin',
   redirectTo,
@@ -57,233 +54,263 @@ export function Login({
     inviteId ? `&inviteId=${encodeURIComponent(inviteId)}` : ''
   }`;
   const oauthErrorMessage = getOauthErrorMessage(oauthError);
+  const switchHref = `${mode === 'signin' ? '/sign-up' : '/sign-in'}${
+    redirectTo ? `?redirect=${encodeURIComponent(redirectTo)}` : ''
+  }${priceId ? `${redirectTo ? '&' : '?'}priceId=${encodeURIComponent(priceId)}` : ''}${
+    inviteId
+      ? `${redirectTo || priceId ? '&' : '?'}inviteId=${encodeURIComponent(inviteId)}`
+      : ''
+  }`;
 
   return (
-    <div className="min-h-[100dvh] flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gray-50">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="flex justify-center">
-          <FamilyLogoStatic size="lg" />
-        </div>
-        <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-          {mode === 'signin'
-            ? 'Sign in to continue your Pathnook household workflow.'
-            : 'Start with Google or create your account'}
-        </h2>
-        <p className="mt-3 text-center text-sm text-gray-600">
-          {mode === 'signin'
-            ? 'Google sign-in is the fastest path. Email and password remain available if you prefer a standard sign-in.'
-            : 'Google sign-in is recommended for the fastest setup. Email and password remain available for parent, guardian, or other authorized adult use. Children may not create accounts directly.'}
-        </p>
-      </div>
-
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        {googleAuthAvailable ? (
-          <div className="mb-6 space-y-3">
-            <a
-              href={googleHref}
-              className="inline-flex h-11 w-full items-center justify-center gap-3 rounded-full border border-gray-300 bg-white px-4 text-sm font-medium text-gray-800 shadow-xs transition-colors hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-orange-500"
-            >
-              <GoogleIcon />
-              {mode === 'signin' ? 'Sign in with Google' : 'Continue with Google'}
-            </a>
-            <p className="text-center text-xs text-gray-500">
-              Use your Google account to sign in or create an account in one step.
-            </p>
-          </div>
-        ) : null}
-
-        <form className="space-y-6" action={formAction}>
-          <input type="hidden" name="redirect" value={redirectTo || ''} />
-          <input type="hidden" name="priceId" value={priceId || ''} />
-          <input type="hidden" name="inviteId" value={inviteId || ''} />
-          <div>
-            <Label
-              htmlFor="email"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Email
-            </Label>
-            <div className="mt-1">
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                autoComplete="email"
-                defaultValue={state.email}
-                required
-                maxLength={50}
-                className="appearance-none rounded-full relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-orange-500 focus:border-orange-500 focus:z-10 sm:text-sm"
-                placeholder="Enter your email"
-              />
+    <div className="pn-page-shell flex min-h-[100dvh] flex-col justify-center px-4 py-12 sm:px-6 lg:px-8">
+      <div className="sm:mx-auto sm:w-full sm:max-w-6xl">
+        <div className="grid gap-8 lg:grid-cols-[0.95fr,1.05fr] lg:items-center">
+          {/* Left-side marketing panel intentionally disabled for the sign-in experience. */}
+          {/* <div className="hidden lg:block">
+            <div className="max-w-xl">
+              <div className="inline-flex items-center gap-2 rounded-full border border-[var(--pn-soft-border)] bg-[var(--pn-soft)] px-4 py-2 text-sm font-extrabold text-[var(--pn-violet)]">
+                <GoogleIcon className="h-4 w-4" />
+                Pathnook account access
+              </div>
+              <h1 className="mt-6 text-5xl font-black leading-[1.04] tracking-[-0.05em] text-[#111827]">
+                Continue with the same
+                <span className="pn-gradient-text mt-2 block">
+                  premium Pathnook workflow
+                </span>
+              </h1>
+              <p className="mt-6 text-lg leading-8 text-[var(--pn-muted)]">
+                Sign in to manage diagnoses, billing, report continuity, and
+                weekly follow-through from one parent-first workspace.
+              </p>
+              <div className="mt-8 grid gap-4 sm:grid-cols-2">
+                {[
+                  'Google sign-in for the fastest entry',
+                  'Adults-only account creation',
+                  'Freemius-powered billing and recovery routes',
+                  'Unified household workflow after sign-in',
+                ].map((item) => (
+                  <div
+                    key={item}
+                    className="rounded-[1.3rem] border border-[var(--pn-soft-border)] bg-white/80 p-4 shadow-[0_12px_36px_rgba(15,23,42,0.05)]"
+                  >
+                    <p className="text-sm font-semibold leading-7 text-[var(--pn-muted-2)]">
+                      {item}
+                    </p>
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
+          </div> */}
 
-          {mode === 'signup' && (
-            <>
-              <div>
-                <Label
-                  htmlFor="name"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Full name
-                </Label>
-                <div className="mt-1">
-                  <Input
-                    id="name"
-                    name="name"
-                    type="text"
-                    autoComplete="name"
-                    defaultValue={state.name}
-                    maxLength={100}
-                    className="appearance-none rounded-full relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-orange-500 focus:border-orange-500 focus:z-10 sm:text-sm"
-                    placeholder="How should we address you?"
-                  />
+          <div className="pn-surface mx-auto w-full max-w-xl p-3">
+            <div className="rounded-[1.6rem] border border-[var(--pn-border)] bg-white p-6 sm:p-8">
+              <div className="flex justify-center">
+                <FamilyLogoStatic size="lg" />
+              </div>
+              <h2 className="mt-6 text-center text-3xl font-black tracking-[-0.04em] text-[#111827]">
+                {mode === 'signin'
+                  ? 'Sign in to continue your Pathnook household workflow.'
+                  : 'Start with Google or create your account'}
+              </h2>
+              <p className="mt-3 text-center text-sm leading-7 text-[var(--pn-muted)]">
+                {mode === 'signin'
+                  ? 'Google sign-in is the fastest path. Email and password remain available if you prefer a standard sign-in.'
+                  : 'Google sign-in is recommended for the fastest setup. Email and password remain available for parent, guardian, or other authorized adult use. Children may not create accounts directly.'}
+              </p>
+
+              {googleAuthAvailable ? (
+                <div className="mb-6 mt-8 space-y-3">
+                  <a
+                    href={googleHref}
+                    className="inline-flex h-12 w-full items-center justify-center gap-3 rounded-[1rem] border border-[var(--pn-border)] bg-white px-4 text-sm font-semibold text-[var(--pn-text)] shadow-[0_12px_30px_rgba(15,23,42,0.06)] transition hover:bg-[var(--pn-soft)] focus:outline-none focus:ring-2 focus:ring-[var(--pn-violet)]"
+                  >
+                    <GoogleIcon />
+                    {mode === 'signin' ? 'Sign in with Google' : 'Continue with Google'}
+                  </a>
+                  <p className="text-center text-xs text-[var(--pn-muted)]">
+                    Use your Google account to sign in or create an account in one step.
+                  </p>
+                </div>
+              ) : null}
+
+              <form className="space-y-6" action={formAction}>
+                <input type="hidden" name="redirect" value={redirectTo || ''} />
+                <input type="hidden" name="priceId" value={priceId || ''} />
+                <input type="hidden" name="inviteId" value={inviteId || ''} />
+
+                <div>
+                  <Label htmlFor="email" className="block text-sm font-semibold text-[var(--pn-muted-2)]">
+                    Email
+                  </Label>
+                  <div className="mt-2">
+                    <Input
+                      id="email"
+                      name="email"
+                      type="email"
+                      autoComplete="email"
+                      defaultValue={state.email}
+                      required
+                      maxLength={50}
+                      className="h-12 rounded-[1rem] border-[var(--pn-border)] bg-white px-4 focus:ring-[var(--pn-violet)]"
+                      placeholder="Enter your email"
+                    />
+                  </div>
+                </div>
+
+                {mode === 'signup' && (
+                  <>
+                    <div>
+                      <Label htmlFor="name" className="block text-sm font-semibold text-[var(--pn-muted-2)]">
+                        Full name
+                      </Label>
+                      <div className="mt-2">
+                        <Input
+                          id="name"
+                          name="name"
+                          type="text"
+                          autoComplete="name"
+                          defaultValue={state.name}
+                          maxLength={100}
+                          className="h-12 rounded-[1rem] border-[var(--pn-border)] bg-white px-4 focus:ring-[var(--pn-violet)]"
+                          placeholder="How should we address you?"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <Label htmlFor="country" className="block text-sm font-semibold text-[var(--pn-muted-2)]">
+                        Country
+                      </Label>
+                      <select
+                        id="country"
+                        name="country"
+                        defaultValue={(state.country as string) || 'US'}
+                        className="mt-2 flex h-12 w-full rounded-[1rem] border border-[var(--pn-border)] bg-white px-4 py-2 text-sm text-gray-900 focus:border-[var(--pn-violet)] focus:outline-none focus:ring-2 focus:ring-[var(--pn-violet)]"
+                        required
+                      >
+                        {countryOptions.map((option) => (
+                          <option key={option.value} value={option.value}>
+                            {option.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </>
+                )}
+
+                <div>
+                  <Label htmlFor="password" className="block text-sm font-semibold text-[var(--pn-muted-2)]">
+                    Password
+                  </Label>
+                  <div className="mt-2">
+                    <Input
+                      id="password"
+                      name="password"
+                      type="password"
+                      autoComplete={
+                        mode === 'signin' ? 'current-password' : 'new-password'
+                      }
+                      defaultValue={state.password}
+                      required
+                      minLength={8}
+                      maxLength={100}
+                      className="h-12 rounded-[1rem] border-[var(--pn-border)] bg-white px-4 focus:ring-[var(--pn-violet)]"
+                      placeholder="Enter your password"
+                    />
+                  </div>
+                </div>
+
+                {mode === 'signup' && (
+                  <div className="rounded-[1.4rem] border border-[var(--pn-soft-border)] bg-[linear-gradient(180deg,var(--pn-soft-2)_0%,white_100%)] p-4">
+                    <div className="space-y-3">
+                      <label className="flex items-start gap-3 text-sm leading-7 text-[var(--pn-muted-2)]">
+                        <input
+                          type="checkbox"
+                          name="is18PlusConfirmed"
+                          defaultChecked={Boolean(state.is18PlusConfirmed)}
+                          className="mt-1 h-4 w-4 rounded border-gray-300 text-[var(--pn-violet)] focus:ring-[var(--pn-violet)]"
+                        />
+                        <span>
+                          I confirm that I am at least 18 years old and I am creating
+                          this account for parent, guardian, or other authorized adult use.
+                        </span>
+                      </label>
+                      <label className="flex items-start gap-3 text-sm leading-7 text-[var(--pn-muted-2)]">
+                        <input
+                          type="checkbox"
+                          name="acceptTerms"
+                          defaultChecked={Boolean(state.acceptTerms)}
+                          className="mt-1 h-4 w-4 rounded border-gray-300 text-[var(--pn-violet)] focus:ring-[var(--pn-violet)]"
+                        />
+                        <span>
+                          I agree to the Pathnook Terms of Service and Privacy Policy.
+                        </span>
+                      </label>
+                    </div>
+                  </div>
+                )}
+
+                {state?.error ? (
+                  <div className="text-sm text-red-500">{state.error}</div>
+                ) : null}
+                {!state?.error && oauthErrorMessage ? (
+                  <div className="text-sm text-red-500">{oauthErrorMessage}</div>
+                ) : null}
+
+                <div>
+                  <Button type="submit" className="h-12 w-full rounded-[1rem]" disabled={pending}>
+                    {pending ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Loading...
+                      </>
+                    ) : mode === 'signin' ? (
+                      'Sign in'
+                    ) : (
+                      'Sign up'
+                    )}
+                  </Button>
+                </div>
+
+                {mode === 'signin' ? (
+                  <div className="text-center text-sm text-[var(--pn-muted)]">
+                    <a
+                      href={`mailto:${FAMILY_EDU_SUPPORT_EMAIL}?subject=Pathnook password recovery`}
+                      className="font-semibold text-[var(--pn-violet)] underline-offset-4 hover:underline"
+                    >
+                      Need help recovering your password?
+                    </a>
+                  </div>
+                ) : null}
+              </form>
+
+              <div className="mt-6">
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-[var(--pn-border)]" />
+                  </div>
+                  <div className="relative flex justify-center text-sm">
+                    <span className="bg-white px-4 text-[var(--pn-muted)]">
+                      {googleAuthAvailable ? 'Or continue with email' : ''}
+                      {mode === 'signin'
+                        ? googleAuthAvailable ? '' : 'New to Pathnook?'
+                        : googleAuthAvailable ? '' : 'Already have an account?'}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="mt-6">
+                  <Button asChild variant="outline" className="h-12 w-full rounded-[1rem]">
+                    <Link href={switchHref}>
+                      {mode === 'signin'
+                        ? 'Create an account'
+                        : 'Sign in to existing account'}
+                    </Link>
+                  </Button>
                 </div>
               </div>
-
-              <div>
-                <Label
-                  htmlFor="country"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Country
-                </Label>
-                <select
-                  id="country"
-                  name="country"
-                  defaultValue={(state.country as string) || 'US'}
-                  className={selectClassName}
-                  required
-                >
-                  {countryOptions.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </>
-          )}
-
-          <div>
-            <Label
-              htmlFor="password"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Password
-            </Label>
-            <div className="mt-1">
-              <Input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete={
-                  mode === 'signin' ? 'current-password' : 'new-password'
-                }
-                defaultValue={state.password}
-                required
-                minLength={8}
-                maxLength={100}
-                className="appearance-none rounded-full relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-orange-500 focus:border-orange-500 focus:z-10 sm:text-sm"
-                placeholder="Enter your password"
-              />
             </div>
-          </div>
-
-          {mode === 'signup' && (
-            <div className="space-y-3 rounded-2xl border border-orange-100 bg-orange-50 p-4">
-              <label className="flex items-start gap-3 text-sm text-gray-700">
-                <input
-                  type="checkbox"
-                  name="is18PlusConfirmed"
-                  defaultChecked={Boolean(state.is18PlusConfirmed)}
-                  className="mt-1 h-4 w-4 rounded border-gray-300 text-orange-600 focus:ring-orange-500"
-                />
-                <span>
-                  I confirm that I am at least 18 years old and I am creating
-                  this account for parent, guardian, or other authorized adult use.
-                </span>
-              </label>
-              <label className="flex items-start gap-3 text-sm text-gray-700">
-                <input
-                  type="checkbox"
-                  name="acceptTerms"
-                  defaultChecked={Boolean(state.acceptTerms)}
-                  className="mt-1 h-4 w-4 rounded border-gray-300 text-orange-600 focus:ring-orange-500"
-                />
-                <span>
-                  I agree to the Pathnook Terms of Service and Privacy Policy.
-                </span>
-              </label>
-            </div>
-          )}
-
-          {state?.error ? (
-            <div className="text-red-500 text-sm">{state.error}</div>
-          ) : null}
-          {!state?.error && oauthErrorMessage ? (
-            <div className="text-red-500 text-sm">{oauthErrorMessage}</div>
-          ) : null}
-
-          <div>
-            <Button
-              type="submit"
-              className="w-full flex justify-center items-center py-2 px-4 border border-transparent rounded-full shadow-sm text-sm font-medium text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
-              disabled={pending}
-            >
-              {pending ? (
-                <>
-                  <Loader2 className="animate-spin mr-2 h-4 w-4" />
-                  Loading...
-                </>
-              ) : mode === 'signin' ? (
-                'Sign in'
-              ) : (
-                'Sign up'
-              )}
-            </Button>
-          </div>
-
-          {mode === 'signin' ? (
-            <div className="text-center text-sm text-gray-600">
-              <a
-                href={`mailto:${FAMILY_EDU_SUPPORT_EMAIL}?subject=Pathnook password recovery`}
-                className="font-medium text-orange-700 underline-offset-4 hover:underline"
-              >
-                Need help recovering your password?
-              </a>
-            </div>
-          ) : null}
-        </form>
-
-        <div className="mt-6">
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300" />
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-gray-50 text-gray-500">
-                {googleAuthAvailable ? 'Or continue with email' : ''}
-                {mode === 'signin'
-                  ? (googleAuthAvailable ? '' : 'New to our platform?')
-                  : (googleAuthAvailable ? '' : 'Already have an account?')}
-              </span>
-            </div>
-          </div>
-
-          <div className="mt-6">
-            <Link
-              href={`${mode === 'signin' ? '/sign-up' : '/sign-in'}${
-                redirectTo ? `?redirect=${redirectTo}` : ''
-              }${priceId ? `&priceId=${priceId}` : ''}${
-                inviteId ? `&inviteId=${inviteId}` : ''
-              }`}
-              className="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-full shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
-            >
-              {mode === 'signin'
-                ? 'Create an account'
-                : 'Sign in to existing account'}
-            </Link>
           </div>
         </div>
       </div>
@@ -291,12 +318,12 @@ export function Login({
   );
 }
 
-function GoogleIcon() {
+function GoogleIcon({ className }: { className?: string }) {
   return (
     <svg
       aria-hidden="true"
       viewBox="0 0 24 24"
-      className="h-5 w-5"
+      className={className || 'h-5 w-5'}
       xmlns="http://www.w3.org/2000/svg"
     >
       <path

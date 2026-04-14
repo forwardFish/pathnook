@@ -30,18 +30,16 @@ export default async function DashboardPage() {
   ];
 
   return (
-    <section className="flex-1 space-y-6 p-4 lg:p-8">
-      <div className="flex flex-col gap-4 rounded-3xl bg-[linear-gradient(135deg,#fff7ed_0%,#fffbeb_52%,#ffffff_100%)] p-6 shadow-sm ring-1 ring-orange-100 lg:flex-row lg:items-end lg:justify-between">
+    <section className="flex-1 space-y-6">
+      <div className="pn-surface flex flex-col gap-4 p-6 lg:flex-row lg:items-end lg:justify-between">
         <div className="max-w-2xl space-y-3">
-          <p className="text-sm font-medium uppercase tracking-[0.18em] text-orange-600">
-            Parent Dashboard
-          </p>
-          <h1 className="text-3xl font-semibold text-gray-900">
+          <p className="pn-kicker">Parent Dashboard</p>
+          <h1 className="text-3xl font-black tracking-[-0.04em] text-[#111827]">
             {user?.name ? `Welcome back, ${user.name}.` : 'Welcome back.'}
           </h1>
-          <p className="text-base text-gray-700">
-            Add each child once, then use this dashboard to upload work, review diagnoses, and
-            track progress week over week.
+          <p className="text-base leading-8 text-[var(--pn-muted)]">
+            Add each child once, then use this dashboard to upload work, review
+            diagnoses, and track progress week over week.
           </p>
         </div>
         <div className="flex flex-wrap gap-3">
@@ -63,13 +61,13 @@ export default async function DashboardPage() {
         {overviewCards.map((card) => (
           <Card key={card.label}>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">
+              <CardTitle className="text-sm font-semibold text-[var(--pn-muted)]">
                 {card.label}
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-3xl font-semibold text-gray-900">{card.value}</p>
-              <p className="mt-2 text-sm text-gray-600">{card.description}</p>
+              <p className="text-3xl font-black text-[#111827]">{card.value}</p>
+              <p className="mt-2 text-sm text-[var(--pn-muted)]">{card.description}</p>
             </CardContent>
           </Card>
         ))}
@@ -88,11 +86,11 @@ export default async function DashboardPage() {
               children.slice(0, 3).map((child) => (
                 <div
                   key={child.id}
-                  className="flex flex-col gap-3 rounded-2xl border border-gray-200 p-4 sm:flex-row sm:items-center sm:justify-between"
+                  className="flex flex-col gap-3 rounded-[1.25rem] border border-[var(--pn-border)] bg-[linear-gradient(180deg,var(--pn-soft-2)_0%,white_100%)] p-4 sm:flex-row sm:items-center sm:justify-between"
                 >
                   <div>
-                    <p className="text-base font-medium text-gray-900">{child.nickname}</p>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-base font-semibold text-[#111827]">{child.nickname}</p>
+                    <p className="text-sm text-[var(--pn-muted)]">
                       {child.grade} · {child.curriculum}
                     </p>
                   </div>
@@ -107,9 +105,9 @@ export default async function DashboardPage() {
                 </div>
               ))
             ) : (
-              <div className="rounded-2xl border border-dashed border-gray-300 bg-gray-50 p-6 text-sm text-gray-600">
-                No child profiles yet. Create your first child profile so this dashboard is ready
-                for uploads and weekly review.
+              <div className="rounded-[1.25rem] border border-dashed border-[var(--pn-border)] bg-[var(--pn-soft-2)] p-6 text-sm text-[var(--pn-muted)]">
+                No child profiles yet. Create your first child profile so this
+                dashboard is ready for uploads and weekly review.
               </div>
             )}
           </CardContent>
@@ -119,12 +117,15 @@ export default async function DashboardPage() {
           <CardHeader>
             <CardTitle>Recent Runs</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4 text-sm text-gray-700">
+          <CardContent className="space-y-4 text-sm text-[var(--pn-muted-2)]">
             {recentRuns.length > 0 ? (
               recentRuns.map((run) => (
-                <div key={run.id} className="rounded-2xl border border-gray-200 bg-gray-50 p-4">
-                  <p className="font-medium text-gray-900">Run #{run.id}</p>
-                  <p className="mt-1 text-sm text-gray-600">
+                <div
+                  key={run.id}
+                  className="rounded-[1.25rem] border border-[var(--pn-border)] bg-[linear-gradient(180deg,var(--pn-soft-2)_0%,white_100%)] p-4"
+                >
+                  <p className="font-semibold text-[#111827]">Run #{run.id}</p>
+                  <p className="mt-1 text-sm text-[var(--pn-muted)]">
                     {run.childNickname} · {run.status.replace('_', ' ')}
                   </p>
                   <Button asChild variant="outline" className="mt-3">
@@ -134,13 +135,13 @@ export default async function DashboardPage() {
               ))
             ) : (
               <>
-                <div className="rounded-2xl bg-orange-50 p-4">
+                <div className="rounded-[1.25rem] bg-[linear-gradient(180deg,var(--pn-soft)_0%,white_100%)] p-4">
                   1. Keep child profiles minimal: nickname, grade, curriculum.
                 </div>
-                <div className="rounded-2xl bg-blue-50 p-4">
+                <div className="rounded-[1.25rem] bg-[linear-gradient(180deg,#eef2ff_0%,white_100%)] p-4">
                   2. Upload 5-10 pages of work to start the diagnosis lifecycle.
                 </div>
-                <div className="rounded-2xl bg-emerald-50 p-4">
+                <div className="rounded-[1.25rem] bg-[linear-gradient(180deg,#faf5ff_0%,white_100%)] p-4">
                   3. Review the evidence-backed diagnosis and 7-day plan.
                 </div>
               </>

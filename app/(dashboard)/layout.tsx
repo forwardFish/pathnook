@@ -112,13 +112,13 @@ function UserMenu() {
 
 function Header() {
   return (
-    <header className="border-b border-gray-200">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-        <FamilyLogo size="sm" showSubtitle={false} />
+    <header className="pn-topbar">
+      <div className="mx-auto flex max-w-[1180px] items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
+        <FamilyLogo size="sm" showSubtitle={false} textClassName="text-[#2f3455]" />
         <div className="flex items-center space-x-4">
           <Link
             href="/pricing"
-            className="hidden text-sm font-medium text-gray-700 hover:text-gray-900 sm:inline"
+            className="hidden rounded-full px-4 py-2 text-sm font-semibold text-[var(--pn-muted-2)] transition hover:bg-white/70 hover:text-[var(--pn-text)] sm:inline"
           >
             Pricing
           </Link>
@@ -145,7 +145,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const showHeader = !isMarketingRoute;
 
   return (
-    <section className="flex flex-col min-h-screen">
+    <section className="pn-page-shell flex min-h-screen flex-col">
       {isMarketingRoute ? <LandingHeader /> : null}
       {showHeader ? <Header /> : null}
       {isMarketingRoute && pathname !== '/' ? (

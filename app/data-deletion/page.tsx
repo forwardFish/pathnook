@@ -2,15 +2,15 @@ import { PUBLIC_CONTACT_EMAIL } from '@/lib/site/public-trust';
 
 export default function DataDeletionPage() {
   return (
-    <main className="mx-auto max-w-4xl px-4 py-16 sm:px-6 lg:px-8">
-      <article className="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-sm">
-        <p className="text-sm font-semibold uppercase tracking-[0.18em] text-sky-700">
+    <main className="pn-doc-shell">
+      <article className="pn-doc-card">
+        <p className="pn-kicker">
           Data Deletion
         </p>
-        <h1 className="mt-4 text-4xl font-semibold tracking-tight text-slate-950">
+        <h1 className="mt-4 text-4xl font-black tracking-tight text-[#111827]">
           Request account or data deletion
         </h1>
-        <div className="mt-6 space-y-5 text-base leading-8 text-slate-600">
+        <div className="pn-doc-prose mt-6 space-y-5">
           <p>
             To request deletion of your Pathnook account data, email
             <strong> {PUBLIC_CONTACT_EMAIL}</strong> and include the account email

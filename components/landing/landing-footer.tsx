@@ -41,8 +41,8 @@ export function LandingFooter() {
   };
 
   return (
-    <footer className="bg-slate-950 text-white" data-testid="landing-footer">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <footer className="mt-20 bg-[var(--pn-dark)] text-white" data-testid="landing-footer">
+      <div className="mx-auto max-w-[1180px] px-4 sm:px-6 lg:px-8">
         <div className="grid gap-10 border-b border-white/10 py-16 md:grid-cols-2 xl:grid-cols-[1.2fr,1fr,1fr,1fr]">
           <div>
             <div className="flex flex-wrap items-center gap-4">
@@ -50,6 +50,7 @@ export function LandingFooter() {
                 size="md"
                 showSubtitle={false}
                 textClassName="text-white"
+                markClassName="rounded-[1rem] shadow-[0_16px_36px_rgba(99,102,241,0.28)]"
               />
               <span className="text-xl text-slate-400">
                 Family learning support
@@ -66,7 +67,7 @@ export function LandingFooter() {
             </p>
             <a
               href={`mailto:${landingSupportEmail}`}
-              className="mt-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-slate-200 transition hover:bg-white/10"
+              className="mt-6 inline-flex items-center gap-2 rounded-[1rem] border border-white/10 bg-white/5 px-4 py-2 text-sm text-slate-200 transition hover:bg-white/10"
             >
               <Mail className="h-4 w-4" />
               {landingSupportEmail}
@@ -111,7 +112,7 @@ export function LandingFooter() {
             <button
               type="button"
               onClick={scrollToTop}
-              className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/5 transition hover:bg-white/10"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-[1rem] border border-white/10 bg-white/5 transition hover:bg-white/10"
               aria-label="Scroll to top"
             >
               <ArrowUp className="h-4 w-4" />

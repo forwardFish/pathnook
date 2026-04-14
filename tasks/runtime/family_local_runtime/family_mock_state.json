@@ -13,7 +13,13 @@
       "itemError": 31,
       "shareLink": 2,
       "subscription": 2,
-      "billingEvent": 1
+      "billingEvent": 1,
+      "diagnosisDeck": 1,
+      "diagnosisSlide": 1,
+      "diagnosisSlideAction": 1,
+      "deckExport": 1,
+      "deckShareSetting": 1,
+      "deckPlaybackSnapshot": 1
     }
   },
   "auth": {
@@ -28,7 +34,7 @@
       "timezone": "America/Los_Angeles",
       "locale": "en-US",
       "createdAt": "2026-04-09T08:00:50.511Z",
-      "updatedAt": "2026-04-09T09:05:10.231Z",
+      "updatedAt": "2026-04-14T12:14:22.511Z",
       "deletedAt": null,
       "googleSub": "115407291538600635852"
     }
@@ -2896,6 +2902,12 @@
       "updatedAt": "2026-04-09T08:00:54.265Z"
     }
   ],
+  "diagnosisDecks": [],
+  "diagnosisSlides": [],
+  "diagnosisSlideActions": [],
+  "deckExports": [],
+  "deckShareSettings": [],
+  "deckPlaybackSnapshots": [],
   "problemItems": [
     {
       "id": 1,
@@ -3446,7 +3458,8 @@
       "severity": "low",
       "rationale": "The student setup shows the right ingredients but the step order breaks before the result.",
       "confidence": 0.79,
-      "createdAt": "2026-04-09T08:00:54.123Z"
+      "createdAt": "2026-04-09T08:00:54.123Z",
+      "isPrimary": true
     },
     {
       "id": 2,
@@ -3455,7 +3468,8 @@
       "severity": "low",
       "rationale": "The method is mostly correct, but the arithmetic execution slips near the finish.",
       "confidence": 0.75,
-      "createdAt": "2026-04-09T08:00:54.123Z"
+      "createdAt": "2026-04-09T08:00:54.123Z",
+      "isPrimary": true
     },
     {
       "id": 3,
@@ -3464,7 +3478,8 @@
       "severity": "low",
       "rationale": "The method is mostly correct, but the arithmetic execution slips near the finish.",
       "confidence": 0.77,
-      "createdAt": "2026-04-09T08:00:54.123Z"
+      "createdAt": "2026-04-09T08:00:54.123Z",
+      "isPrimary": true
     },
     {
       "id": 4,
@@ -3473,7 +3488,8 @@
       "severity": "med",
       "rationale": "The student switches or drops notation, which changes the meaning of the work.",
       "confidence": 0.73,
-      "createdAt": "2026-04-09T08:00:54.123Z"
+      "createdAt": "2026-04-09T08:00:54.123Z",
+      "isPrimary": true
     },
     {
       "id": 5,
@@ -3482,7 +3498,8 @@
       "severity": "low",
       "rationale": "The student switches or drops notation, which changes the meaning of the work.",
       "confidence": 0.75,
-      "createdAt": "2026-04-09T08:00:54.123Z"
+      "createdAt": "2026-04-09T08:00:54.123Z",
+      "isPrimary": true
     },
     {
       "id": 6,
@@ -3491,7 +3508,8 @@
       "severity": "med",
       "rationale": "The student chooses a weaker strategy than the page seems to require.",
       "confidence": 0.71,
-      "createdAt": "2026-04-09T08:00:54.123Z"
+      "createdAt": "2026-04-09T08:00:54.123Z",
+      "isPrimary": true
     },
     {
       "id": 7,
@@ -3500,7 +3518,8 @@
       "severity": "med",
       "rationale": "The student chooses a weaker strategy than the page seems to require.",
       "confidence": 0.73,
-      "createdAt": "2026-04-09T08:00:54.123Z"
+      "createdAt": "2026-04-09T08:00:54.123Z",
+      "isPrimary": true
     },
     {
       "id": 8,
@@ -3509,7 +3528,8 @@
       "severity": "med",
       "rationale": "The student setup shows the right ingredients but the step order breaks before the result.",
       "confidence": 0.69,
-      "createdAt": "2026-04-09T08:00:54.123Z"
+      "createdAt": "2026-04-09T08:00:54.123Z",
+      "isPrimary": true
     },
     {
       "id": 9,
@@ -3518,7 +3538,8 @@
       "severity": "med",
       "rationale": "The student setup shows the right ingredients but the step order breaks before the result.",
       "confidence": 0.71,
-      "createdAt": "2026-04-09T08:00:54.123Z"
+      "createdAt": "2026-04-09T08:00:54.123Z",
+      "isPrimary": true
     },
     {
       "id": 10,
@@ -3527,7 +3548,8 @@
       "severity": "med",
       "rationale": "The method is mostly correct, but the arithmetic execution slips near the finish.",
       "confidence": 0.67,
-      "createdAt": "2026-04-09T08:00:54.123Z"
+      "createdAt": "2026-04-09T08:00:54.123Z",
+      "isPrimary": true
     },
     {
       "id": 11,
@@ -3536,7 +3558,8 @@
       "severity": "low",
       "rationale": "The student setup shows the right ingredients but the step order breaks before the result.",
       "confidence": 0.79,
-      "createdAt": "2026-04-09T08:00:54.206Z"
+      "createdAt": "2026-04-09T08:00:54.206Z",
+      "isPrimary": true
     },
     {
       "id": 12,
@@ -3545,7 +3568,8 @@
       "severity": "low",
       "rationale": "The method is mostly correct, but the arithmetic execution slips near the finish.",
       "confidence": 0.75,
-      "createdAt": "2026-04-09T08:00:54.206Z"
+      "createdAt": "2026-04-09T08:00:54.206Z",
+      "isPrimary": true
     },
     {
       "id": 13,
@@ -3554,7 +3578,8 @@
       "severity": "low",
       "rationale": "The method is mostly correct, but the arithmetic execution slips near the finish.",
       "confidence": 0.77,
-      "createdAt": "2026-04-09T08:00:54.206Z"
+      "createdAt": "2026-04-09T08:00:54.206Z",
+      "isPrimary": true
     },
     {
       "id": 14,
@@ -3563,7 +3588,8 @@
       "severity": "med",
       "rationale": "The student switches or drops notation, which changes the meaning of the work.",
       "confidence": 0.73,
-      "createdAt": "2026-04-09T08:00:54.206Z"
+      "createdAt": "2026-04-09T08:00:54.206Z",
+      "isPrimary": true
     },
     {
       "id": 15,
@@ -3572,7 +3598,8 @@
       "severity": "low",
       "rationale": "The student switches or drops notation, which changes the meaning of the work.",
       "confidence": 0.75,
-      "createdAt": "2026-04-09T08:00:54.206Z"
+      "createdAt": "2026-04-09T08:00:54.206Z",
+      "isPrimary": true
     },
     {
       "id": 16,
@@ -3581,7 +3608,8 @@
       "severity": "med",
       "rationale": "The student chooses a weaker strategy than the page seems to require.",
       "confidence": 0.71,
-      "createdAt": "2026-04-09T08:00:54.206Z"
+      "createdAt": "2026-04-09T08:00:54.206Z",
+      "isPrimary": true
     },
     {
       "id": 17,
@@ -3590,7 +3618,8 @@
       "severity": "med",
       "rationale": "The student chooses a weaker strategy than the page seems to require.",
       "confidence": 0.73,
-      "createdAt": "2026-04-09T08:00:54.206Z"
+      "createdAt": "2026-04-09T08:00:54.206Z",
+      "isPrimary": true
     },
     {
       "id": 18,
@@ -3599,7 +3628,8 @@
       "severity": "med",
       "rationale": "The student setup shows the right ingredients but the step order breaks before the result.",
       "confidence": 0.69,
-      "createdAt": "2026-04-09T08:00:54.206Z"
+      "createdAt": "2026-04-09T08:00:54.206Z",
+      "isPrimary": true
     },
     {
       "id": 19,
@@ -3608,7 +3638,8 @@
       "severity": "med",
       "rationale": "The student setup shows the right ingredients but the step order breaks before the result.",
       "confidence": 0.71,
-      "createdAt": "2026-04-09T08:00:54.206Z"
+      "createdAt": "2026-04-09T08:00:54.206Z",
+      "isPrimary": true
     },
     {
       "id": 20,
@@ -3617,7 +3648,8 @@
       "severity": "med",
       "rationale": "The method is mostly correct, but the arithmetic execution slips near the finish.",
       "confidence": 0.67,
-      "createdAt": "2026-04-09T08:00:54.206Z"
+      "createdAt": "2026-04-09T08:00:54.206Z",
+      "isPrimary": true
     },
     {
       "id": 21,
@@ -3626,7 +3658,8 @@
       "severity": "low",
       "rationale": "The student setup shows the right ingredients but the step order breaks before the result.",
       "confidence": 0.79,
-      "createdAt": "2026-04-09T08:00:54.265Z"
+      "createdAt": "2026-04-09T08:00:54.265Z",
+      "isPrimary": true
     },
     {
       "id": 22,
@@ -3635,7 +3668,8 @@
       "severity": "low",
       "rationale": "The method is mostly correct, but the arithmetic execution slips near the finish.",
       "confidence": 0.75,
-      "createdAt": "2026-04-09T08:00:54.265Z"
+      "createdAt": "2026-04-09T08:00:54.265Z",
+      "isPrimary": true
     },
     {
       "id": 23,
@@ -3644,7 +3678,8 @@
       "severity": "low",
       "rationale": "The method is mostly correct, but the arithmetic execution slips near the finish.",
       "confidence": 0.77,
-      "createdAt": "2026-04-09T08:00:54.265Z"
+      "createdAt": "2026-04-09T08:00:54.265Z",
+      "isPrimary": true
     },
     {
       "id": 24,
@@ -3653,7 +3688,8 @@
       "severity": "med",
       "rationale": "The student switches or drops notation, which changes the meaning of the work.",
       "confidence": 0.73,
-      "createdAt": "2026-04-09T08:00:54.265Z"
+      "createdAt": "2026-04-09T08:00:54.265Z",
+      "isPrimary": true
     },
     {
       "id": 25,
@@ -3662,7 +3698,8 @@
       "severity": "low",
       "rationale": "The student switches or drops notation, which changes the meaning of the work.",
       "confidence": 0.75,
-      "createdAt": "2026-04-09T08:00:54.265Z"
+      "createdAt": "2026-04-09T08:00:54.265Z",
+      "isPrimary": true
     },
     {
       "id": 26,
@@ -3671,7 +3708,8 @@
       "severity": "med",
       "rationale": "The student chooses a weaker strategy than the page seems to require.",
       "confidence": 0.71,
-      "createdAt": "2026-04-09T08:00:54.265Z"
+      "createdAt": "2026-04-09T08:00:54.265Z",
+      "isPrimary": true
     },
     {
       "id": 27,
@@ -3680,7 +3718,8 @@
       "severity": "med",
       "rationale": "The student chooses a weaker strategy than the page seems to require.",
       "confidence": 0.73,
-      "createdAt": "2026-04-09T08:00:54.265Z"
+      "createdAt": "2026-04-09T08:00:54.265Z",
+      "isPrimary": true
     },
     {
       "id": 28,
@@ -3689,7 +3728,8 @@
       "severity": "med",
       "rationale": "The student setup shows the right ingredients but the step order breaks before the result.",
       "confidence": 0.69,
-      "createdAt": "2026-04-09T08:00:54.265Z"
+      "createdAt": "2026-04-09T08:00:54.265Z",
+      "isPrimary": true
     },
     {
       "id": 29,
@@ -3698,7 +3738,8 @@
       "severity": "med",
       "rationale": "The student setup shows the right ingredients but the step order breaks before the result.",
       "confidence": 0.71,
-      "createdAt": "2026-04-09T08:00:54.265Z"
+      "createdAt": "2026-04-09T08:00:54.265Z",
+      "isPrimary": true
     },
     {
       "id": 30,
@@ -3707,7 +3748,8 @@
       "severity": "med",
       "rationale": "The method is mostly correct, but the arithmetic execution slips near the finish.",
       "confidence": 0.67,
-      "createdAt": "2026-04-09T08:00:54.265Z"
+      "createdAt": "2026-04-09T08:00:54.265Z",
+      "isPrimary": true
     }
   ],
   "shareLinks": [

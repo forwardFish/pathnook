@@ -1,13 +1,18 @@
 import Link from "next/link";
 import {
-  Compass,
+  ArrowRight,
+  Check,
   FileSearch,
   GraduationCap,
   Handshake,
   Layers3,
+  MessageCircleMore,
+  NotebookPen,
+  ScanSearch,
   ShieldCheck,
   Sparkles,
   Target,
+  Upload,
 } from "lucide-react";
 import { BILLING_PLANS, formatBillingInterval, getAnnualSavings } from "@/lib/payments/catalog";
 import { Button } from "@/components/ui/button";
@@ -39,25 +44,7 @@ const heroCards = [
     body: "Tutor-ready handoff without losing family context.",
     icon: Handshake,
   },
-];
-
-const whyUseCards = [
-  {
-    title: "See the real bottleneck",
-    body: "Do not stop at surface mistakes. See where the learning process is actually breaking down and what matters most now.",
-    icon: Compass,
-  },
-  {
-    title: "Follow the shortest next path",
-    body: "Get a focused next step that builds the right ability first, instead of a generic weekly checklist.",
-    icon: Target,
-  },
-  {
-    title: "Carry progress forward",
-    body: "Use weekly follow-through, compare, and tutor-ready sharing so each review becomes the next step instead of a one-time report drop.",
-    icon: GraduationCap,
-  },
-];
+] as const;
 
 const stageOneCards = [
   {
@@ -83,6 +70,24 @@ const trustCards = [
   "Parent-controlled uploads and sharing.",
   "Secure billing through Freemius.",
   "Clear refund, privacy, and support routes.",
+] as const;
+
+const howItWorksSteps = [
+  {
+    title: "Upload Schoolwork",
+    body: "Use recent homework, quizzes, tests, or corrections that show the current problem.",
+    icon: NotebookPen,
+  },
+  {
+    title: "Tell Us the Goal",
+    body: "Say what feels stuck, what you want fixed first, and what kind of help you need.",
+    icon: MessageCircleMore,
+  },
+  {
+    title: "Get the Review",
+    body: "See the diagnosis, the shortest next path, and a 7-day plan for this week.",
+    icon: ScanSearch,
+  },
 ] as const;
 
 const faqItems = [
@@ -121,7 +126,7 @@ const faqItems = [
     answer:
       "Pathnook is not built to generate shortcut answers or generic study plans. It is built to help families see the real bottleneck, choose the most valuable next step, and keep progress moving from week to week.",
   },
-];
+] as const;
 
 function SectionIntro({
   eyebrow,
@@ -134,13 +139,13 @@ function SectionIntro({
 }) {
   return (
     <div className="mx-auto max-w-3xl text-center">
-      <p className="text-sm font-semibold uppercase tracking-[0.24em] text-teal-700">
-        {eyebrow}
-      </p>
-      <h2 className="mt-4 text-3xl font-semibold tracking-tight text-slate-950 sm:text-4xl">
+      <p className="pn-kicker">{eyebrow}</p>
+      <h2 className="mt-4 text-4xl font-black tracking-[-0.04em] text-[#111827] sm:text-5xl">
         {title}
       </h2>
-      <p className="mt-4 text-lg leading-8 text-slate-600">{body}</p>
+      <p className="mt-4 text-lg leading-8 text-[var(--pn-muted)] sm:text-xl">
+        {body}
+      </p>
     </div>
   );
 }
@@ -149,411 +154,279 @@ export function FamilyLandingPage() {
   const annualSavings = getAnnualSavings();
 
   return (
-    <>
-      <main className="overflow-x-clip bg-[linear-gradient(180deg,#f8fcfb_0%,#ffffff_22%,#f9fafb_100%)]">
-        <section className="relative overflow-hidden pt-28 pb-20 sm:pt-32 sm:pb-24">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(20,184,166,0.18),transparent_28%),radial-gradient(circle_at_top_right,rgba(249,115,22,0.14),transparent_22%),linear-gradient(180deg,#f4fffc_0%,rgba(244,255,252,0)_100%)]" />
-          <div className="relative mx-auto grid max-w-7xl gap-12 px-4 sm:px-6 lg:grid-cols-[1.05fr,0.95fr] lg:items-center lg:px-8">
-            <div>
-              <div className="mx-auto mt-7 max-w-4xl text-center">
-                <h1 className="text-4xl font-semibold tracking-[-0.04em] text-slate-950 sm:text-5xl lg:text-6xl lg:leading-[1.02]">
-                  Pathnook is an{" "}
-                  <span className="bg-[linear-gradient(135deg,#115e59_0%,#0f766e_36%,#2563eb_70%,#ea580c_100%)] bg-clip-text text-transparent">
-                    AI learning and growth system
-                  </span>
-                </h1>
-                <p className="mx-auto mt-6 max-w-3xl text-xl leading-8 text-slate-700 sm:text-2xl sm:leading-9">
-                  AI-driven clarity, the shortest next path, and steady family
-                  follow-through.
-                </p>
-                <p className="mx-auto mt-5 max-w-3xl text-base leading-8 text-slate-600 sm:text-lg">
-                  Built for families first, starting with education diagnosis,
-                  evidence-backed review, and weekly learning guidance.
-                </p>
-                <p className="mx-auto mt-4 max-w-3xl text-base leading-8 text-slate-600">
-                  Pathnook is software for parents who want clearer learning
-                  decisions, evidence-backed review, and a steadier weekly
-                  follow-through workflow.
-                </p>
-                <p className="mx-auto mt-3 max-w-3xl text-base leading-8 text-slate-600">
-                  Today, Pathnook focuses on parent-facing family learning
-                  support. It does not provide direct answer generation for
-                  children or replace a tutor or school teacher.
-                </p>
-              </div>
-
-              <div className="mx-auto mt-8 max-w-5xl overflow-hidden rounded-[1.75rem] border border-slate-200 bg-white/92 shadow-[0_14px_40px_rgba(15,23,42,0.07)]">
-                <div className="grid gap-px bg-slate-200/80 sm:grid-cols-3">
-                  {proofPoints.map((item, index) => (
-                  <div
-                    key={item}
-                    className="bg-white px-6 py-5 text-center"
-                  >
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-slate-400">
-                      0{index + 1}
-                    </p>
-                    <p className="mt-2 text-base font-semibold leading-6 text-slate-800">
-                      {item}
-                    </p>
-                  </div>
-                ))}
-                </div>
-              </div>
-
-              <div className="mt-9 flex flex-col items-center gap-3 sm:flex-row sm:flex-wrap sm:justify-center">
-                <Button
-                  asChild
-                  size="lg"
-                  className="rounded-full bg-slate-950 px-8 text-base text-white hover:bg-slate-800"
-                >
-                  <Link href="/sign-up?redirect=dashboard">Start a diagnosis</Link>
-                </Button>
-                <Button
-                  asChild
-                  size="lg"
-                  variant="outline"
-                  className="rounded-full border-slate-300 bg-white px-8 text-base text-slate-900 hover:bg-slate-50"
-                >
-                  <Link href="/sample-report">View a sample report</Link>
-                </Button>
-              </div>
-            </div>
-
-            <div className="relative">
-              <div className="rounded-[2rem] border border-white/80 bg-white/85 p-5 shadow-[0_30px_120px_rgba(15,23,42,0.12)] backdrop-blur">
-                <div className="rounded-[1.7rem] border border-slate-200 bg-slate-950 p-5 text-white">
-                  <p className="text-xs uppercase tracking-[0.22em] text-teal-200">
-                    Family review outcome
-                  </p>
-                  <p className="mt-2 text-2xl font-semibold">
-                    From confusion to a grounded next step
-                  </p>
-                  <div className="mt-5 grid gap-4 sm:grid-cols-2">
-                    {heroCards.map((card) => {
-                      const Icon = card.icon;
-                      return (
-                        <div
-                          key={card.title}
-                          className="rounded-[1.35rem] border border-white/10 bg-white/5 p-4"
-                        >
-                          <div className="inline-flex rounded-2xl bg-white px-3 py-3 text-slate-950">
-                            <Icon className="h-5 w-5" />
-                          </div>
-                          <h3 className="mt-4 text-xl font-semibold">{card.title}</h3>
-                          <p className="mt-2 text-base leading-7 text-slate-300">
-                            {card.body}
-                          </p>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              </div>
-            </div>
+    <main className="pn-page-shell overflow-x-clip">
+      <section className="mx-auto max-w-[1180px] px-4 pb-20 pt-24 sm:px-6 sm:pt-28 lg:px-8">
+        <div className="hero mx-auto max-w-[1180px] text-center">
+          <div className="inline-flex items-center gap-2 rounded-full border border-[var(--pn-soft-border)] bg-[var(--pn-soft)] px-5 py-3 text-sm font-extrabold text-[var(--pn-violet)] shadow-[0_12px_30px_rgba(124,58,237,0.12)]">
+            <Sparkles className="h-4 w-4" />
+            Family-first AI learning guidance
           </div>
-        </section>
+          <h1 className="mt-5 text-4xl font-black leading-[1.02] tracking-[-0.06em] text-[#111827] sm:text-5xl lg:text-[3.9rem]">
+            Pathnook is an AI learning and growth
+            <span className="pn-gradient-text mt-2 block">
+              system
+            </span>
+          </h1>
+          <p className="pn-gradient-text mx-auto mt-5 max-w-5xl text-3xl font-black leading-[1.08] tracking-[-0.05em] sm:text-4xl lg:text-[3.25rem]">
+            AI-driven clarity, the shortest next path,
+            <br className="hidden lg:block" /> and steady family follow-through.
+          </p>
+          <p className="mx-auto mt-6 max-w-5xl text-lg leading-8 text-[var(--pn-muted-2)] sm:text-[1.6rem] sm:leading-[1.75]">
+            Upload recent schoolwork, say what feels stuck, and get a clearer
+            diagnosis, a stronger next step, and a weekly path you can actually
+            follow.
+          </p>
+          {/*
+          <p className="mx-auto mt-5 max-w-3xl text-lg leading-8 text-[var(--pn-muted)]">
+            Built for families first, starting with education diagnosis,
+            evidence-backed review, and weekly learning guidance.
+          </p>
+          <p className="mx-auto mt-3 max-w-3xl text-base leading-8 text-[var(--pn-muted)]">
+            Pathnook is software for parents who want clearer learning
+            decisions, evidence-backed review, and a steadier weekly
+            follow-through workflow.
+          </p>
+          */}
+        </div>
 
-        <section id="features" className="py-20 sm:py-24">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <SectionIntro
-              eyebrow="What Pathnook Is"
-              title="More than a report tool. The first layer of an AI learning and growth system."
-              body="Pathnook does more than summarize schoolwork. It helps families understand what is actually happening in learning, decide what to focus on next, and keep growth moving week by week as a parent-facing software workflow."
-            />
-          </div>
-        </section>
+        <div className="mx-auto mt-10 max-w-[1160px]">
+          <div className="rounded-[2.35rem] border border-white/80 bg-white/82 p-5 shadow-[0_30px_100px_rgba(124,58,237,0.15)] backdrop-blur">
+            <div className="rounded-[2rem] border border-[#d9dee7] bg-white p-5 sm:p-7">
+              <div className="rounded-[1.7rem] border border-[#dfe4ec] bg-[#fcfcfe] px-6 py-7 sm:px-8 sm:py-8">
+                <div className="font-mono text-[1rem] leading-[2.2] tracking-[0.01em] text-[#334155] sm:text-[1.1rem]">
+                  My child understands the ideas in class, but still breaks down
+                  on mixed math work. I want to know the real bottleneck and
+                  what we should focus on this week.
+                </div>
 
-        <section id="why-use" className="bg-white py-20 sm:py-24">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <SectionIntro
-              eyebrow="Why Families Use Pathnook"
-              title="A clearer decision layer for home learning support."
-              body="The homepage story starts with outcomes: clarity, next-step guidance, and steadier follow-through. Features support that value, but they are not the value by themselves."
-            />
-            <div className="mt-12 grid gap-6 lg:grid-cols-3">
-              {whyUseCards.map((card) => {
-                const Icon = card.icon;
-                return (
-                  <article
-                    key={card.title}
-                    className="rounded-[1.8rem] border border-slate-200 bg-slate-50 p-6 shadow-sm"
-                  >
-                    <div className="inline-flex rounded-2xl bg-teal-600 p-3 text-white">
-                      <Icon className="h-5 w-5" />
+                <div className="mt-8 border-t border-[#e4e7ee] pt-8">
+                  <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+                    <div className="flex items-center gap-4 rounded-[1.35rem] border border-[var(--pn-soft-border)] bg-[linear-gradient(180deg,#f2efff_0%,#f8f7ff_100%)] px-5 py-5 shadow-[0_12px_30px_rgba(124,58,237,0.08)]">
+                      <div className="grid h-16 w-16 place-items-center rounded-[1.15rem] bg-white text-[var(--pn-violet)] shadow-[0_10px_24px_rgba(124,58,237,0.14)]">
+                        <Upload className="h-6 w-6" />
+                      </div>
+                      <div>
+                        <p className="text-[1.02rem] font-black tracking-[-0.02em] text-[#111827]">
+                          Upload Files
+                        </p>
+                        <p className="mt-1 text-sm leading-7 text-[var(--pn-muted)] sm:text-base">
+                          Homework, tests, corrections · PDF, photo, or ZIP
+                        </p>
+                      </div>
                     </div>
-                    <h3 className="mt-5 text-2xl font-semibold text-slate-950">
-                      {card.title}
-                    </h3>
-                    <p className="mt-3 text-base leading-8 text-slate-600">
-                      {card.body}
-                    </p>
-                  </article>
-                );
-              })}
-            </div>
-          </div>
-        </section>
 
-        <section className="py-20 sm:py-24">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <SectionIntro
-              eyebrow="Stage 1 Value"
-              title="What families get today"
-              body="Today, Pathnook is intentionally focused on family learning support. The public value is clearer judgment, the shortest next path, small output checkpoints, and steadier weekly follow-through."
-            />
-            <div className="mt-12 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-              {stageOneCards.map((card, index) => (
-                <article
-                  key={card.title}
-                  className="rounded-[1.7rem] border border-slate-200 bg-white p-6 shadow-[0_14px_40px_rgba(15,23,42,0.05)]"
-                >
-                  <p className="text-sm font-semibold uppercase tracking-[0.22em] text-slate-500">
-                    0{index + 1}
-                  </p>
-                  <h3 className="mt-4 text-xl font-semibold text-slate-950">{card.title}</h3>
-                  <p className="mt-3 text-base leading-8 text-slate-600">{card.body}</p>
-                </article>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section className="bg-slate-950 py-20 text-white sm:py-24">
-          <div className="mx-auto grid max-w-7xl gap-8 px-4 sm:px-6 lg:grid-cols-[1fr,1fr] lg:px-8">
-            <div className="rounded-[2rem] border border-white/10 bg-white/5 p-7 text-center">
-              <p className="text-sm font-semibold uppercase tracking-[0.24em] text-teal-200">
-                Proof before pay
-              </p>
-              <h2 className="mt-4 text-3xl font-semibold tracking-tight">
-                See the output before you pay
-              </h2>
-              <div className="mt-6 space-y-4 text-base leading-7 text-slate-200">
-                <p>
-                  Sample diagnosis shows the main issue, repeated pattern, and what not to overreact to.
-                </p>
-                <p>
-                  Sample shortest path shows what to do first, why it comes first, and what can wait.
-                </p>
-                <p>
-                  Sample weekly plan and output checkpoint make the workflow visible before purchase.
-                </p>
-                <p>
-                  Pricing, refund, privacy, contact, and billing management routes stay visible so trust is not hidden behind checkout.
-                </p>
-              </div>
-              <Button
-                asChild
-                size="lg"
-                variant="secondary"
-                className="mt-8 rounded-full bg-white px-7 text-base text-slate-950 hover:bg-slate-100"
-              >
-                <Link href="/sample-report">View a sample report</Link>
-              </Button>
-            </div>
-
-            <div id="trust" className="rounded-[2rem] border border-white/10 bg-white/5 p-7">
-              <p className="text-sm font-semibold uppercase tracking-[0.24em] text-orange-200">
-                Built for trust
-              </p>
-              <h2 className="mt-4 text-3xl font-semibold tracking-tight">
-                Built for trust, not just output
-              </h2>
-              <p className="mt-4 text-base leading-7 text-slate-300">
-                The public Pathnook story is software-first, parent-first, and explicit
-                about billing, privacy, and support routes.
-              </p>
-              <div className="mt-6 grid gap-4 sm:grid-cols-2">
-                {trustCards.map((item) => (
-                  <div
-                    key={item}
-                    className="rounded-[1.4rem] border border-white/10 bg-slate-900/70 p-4"
-                  >
-                    <ShieldCheck className="h-5 w-5 text-emerald-300" />
-                    <p className="mt-3 text-base leading-7 text-slate-200">{item}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section className="py-20 sm:py-24">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="rounded-[2rem] border border-teal-100 bg-[linear-gradient(135deg,#ecfeff_0%,#f8fafc_100%)] p-8 text-center sm:p-10">
-              <p className="text-sm font-semibold uppercase tracking-[0.24em] text-teal-700">
-                Stage 2 Bridge
-              </p>
-              <h2 className="mt-4 text-3xl font-semibold tracking-tight text-slate-950 sm:text-4xl">
-                Pathnook starts with family learning and grows into a learning and growth system.
-              </h2>
-              <p className="mx-auto mt-5 max-w-4xl text-lg leading-8 text-slate-700">
-                Today, Pathnook helps families turn schoolwork into diagnosis,
-                next steps, and weekly follow-through. Over time, every review
-                becomes part of a larger learning and growth system: clearer
-                decisions, better next steps, and steadier progress over time.
-              </p>
-            </div>
-          </div>
-        </section>
-
-        <section id="how-it-works" className="bg-white py-20 sm:py-24">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <SectionIntro
-              eyebrow="How Pathnook Works"
-              title="A public flow explained in value language."
-              body="Start with real schoolwork, get grounded clarity, and carry that clarity into action at home or with extra support."
-            />
-            <div className="mt-12 grid gap-6 lg:grid-cols-3">
-              <article className="rounded-[1.8rem] border border-slate-200 bg-slate-50 p-6">
-                <p className="text-sm font-semibold uppercase tracking-[0.22em] text-slate-500">
-                  01
-                </p>
-                <h3 className="mt-4 text-2xl font-semibold text-slate-950">
-                  Bring in recent schoolwork
-                </h3>
-                <p className="mt-3 text-base leading-8 text-slate-600">
-                  Upload the pages that best represent the current struggle so
-                  Pathnook can review the real learning signal.
-                </p>
-              </article>
-              <article className="rounded-[1.8rem] border border-slate-200 bg-slate-50 p-6">
-                <p className="text-sm font-semibold uppercase tracking-[0.22em] text-slate-500">
-                  02
-                </p>
-                <h3 className="mt-4 text-2xl font-semibold text-slate-950">
-                  Get clarity and direction
-                </h3>
-                <p className="mt-3 text-base leading-8 text-slate-600">
-                  See the main issue, the supporting evidence, and the next-step
-                  guidance that matters this week.
-                </p>
-              </article>
-              <article className="rounded-[1.8rem] border border-slate-200 bg-slate-50 p-6">
-                <p className="text-sm font-semibold uppercase tracking-[0.22em] text-slate-500">
-                  03
-                </p>
-                <h3 className="mt-4 text-2xl font-semibold text-slate-950">
-                  Use it at home or share it
-                </h3>
-                <p className="mt-3 text-base leading-8 text-slate-600">
-                  Act on the weekly plan yourself or hand off the same grounded
-                  context to a tutor when outside support is useful.
-                </p>
-              </article>
-            </div>
-          </div>
-        </section>
-
-        <section id="pricing-preview" className="py-20 sm:py-24">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="mx-auto max-w-3xl text-center">
-              <p className="text-sm font-semibold uppercase tracking-[0.24em] text-teal-700">
-                Pricing
-              </p>
-              <h2 className="mt-4 text-3xl font-semibold tracking-tight text-slate-950 sm:text-4xl">
-                Simple pricing.
-              </h2>
-              <p className="mt-4 text-lg leading-8 text-slate-600">
-                Start with one diagnosis or choose ongoing access. Billing and
-                cancellation are handled through Freemius.
-              </p>
-            </div>
-
-            <div className="mt-12 grid gap-6 lg:grid-cols-3">
-              {BILLING_PLANS.map((plan) => (
-                <article
-                  key={plan.priceId}
-                  className={`flex h-full flex-col rounded-[1.8rem] border bg-white p-6 shadow-sm ${
-                    plan.featured
-                      ? "border-emerald-300 ring-2 ring-emerald-200"
-                      : "border-slate-200"
-                  }`}
-                >
-                  {plan.badge ? (
-                    <span className="inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-slate-600">
-                      {plan.badge}
-                    </span>
-                  ) : null}
-                  <h3 className="mt-5 text-2xl font-semibold text-slate-950">{plan.name}</h3>
-                  <p className="mt-3 text-base leading-7 text-slate-600">{plan.description}</p>
-                  <div className="mt-6 flex items-end gap-2">
-                    <p className="text-5xl font-semibold tracking-[-0.04em] text-slate-950">
-                      ${plan.unitAmount / 100}
-                    </p>
-                    <p className="pb-2 text-base text-slate-500">
-                      {formatBillingInterval(plan.interval)}
-                    </p>
-                  </div>
-                  {plan.planType === "annual" ? (
-                    <p className="mt-2 text-sm font-medium text-emerald-700">
-                      Saves ${(annualSavings / 100).toFixed(0)} compared with 12 monthly renewals.
-                    </p>
-                  ) : null}
-                  {plan.planType === "one_time" ? (
-                    <p className="mt-2 text-sm text-slate-500">
-                      Limited early access: first review discount may apply at checkout.
-                    </p>
-                  ) : null}
-                  <ul className="mt-6 flex-1 space-y-3 text-sm leading-7 text-slate-600">
-                    {plan.features.map((feature) => (
-                      <li key={feature}>{feature}</li>
-                    ))}
-                  </ul>
-                  <div className="mt-6 pt-2">
-                    <Button
-                      asChild
-                      className={`h-14 w-full rounded-full text-base ${
-                        plan.featured
-                          ? "bg-slate-950 text-white hover:bg-slate-800"
-                          : "bg-white text-slate-950 border border-slate-300 hover:bg-slate-50"
-                      }`}
-                      variant={plan.featured ? "default" : "outline"}
-                    >
-                      <Link href="/pricing">{plan.ctaLabel}</Link>
+                    <Button asChild size="lg" className="h-14 rounded-[1.2rem] px-8 text-[1.05rem]">
+                      <Link href="/sign-up?redirect=dashboard">
+                        Analyze &amp; Get Plan
+                        <ArrowRight className="h-4 w-4" />
+                      </Link>
                     </Button>
                   </div>
-                </article>
-              ))}
-            </div>
+                </div>
+              </div>
 
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Button
-                asChild
-                size="lg"
-                variant="outline"
-                className="rounded-full border-slate-300 bg-white px-8 text-base text-slate-900 hover:bg-slate-50"
+              <div className="mt-5 flex flex-wrap items-center justify-center gap-3 text-sm font-semibold text-[var(--pn-muted)]">
+                <span>Adults only account creation</span>
+                <span>•</span>
+                <span>Parent-controlled uploads</span>
+                <span>•</span>
+                <span>Secure billing through Freemius</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="how-it-works" className="mx-auto max-w-[1180px] px-4 py-10 sm:px-6 lg:px-8">
+        <div className="text-center">
+          <div className="inline-flex rounded-md bg-[linear-gradient(90deg,var(--pn-indigo),var(--pn-violet))] px-5 py-2 text-4xl font-black tracking-[-0.04em] text-white shadow-[0_18px_40px_rgba(79,70,229,0.18)] sm:text-5xl">
+            How It Works
+          </div>
+        </div>
+
+        <div className="mt-12 grid gap-8 lg:grid-cols-3">
+          {howItWorksSteps.map((step, index) => {
+            const Icon = step.icon;
+            return (
+              <article
+                key={step.title}
+                className="relative rounded-[2rem] border border-[var(--pn-border)] bg-white px-8 pb-10 pt-14 shadow-[0_16px_44px_rgba(15,23,42,0.08)]"
               >
-                <Link href="/contact">Talk to support</Link>
-              </Button>
-            </div>
-          </div>
-        </section>
+                <div className="absolute left-8 top-[-22px] grid h-18 w-18 place-items-center rounded-full border border-[var(--pn-soft-border)] bg-[linear-gradient(180deg,#f2efff_0%,#faf8ff_100%)] text-3xl font-black text-[var(--pn-violet)] shadow-[0_10px_24px_rgba(124,58,237,0.08)]">
+                  {index + 1}
+                </div>
+                <div className="grid h-28 w-28 place-items-center rounded-[1.7rem] bg-[linear-gradient(180deg,#f4f1ff_0%,#f9f8ff_100%)] text-[var(--pn-violet)] shadow-[inset_0_0_0_1px_rgba(237,233,254,1)]">
+                  <Icon className="h-11 w-11" />
+                </div>
+                <h3 className="mt-10 text-3xl font-black tracking-[-0.04em] text-[#111827]">
+                  {step.title}
+                </h3>
+                <p className="mt-5 text-[1.02rem] leading-9 text-[var(--pn-muted)]">
+                  {step.body}
+                </p>
+              </article>
+            );
+          })}
+        </div>
+      </section>
 
-        <section id="faq" className="bg-white py-20 sm:py-24">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <SectionIntro
-              eyebrow="FAQ"
-              title="Questions that reinforce positioning, not just upload mechanics."
-              body="The FAQ should help families understand scope, trust boundaries, and how the current public workflow fits into the larger Pathnook story."
-            />
-            <div className="mt-12 grid gap-4">
-              {faqItems.map((item) => (
-                <article
-                  key={item.question}
-                  className="rounded-[1.5rem] border border-slate-200 bg-slate-50 p-6"
+      {/*
+      <section className="mx-auto max-w-[1180px] px-4 py-10 sm:px-6 lg:px-8">
+        <div className="text-center">
+          <h2 className="text-5xl font-black tracking-[-0.05em] text-[#111827] sm:text-6xl">
+            What You’ll Get
+          </h2>
+        </div>
+        <div className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+          {stageOneCards.map((card) => (
+            <article
+              key={card.title}
+              className="rounded-[1.9rem] border border-[var(--pn-soft-border)] bg-[linear-gradient(180deg,#faf7ff_0%,white_100%)] p-7 shadow-[0_14px_40px_rgba(15,23,42,0.05)]"
+            >
+              <div className="grid h-22 w-22 place-items-center rounded-[1.45rem] bg-white text-[var(--pn-violet)] shadow-[0_10px_24px_rgba(15,23,42,0.06)]">
+                <Target className="h-8 w-8" />
+              </div>
+              <h3 className="mt-8 text-[2rem] font-black leading-[1.15] tracking-[-0.04em] text-[#111827]">
+                {card.title}
+              </h3>
+              <p className="mt-5 text-[1.02rem] leading-9 text-[var(--pn-muted)]">
+                {card.body}
+              </p>
+            </article>
+          ))}
+        </div>
+      </section>
+      */}
+
+      {/*
+      <section className="mx-auto max-w-[1180px] px-4 py-10 sm:px-6 lg:px-8">
+      </section>
+      */}
+
+      <section className="mx-auto max-w-[1180px] px-4 py-10 sm:px-6 lg:px-8">
+        <div className="grid gap-8 lg:grid-cols-2">
+          <div className="pn-card p-8">
+            <p className="pn-kicker">Built for trust</p>
+            <h2 className="mt-4 text-4xl font-black tracking-[-0.04em] text-[#111827]">
+              Built for trust, not just output
+            </h2>
+            <p className="mt-4 text-base leading-8 text-[var(--pn-muted)]">
+              The public Pathnook story is software-first, parent-first, and
+              explicit about billing, privacy, and support routes.
+            </p>
+            <div className="mt-6 grid gap-4 sm:grid-cols-2">
+              {trustCards.map((item) => (
+                <div
+                  key={item}
+                  className="rounded-[1.35rem] border border-[var(--pn-soft-border)] bg-[linear-gradient(180deg,var(--pn-soft-2)_0%,white_100%)] p-4"
                 >
-                  <h3 className="text-xl font-semibold text-slate-950">
-                    {item.question}
-                  </h3>
-                  <p className="mt-3 text-base leading-8 text-slate-600">
-                    {item.answer}
-                  </p>
-                </article>
+                  <ShieldCheck className="h-5 w-5 text-[var(--pn-violet)]" />
+                  <p className="mt-3 text-base leading-7 text-[var(--pn-muted-2)]">{item}</p>
+                </div>
               ))}
             </div>
           </div>
-        </section>
-      </main>
-    </>
+
+          <div className="pn-surface p-8 text-center">
+            <p className="pn-kicker">Stage 2 Bridge</p>
+            <h2 className="mt-4 text-4xl font-black tracking-[-0.04em] text-[#111827] sm:text-5xl">
+              Pathnook starts with family learning and grows into a learning and growth system.
+            </h2>
+            <p className="mx-auto mt-5 max-w-4xl text-lg leading-8 text-[var(--pn-muted-2)]">
+              Today, Pathnook helps families turn schoolwork into diagnosis,
+              next steps, and weekly follow-through. Over time, every review
+              becomes part of a larger learning and growth system: clearer
+              decisions, better next steps, and steadier progress over time.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="pricing" className="mx-auto max-w-[1180px] px-4 py-12 sm:px-6 lg:px-8">
+        <SectionIntro
+          eyebrow="Pricing"
+          title="Simple pricing."
+          body="Start with one diagnosis or choose ongoing access. Billing and cancellation are handled through Freemius."
+        />
+
+        <div className="mt-10 grid gap-6 lg:grid-cols-3">
+          {BILLING_PLANS.map((plan) => (
+            <article
+              key={plan.priceId}
+              className={`relative flex h-full flex-col rounded-[1.75rem] border bg-white p-7 shadow-[0_12px_40px_rgba(15,23,42,0.06)] ${
+                plan.featured
+                  ? "border-[#c4b5fd] shadow-[0_18px_48px_rgba(124,58,237,0.14)]"
+                  : "border-[var(--pn-border)]"
+              }`}
+            >
+              {plan.badge ? (
+                <span className="absolute right-0 top-0 rounded-bl-[1rem] bg-[linear-gradient(90deg,var(--pn-indigo),var(--pn-violet))] px-4 py-2 text-xs font-black uppercase tracking-[0.04em] text-white">
+                  {plan.badge}
+                </span>
+              ) : null}
+              <div className="text-2xl font-black tracking-[-0.03em] text-[#111827]">
+                {plan.name}
+              </div>
+              <div className="mt-4 text-5xl font-black tracking-[-0.05em] text-[#111827]">
+                ${plan.unitAmount / 100}
+              </div>
+              <div className="mt-1 text-sm font-semibold text-[var(--pn-muted)]">
+                {formatBillingInterval(plan.interval)}
+              </div>
+              <p className="mt-4 min-h-[4.5rem] text-sm leading-7 text-[var(--pn-muted)]">
+                {plan.description}
+              </p>
+              {plan.planType === "annual" ? (
+                <p className="mt-1 text-sm font-semibold text-[var(--pn-violet)]">
+                  Saves ${(annualSavings / 100).toFixed(0)} compared with 12 monthly renewals.
+                </p>
+              ) : null}
+              {plan.planType === "one_time" ? (
+                <p className="mt-1 text-sm text-[var(--pn-muted)]">
+                  Limited early access: first review discount may apply at checkout.
+                </p>
+              ) : null}
+              <ul className="mt-5 grid gap-3 text-sm leading-7 text-[var(--pn-muted-2)]">
+                {plan.features.map((feature) => (
+                  <li key={feature} className="flex items-start gap-3">
+                    <Check className="mt-1 h-4 w-4 flex-none text-[var(--pn-violet)]" />
+                    <span>{feature}</span>
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-6">
+                <Button
+                  asChild
+                  variant={plan.featured ? "default" : "outline"}
+                  className="h-12 w-full rounded-[1rem] text-base"
+                >
+                  <Link href="/pricing">{plan.ctaLabel}</Link>
+                </Button>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section id="faq" className="mx-auto max-w-[1180px] px-4 py-12 sm:px-6 lg:px-8">
+        <SectionIntro
+          eyebrow="FAQ"
+          title="Common questions from families."
+          body="The current Pathnook trust copy stays explicit: what you can upload, what the workflow does, how billing works, and where support routes live."
+        />
+        <div className="mt-8 grid gap-4">
+          {faqItems.map((item) => (
+            <article key={item.question} className="pn-card p-6">
+              <h3 className="text-xl font-black tracking-[-0.02em] text-[#111827]">
+                {item.question}
+              </h3>
+              <p className="mt-3 text-base leading-8 text-[var(--pn-muted)]">
+                {item.answer}
+              </p>
+            </article>
+          ))}
+        </div>
+      </section>
+    </main>
   );
 }

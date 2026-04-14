@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { signToken, verifyToken } from '@/lib/auth/session';
 import { shouldUseSecureCookies } from '@/lib/auth/cookies';
+import { getConfiguredBaseUrl } from '@/lib/runtime/base-url';
 import {
   isFamilyEduDemoAutoAuth,
   isFamilyEduDemoMode,
@@ -12,10 +13,31 @@ const FAMILY_EDU_DEMO_AUTO_AUTH = isFamilyEduDemoAutoAuth();
 
 const protectedRoutes = '/dashboard';
 
+function isLoopbackOrigin(origin: string) {
+  return (
+    origin.startsWith('http://localhost') ||
+    origin.startsWith('http://127.0.0.1')
+  );
+}
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const sessionCookie = request.cookies.get('session');
   const isProtectedRoute = pathname.startsWith(protectedRoutes);
+  const configuredBaseUrl = getConfiguredBaseUrl();
+  const requestOrigin = request.nextUrl.origin;
+
+  if (
+    request.method === 'GET' &&
+    configuredBaseUrl !== requestOrigin &&
+    isLoopbackOrigin(configuredBaseUrl) &&
+    isLoopbackOrigin(requestOrigin)
+  ) {
+    const redirectUrl = new URL(request.url);
+    redirectUrl.protocol = new URL(configuredBaseUrl).protocol;
+    redirectUrl.host = new URL(configuredBaseUrl).host;
+    return NextResponse.redirect(redirectUrl);
+  }
 
   if (
     isProtectedRoute &&

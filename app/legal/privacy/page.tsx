@@ -5,21 +5,21 @@ import {
 
 export default function PrivacyPage() {
   return (
-    <main className="mx-auto max-w-4xl px-4 py-16 sm:px-6 lg:px-8">
-      <article className="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-sm">
-        <p className="text-sm font-semibold uppercase tracking-[0.18em] text-sky-700">
+    <main className="pn-doc-shell">
+      <article className="pn-doc-card">
+        <p className="pn-kicker">
           Privacy
         </p>
-        <h1 className="mt-4 text-4xl font-semibold tracking-tight text-slate-950">
+        <h1 className="mt-4 text-4xl font-black tracking-tight text-[#111827]">
           Pathnook Privacy Policy
         </h1>
-        <p className="mt-4 text-sm leading-7 text-slate-500">
+        <p className="mt-4 text-sm leading-7 text-[var(--pn-muted)]">
           Effective date: April 14, 2026
         </p>
 
-        <div className="mt-8 space-y-8 text-base leading-8 text-slate-600">
+        <div className="pn-doc-prose mt-8 space-y-8">
           <section>
-            <h2 className="text-2xl font-semibold text-slate-950">1. Operator and account eligibility</h2>
+            <h2>1. Operator and account eligibility</h2>
             <p className="mt-3">
               {PUBLIC_OPERATOR_LINE} This Privacy Policy describes how Pathnook
               collects, uses, stores, shares, and protects personal data for
@@ -30,7 +30,7 @@ export default function PrivacyPage() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold text-slate-950">2. Information we collect</h2>
+            <h2>2. Information we collect</h2>
             <p className="mt-3">
               We may collect account and identity data such as name, email
               address, hashed credentials, authentication records, country,
@@ -43,7 +43,7 @@ export default function PrivacyPage() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold text-slate-950">3. Child and student materials</h2>
+            <h2>3. Child and student materials</h2>
             <p className="mt-3">
               Pathnook may process learning materials that relate to a child or
               student when an adult account holder uploads those materials. The
@@ -55,7 +55,7 @@ export default function PrivacyPage() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold text-slate-950">4. How we use information</h2>
+            <h2>4. How we use information</h2>
             <p className="mt-3">
               We use information to create and protect accounts, run diagnosis
               workflows, generate reports, maintain entitlements, keep billing
@@ -65,7 +65,7 @@ export default function PrivacyPage() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold text-slate-950">5. Cookies, sessions, and device signals</h2>
+            <h2>5. Cookies, sessions, and device signals</h2>
             <p className="mt-3">
               Pathnook uses cookies, session records, and similar technical data
               to keep users signed in, protect accounts, remember workflow
@@ -76,7 +76,7 @@ export default function PrivacyPage() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold text-slate-950">6. AI processing and model-training stance</h2>
+            <h2>6. AI processing and model-training stance</h2>
             <p className="mt-3">
               Pathnook uses AI-assisted processing to analyze uploaded learning
               evidence and produce structured outputs. Pathnook does not use
@@ -88,7 +88,7 @@ export default function PrivacyPage() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold text-slate-950">7. Service providers and Freemius billing role</h2>
+            <h2>7. Service providers and Freemius billing role</h2>
             <p className="mt-3">
               We may use service providers for cloud hosting, authentication,
               file storage, AI processing, infrastructure security, email or
@@ -103,7 +103,7 @@ export default function PrivacyPage() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold text-slate-950">8. Sharing, exports, and support access</h2>
+            <h2>8. Sharing, exports, and support access</h2>
             <p className="mt-3">
               Pathnook may share information with service providers, legal
               authorities where required, fraud-prevention partners, or other
@@ -116,7 +116,7 @@ export default function PrivacyPage() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold text-slate-950">9. Retention and deletion boundaries</h2>
+            <h2>9. Retention and deletion boundaries</h2>
             <p className="mt-3">
               We retain data for as long as needed to operate the service,
               preserve report history, maintain billing reconciliation, enforce
@@ -129,7 +129,7 @@ export default function PrivacyPage() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold text-slate-950">10. Regional rights and international processing</h2>
+            <h2>10. Regional rights and international processing</h2>
             <p className="mt-3">
               Depending on your location, you may request access, correction,
               deletion, export, objection, or restriction of certain personal
@@ -141,7 +141,7 @@ export default function PrivacyPage() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold text-slate-950">11. Security and policy updates</h2>
+            <h2>11. Security and policy updates</h2>
             <p className="mt-3">
               Pathnook uses reasonable administrative, technical, and
               organizational safeguards such as access control, encrypted
@@ -155,7 +155,7 @@ export default function PrivacyPage() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold text-slate-950">12. Contact</h2>
+            <h2>12. Contact</h2>
             <p className="mt-3">
               Use <strong>{PUBLIC_CONTACT_EMAIL}</strong> for general support,
               privacy requests, deletion requests, correction requests, export

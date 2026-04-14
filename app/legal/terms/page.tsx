@@ -5,21 +5,21 @@ import {
 
 export default function TermsPage() {
   return (
-    <main className="mx-auto max-w-4xl px-4 py-16 sm:px-6 lg:px-8">
-      <article className="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-sm">
-        <p className="text-sm font-semibold uppercase tracking-[0.18em] text-sky-700">
+    <main className="pn-doc-shell">
+      <article className="pn-doc-card">
+        <p className="pn-kicker">
           Terms
         </p>
-        <h1 className="mt-4 text-4xl font-semibold tracking-tight text-slate-950">
+        <h1 className="mt-4 text-4xl font-black tracking-tight text-[#111827]">
           Pathnook Terms of Service
         </h1>
-        <p className="mt-4 text-sm leading-7 text-slate-500">
+        <p className="mt-4 text-sm leading-7 text-[var(--pn-muted)]">
           Effective date: April 14, 2026
         </p>
 
-        <div className="mt-8 space-y-8 text-base leading-8 text-slate-600">
+        <div className="pn-doc-prose mt-8 space-y-8">
           <section>
-            <h2 className="text-2xl font-semibold text-slate-950">1. Operator and service description</h2>
+            <h2>1. Operator and service description</h2>
             <p className="mt-3">
               These Terms of Service govern your use of Pathnook, a software
               product operated by Yanhui Lin, an individual software maker based
@@ -33,7 +33,7 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold text-slate-950">2. Eligibility and adult-only accounts</h2>
+            <h2>2. Eligibility and adult-only accounts</h2>
             <p className="mt-3">
               Accounts may be created only by adults, including parents,
               guardians, or other authorized adults. You must provide accurate
@@ -44,7 +44,7 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold text-slate-950">3. Upload rights, user content, and sharing</h2>
+            <h2>3. Upload rights, user content, and sharing</h2>
             <p className="mt-3">
               You represent that you have the right to upload, review, use, and
               share the materials you submit. You keep ownership of your
@@ -57,7 +57,7 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold text-slate-950">4. AI limitations and no guarantee</h2>
+            <h2>4. AI limitations and no guarantee</h2>
             <p className="mt-3">
               Pathnook outputs are generated with AI-assisted methods and may be
               incomplete, probabilistic, or context-limited. The service does
@@ -69,7 +69,7 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold text-slate-950">5. Acceptable use and prohibited conduct</h2>
+            <h2>5. Acceptable use and prohibited conduct</h2>
             <p className="mt-3">
               You may not misuse the service, reverse engineer it except where
               law clearly permits, upload unlawful or abusive content, attempt
@@ -81,7 +81,7 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold text-slate-950">6. One-time and recurring billing</h2>
+            <h2>6. One-time and recurring billing</h2>
             <p className="mt-3">
               Paid access may include one-time diagnosis purchases and recurring
               monthly or annual plans. One-time purchases unlock a limited local
@@ -92,7 +92,7 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold text-slate-950">7. Freemius as Merchant of Record</h2>
+            <h2>7. Freemius as Merchant of Record</h2>
             <p className="mt-3">
               Freemius acts as Merchant of Record for checkout, certain tax
               handling, invoicing, payment methods, renewals, and cancellation
@@ -105,7 +105,7 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold text-slate-950">8. Refunds, access changes, and payment risk</h2>
+            <h2>8. Refunds, access changes, and payment risk</h2>
             <p className="mt-3">
               Refunds are governed by the Pathnook Refund Policy, which is
               incorporated into these terms by reference. Eligibility may depend
@@ -117,7 +117,7 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold text-slate-950">9. Service availability, changes, and termination</h2>
+            <h2>9. Service availability, changes, and termination</h2>
             <p className="mt-3">
               Pathnook may update, improve, limit, or discontinue parts of the
               service over time. We may suspend or terminate access for
@@ -129,7 +129,7 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold text-slate-950">10. Intellectual property, feedback, and exports</h2>
+            <h2>10. Intellectual property, feedback, and exports</h2>
             <p className="mt-3">
               Pathnook and its service design, software, branding, and output
               structure remain protected by applicable intellectual-property
@@ -141,7 +141,7 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold text-slate-950">11. Disclaimer of warranties and liability limits</h2>
+            <h2>11. Disclaimer of warranties and liability limits</h2>
             <p className="mt-3">
               Pathnook is provided on an &quot;as is&quot; and &quot;as available&quot; basis
               to the maximum extent permitted by law. To the extent permitted by
@@ -153,7 +153,7 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold text-slate-950">12. Governing law and dispute handling</h2>
+            <h2>12. Governing law and dispute handling</h2>
             <p className="mt-3">
               These terms are governed by the laws of Mainland China, without
               regard to conflict-of-law principles. Before filing a formal
@@ -165,7 +165,7 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold text-slate-950">13. Contact</h2>
+            <h2>13. Contact</h2>
             <p className="mt-3">
               Use <strong>{PUBLIC_CONTACT_EMAIL}</strong> for support, privacy
               requests, refund review, deletion requests, export requests, and

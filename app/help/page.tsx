@@ -58,13 +58,13 @@ const supportFaq = [
 
 export default function HelpPage() {
   return (
-    <main className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
+    <main className="pn-doc-shell max-w-[1180px]">
       <section className="max-w-3xl">
-        <p className="text-sm font-semibold uppercase tracking-[0.18em] text-sky-700">Help</p>
-        <h1 className="mt-4 text-4xl font-semibold tracking-tight text-slate-950">
+        <p className="pn-kicker">Help</p>
+        <h1 className="mt-4 text-4xl font-black tracking-tight text-[#111827]">
           Help for billing, access, refunds, and trust requests
         </h1>
-        <p className="mt-5 text-lg leading-8 text-slate-600">
+        <p className="mt-5 text-lg leading-8 text-[var(--pn-muted)]">
           Pathnook keeps the public help surface explicit: Freemius handles
           billing operations, Pathnook handles local access and product support,
           and one public inbox handles support, privacy, refund, and legal
@@ -74,15 +74,15 @@ export default function HelpPage() {
 
       <div className="mt-10 grid gap-6 lg:grid-cols-3">
         {helpCards.map((card) => (
-          <article key={card.title} className="rounded-[1.8rem] border border-slate-200 bg-white p-6 shadow-sm">
-            <h2 className="text-2xl font-semibold text-slate-950">{card.title}</h2>
-            <p className="mt-3 text-base leading-8 text-slate-600">{card.body}</p>
+          <article key={card.title} className="pn-card p-6">
+            <h2 className="text-2xl font-black text-[#111827]">{card.title}</h2>
+            <p className="mt-3 text-base leading-8 text-[var(--pn-muted)]">{card.body}</p>
             <div className="mt-5 flex flex-wrap gap-3">
               {card.links.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="rounded-full border border-slate-300 px-4 py-2 text-sm font-medium text-slate-900"
+                  className="rounded-[1rem] border border-[var(--pn-border)] px-4 py-2 text-sm font-semibold text-[var(--pn-text)]"
                 >
                   {link.label}
                 </Link>
@@ -92,15 +92,15 @@ export default function HelpPage() {
         ))}
       </div>
 
-      <section className="mt-12 rounded-[2rem] border border-slate-200 bg-slate-50 p-8">
-        <p className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-500">
+      <section className="pn-doc-card mt-12">
+        <p className="pn-kicker">
           Support FAQ
         </p>
         <div className="mt-6 space-y-4">
           {supportFaq.map((item) => (
-            <article key={item.question} className="rounded-[1.4rem] border border-slate-200 bg-white p-5">
-              <h2 className="text-xl font-semibold text-slate-950">{item.question}</h2>
-              <p className="mt-2 text-base leading-8 text-slate-600">{item.answer}</p>
+            <article key={item.question} className="rounded-[1.4rem] border border-[var(--pn-border)] bg-[linear-gradient(180deg,var(--pn-soft-2)_0%,white_100%)] p-5">
+              <h2 className="text-xl font-semibold text-[#111827]">{item.question}</h2>
+              <p className="mt-2 text-base leading-8 text-[var(--pn-muted)]">{item.answer}</p>
             </article>
           ))}
         </div>
