@@ -11,7 +11,7 @@ const footerColumns = [
     title: "Product",
     links: [
       { label: "Pricing", href: "/pricing" },
-      { label: "Sample Report", href: "/sample-report" },
+      // { label: "Sample Report", href: "/sample-report" },
       { label: "Get Started", href: "/sign-up?redirect=dashboard" },
       { label: "Sign In", href: "/sign-in" },
     ],

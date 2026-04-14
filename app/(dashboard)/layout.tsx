@@ -136,7 +136,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const isMarketingRoute =
     pathname === '/' ||
     pathname === '/pricing' ||
-    pathname === '/sample-report' ||
+    // pathname === '/sample-report' ||
     pathname === '/contact' ||
     pathname === '/help' ||
     pathname === '/faq' ||
