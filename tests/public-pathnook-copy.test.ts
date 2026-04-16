@@ -95,7 +95,7 @@ test('legal pages contain the 1.5.3 audit-critical language', () => {
   assert.equal(refundsSource.includes('unauthorized charge'), true);
 });
 
-test('billing and sample-report pages use the review-ready 1.5.3 wording', () => {
+test('billing page copy and sample-report redirect match the public site contract', () => {
   const pricingSource = normalizedSource('../app/(dashboard)/pricing/page.tsx');
   const sampleSource = normalizedSource('../app/(dashboard)/sample-report/page.tsx');
   const helpSource = normalizedSource('../app/help/page.tsx');
@@ -105,8 +105,8 @@ test('billing and sample-report pages use the review-ready 1.5.3 wording', () =>
   assert.equal(pricingSource.includes('SUBSCRIPTION_REFUND_WINDOW_DAYS'), true);
   assert.equal(pricingSource.includes('Start from Pathnook billing management'), true);
 
-  assert.equal(sampleSource.includes('product proof rather than a placeholder'), true);
-  assert.equal(sampleSource.includes('Families should be able to inspect the shape of the output before buying'), true);
+  assert.equal(sampleSource.includes('redirect("/")'), true);
+  assert.equal(sampleSource.includes('Sample report is intentionally disabled for the public site.'), true);
 
   assert.equal(helpSource.includes('Open billing management'), true);
   assert.equal(helpSource.includes('one public inbox handles support, privacy, refund, and legal questions'), true);
