@@ -97,6 +97,7 @@ test('legal pages contain the 1.5.3 audit-critical language', () => {
 
 test('billing page copy and sample-report redirect match the public site contract', () => {
   const pricingSource = normalizedSource('../app/(dashboard)/pricing/page.tsx');
+  const billingSource = normalizedSource('../app/(dashboard)/dashboard/billing/page.tsx');
   const sampleSource = normalizedSource('../app/(dashboard)/sample-report/page.tsx');
   const helpSource = normalizedSource('../app/help/page.tsx');
 
@@ -104,6 +105,25 @@ test('billing page copy and sample-report redirect match the public site contrac
   assert.equal(pricingSource.includes('ONE_TIME_REFUND_WINDOW_DAYS'), true);
   assert.equal(pricingSource.includes('SUBSCRIPTION_REFUND_WINDOW_DAYS'), true);
   assert.equal(pricingSource.includes('Start from Pathnook billing management'), true);
+  assert.equal(pricingSource.includes('Single Review'), true);
+  assert.equal(pricingSource.includes('Starter'), true);
+  assert.equal(pricingSource.includes('Plus'), true);
+  assert.equal(pricingSource.includes('Family'), true);
+  assert.equal(pricingSource.includes('Parent Weekly'), false);
+  assert.equal(pricingSource.includes('Parent Annual'), false);
+  assert.equal(pricingSource.includes('One-Time Diagnosis'), false);
+  assert.equal(pricingSource.includes('learning seats'), true);
+  assert.equal(pricingSource.includes('active subject slots'), true);
+  assert.equal(pricingSource.includes('formal review credits'), true);
+
+  assert.equal(billingSource.includes('Pathnook billing center'), true);
+  assert.equal(billingSource.includes('Learning seats'), true);
+  assert.equal(billingSource.includes('Active subject slots'), true);
+  assert.equal(billingSource.includes('Review credits remaining'), true);
+  assert.equal(billingSource.includes('Add-ons available inside billing'), true);
+  assert.equal(billingSource.includes('Parent Weekly'), false);
+  assert.equal(billingSource.includes('Parent Annual'), false);
+  assert.equal(billingSource.includes('One-Time Diagnosis'), false);
 
   assert.equal(sampleSource.includes('redirect("/")'), true);
   assert.equal(sampleSource.includes('Sample report is intentionally disabled for the public site.'), true);

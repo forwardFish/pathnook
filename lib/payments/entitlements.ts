@@ -13,17 +13,34 @@ import {
   teamMembers,
   teams,
 } from '@/lib/db/schema';
-import { BILLING_PLANS, isRecurringPlanType, type BillingPlanType } from './catalog';
+import {
+  BILLING_ADD_ONS,
+  BILLING_PLANS,
+  getBillingPlanByPriceId,
+  isAnnualBillingMode,
+  isRecurringPlanType,
+  type BillingMode,
+  type BillingPlan,
+  type BillingPlanType,
+} from './catalog';
 
 export type BillingSnapshot = {
   activePlanType: 'free' | BillingPlanType;
+  activePlanCode: BillingPlanType | null;
+  billingMode: BillingMode | null;
   planName: string | null;
   subscriptionStatus: string;
   reportCredits: number;
+  reviewCreditsRemaining: number;
+  seatLimit: number;
+  subjectSlotLimit: number;
+  reviewCreditLimit: number;
   unlockedReportIds: number[];
   accessibleReportIds: number[];
   lockedReportIds: number[];
   currentPeriodEndsAt: string | null;
+  subjectAllocationPolicy: string;
+  addOnSummary: typeof BILLING_ADD_ONS;
   plans: typeof BILLING_PLANS;
   portalAvailable: boolean;
 };
@@ -36,6 +53,7 @@ export const BILLING_COMPAT_READ_ORDER = [
 
 type BillingProjectionRow = {
   planType: string;
+  priceId?: string;
   status: string;
   reportCredits: number;
   unlockedReportIds: number[];
@@ -53,18 +71,56 @@ function normalizeUnlockedReportIds(ids: number[]) {
   ).sort((left, right) => right - left);
 }
 
-function getPlanName(planType: 'free' | BillingPlanType) {
-  if (planType === 'free') {
-    return null;
-  }
-
-  return BILLING_PLANS.find((plan) => plan.planType === planType)?.name || null;
+function getPlanForProjection(row: Pick<BillingProjectionRow, 'planType' | 'priceId'>) {
+  return getBillingPlanByPriceId(row.priceId) || BILLING_PLANS.find((plan) => plan.planType === row.planType) || null;
 }
 
 function getRecurringPlanIdsForDb() {
-  return BILLING_PLANS.filter((plan) => isRecurringPlanType(plan.planType)).map(
-    (plan) => plan.planType
+  return Array.from(
+    new Set(BILLING_PLANS.filter((plan) => isRecurringPlanType(plan.planType)).map((plan) => plan.planType))
   );
+}
+
+function getSubjectAllocationPolicy(plan: BillingPlan | null) {
+  if (!plan) {
+    return 'No active subject allocation policy yet.';
+  }
+
+  return isAnnualBillingMode(plan.billingMode)
+    ? 'Active subject slots stay managed as annual continuity capacity with a higher annual ceiling.'
+    : 'Active subject slots may be reallocated each natural month and cannot be switched infinitely inside one cycle.';
+}
+
+function buildSnapshotFromPlan(
+  plan: BillingPlan | null,
+  status: string,
+  reportCredits: number,
+  unlockedReportIds: number[],
+  accessibleReportIds: number[],
+  lockedReportIds: number[],
+  currentPeriodEndsAt: string | null,
+  portalAvailable: boolean
+): BillingSnapshot {
+  return {
+    activePlanType: plan?.planType || 'free',
+    activePlanCode: plan?.planCode || null,
+    billingMode: plan?.billingMode || null,
+    planName: plan?.name || null,
+    subscriptionStatus: status,
+    reportCredits,
+    reviewCreditsRemaining: reportCredits,
+    seatLimit: plan?.seatLimit || 0,
+    subjectSlotLimit: plan?.subjectSlotLimit || 0,
+    reviewCreditLimit: plan?.reviewCreditLimit || 0,
+    unlockedReportIds,
+    accessibleReportIds,
+    lockedReportIds,
+    currentPeriodEndsAt,
+    subjectAllocationPolicy: getSubjectAllocationPolicy(plan),
+    addOnSummary: BILLING_ADD_ONS,
+    plans: BILLING_PLANS,
+    portalAvailable,
+  };
 }
 
 function hasRecurringAccess(status: string) {
@@ -94,18 +150,16 @@ async function listUserReportIds(userId: number) {
 }
 
 function buildFreeSnapshot(allReportIds: number[]): BillingSnapshot {
-  return {
-    activePlanType: 'free',
-    planName: null,
-    subscriptionStatus: 'free',
-    reportCredits: 0,
-    unlockedReportIds: [],
-    accessibleReportIds: [],
-    lockedReportIds: allReportIds,
-    currentPeriodEndsAt: null,
-    plans: BILLING_PLANS,
-    portalAvailable: false,
-  };
+  return buildSnapshotFromPlan(
+    null,
+    'free',
+    0,
+    [],
+    [],
+    allReportIds,
+    null,
+    false
+  );
 }
 
 function getPortalAvailability(
@@ -124,84 +178,73 @@ export function projectBillingSnapshotFromEntitlements(
   providerAccounts: ProviderAccountProjection[] = []
 ): BillingSnapshot | null {
   const activeRecurring =
-    entitlementRows.find(
-      (row) =>
-        (row.planType === 'monthly' || row.planType === 'annual') &&
-        hasRecurringAccess(row.status)
-    ) || null;
+    entitlementRows.find((row) => {
+      const plan = getPlanForProjection(row);
+      return Boolean(plan && isRecurringPlanType(plan.planType) && hasRecurringAccess(row.status));
+    }) || null;
 
   if (activeRecurring) {
-    return {
-      activePlanType: activeRecurring.planType as BillingPlanType,
-      planName: getPlanName(activeRecurring.planType as BillingPlanType),
-      subscriptionStatus: activeRecurring.status,
-      reportCredits: 0,
-      unlockedReportIds: allReportIds,
-      accessibleReportIds: allReportIds,
-      lockedReportIds: [],
-      currentPeriodEndsAt: activeRecurring.currentPeriodEndsAt
+    return buildSnapshotFromPlan(
+      getPlanForProjection(activeRecurring),
+      activeRecurring.status,
+      activeRecurring.reportCredits,
+      allReportIds,
+      allReportIds,
+      [],
+      activeRecurring.currentPeriodEndsAt
         ? activeRecurring.currentPeriodEndsAt.toISOString()
         : null,
-      plans: BILLING_PLANS,
-      portalAvailable: getPortalAvailability(
-        activeRecurring.providerCustomerId,
-        providerAccounts
-      ),
-    };
+      getPortalAvailability(activeRecurring.providerCustomerId, providerAccounts)
+    );
   }
 
   const latestRecurring =
-    entitlementRows.find(
-      (row) => row.planType === 'monthly' || row.planType === 'annual'
-    ) || null;
+    entitlementRows.find((row) => {
+      const plan = getPlanForProjection(row);
+      return Boolean(plan && isRecurringPlanType(plan.planType));
+    }) || null;
 
   if (latestRecurring) {
+    const recurringPlan = getPlanForProjection(latestRecurring);
     const unlockedReportIds = normalizeUnlockedReportIds(
       latestRecurring.unlockedReportIds || []
     ).filter((reportId) => allReportIds.includes(reportId));
 
-    return {
-      activePlanType: latestRecurring.planType as BillingPlanType,
-      planName: getPlanName(latestRecurring.planType as BillingPlanType),
-      subscriptionStatus: latestRecurring.status,
-      reportCredits: 0,
+    return buildSnapshotFromPlan(
+      recurringPlan,
+      latestRecurring.status,
+      latestRecurring.reportCredits,
       unlockedReportIds,
-      accessibleReportIds: unlockedReportIds,
-      lockedReportIds: allReportIds.filter((reportId) => !unlockedReportIds.includes(reportId)),
-      currentPeriodEndsAt: latestRecurring.currentPeriodEndsAt
+      unlockedReportIds,
+      allReportIds.filter((reportId) => !unlockedReportIds.includes(reportId)),
+      latestRecurring.currentPeriodEndsAt
         ? latestRecurring.currentPeriodEndsAt.toISOString()
         : null,
-      plans: BILLING_PLANS,
-      portalAvailable: getPortalAvailability(
-        latestRecurring.providerCustomerId,
-        providerAccounts
-      ),
-    };
+      getPortalAvailability(latestRecurring.providerCustomerId, providerAccounts)
+    );
   }
 
-  const oneTime = entitlementRows.find(
-    (row) => row.planType === 'one_time' && hasOneTimeAccess(row)
-  );
+  const oneTime = entitlementRows.find((row) => {
+    const plan = getPlanForProjection(row);
+    return Boolean(plan && plan.planType === 'single_review' && hasOneTimeAccess(row));
+  });
 
   if (oneTime) {
+    const singleReviewPlan = getPlanForProjection(oneTime);
     const unlockedReportIds = normalizeUnlockedReportIds(oneTime.unlockedReportIds || []).filter(
       (reportId) => allReportIds.includes(reportId)
     );
 
-    return {
-      activePlanType: 'one_time',
-      planName: getPlanName('one_time'),
-      subscriptionStatus: oneTime.status,
-      reportCredits: oneTime.reportCredits,
+    return buildSnapshotFromPlan(
+      singleReviewPlan,
+      oneTime.status,
+      oneTime.reportCredits,
       unlockedReportIds,
-      accessibleReportIds: unlockedReportIds,
-      lockedReportIds: allReportIds.filter((reportId) => !unlockedReportIds.includes(reportId)),
-      currentPeriodEndsAt: oneTime.currentPeriodEndsAt
-        ? oneTime.currentPeriodEndsAt.toISOString()
-        : null,
-      plans: BILLING_PLANS,
-      portalAvailable: getPortalAvailability(oneTime.providerCustomerId, providerAccounts),
-    };
+      unlockedReportIds,
+      allReportIds.filter((reportId) => !unlockedReportIds.includes(reportId)),
+      oneTime.currentPeriodEndsAt ? oneTime.currentPeriodEndsAt.toISOString() : null,
+      getPortalAvailability(oneTime.providerCustomerId, providerAccounts)
+    );
   }
 
   return null;
@@ -391,7 +434,7 @@ async function applyCreditsToLegacyOneTimeSubscription(userId: number) {
   const rows = await db
     .select()
     .from(subscriptions)
-    .where(and(eq(subscriptions.userId, userId), eq(subscriptions.planType, 'one_time')))
+    .where(and(eq(subscriptions.userId, userId), eq(subscriptions.planType, 'single_review')))
     .orderBy(desc(subscriptions.updatedAt))
     .limit(1);
 
@@ -471,22 +514,18 @@ async function buildSnapshotFromLegacy(userId: number): Promise<BillingSnapshot>
           (recurringSubscription.unlockedReportIds as number[] | undefined) || []
         ).filter((reportId) => allReportIds.includes(reportId));
 
-    return {
-      activePlanType: recurringSubscription.planType as BillingPlanType,
-      planName: getPlanName(recurringSubscription.planType as BillingPlanType),
-      subscriptionStatus: recurringSubscription.status,
-      reportCredits: 0,
+    return buildSnapshotFromPlan(
+      getBillingPlanByPriceId(recurringSubscription.priceId),
+      recurringSubscription.status,
+      recurringSubscription.reportCredits,
       unlockedReportIds,
-      accessibleReportIds: unlockedReportIds,
-      lockedReportIds: allReportIds.filter((reportId) => !unlockedReportIds.includes(reportId)),
-      currentPeriodEndsAt: recurringSubscription.currentPeriodEndsAt
+      unlockedReportIds,
+      allReportIds.filter((reportId) => !unlockedReportIds.includes(reportId)),
+      recurringSubscription.currentPeriodEndsAt
         ? recurringSubscription.currentPeriodEndsAt.toISOString()
         : null,
-      plans: BILLING_PLANS,
-      portalAvailable: Boolean(
-        recurringSubscription.stripeCustomerId || legacyTeamBilling?.stripeCustomerId
-      ),
-    };
+      Boolean(recurringSubscription.stripeCustomerId || legacyTeamBilling?.stripeCustomerId)
+    );
   }
 
   const unlockedReportIds = normalizeUnlockedReportIds(
@@ -494,22 +533,18 @@ async function buildSnapshotFromLegacy(userId: number): Promise<BillingSnapshot>
   ).filter((reportId) => allReportIds.includes(reportId));
 
   if (oneTimeSubscription) {
-    return {
-      activePlanType: 'one_time',
-      planName: getPlanName('one_time'),
-      subscriptionStatus: oneTimeSubscription.status,
-      reportCredits: oneTimeSubscription.reportCredits,
+    return buildSnapshotFromPlan(
+      getBillingPlanByPriceId(oneTimeSubscription.priceId),
+      oneTimeSubscription.status,
+      oneTimeSubscription.reportCredits,
       unlockedReportIds,
-      accessibleReportIds: unlockedReportIds,
-      lockedReportIds: allReportIds.filter((reportId) => !unlockedReportIds.includes(reportId)),
-      currentPeriodEndsAt: oneTimeSubscription.currentPeriodEndsAt
+      unlockedReportIds,
+      allReportIds.filter((reportId) => !unlockedReportIds.includes(reportId)),
+      oneTimeSubscription.currentPeriodEndsAt
         ? oneTimeSubscription.currentPeriodEndsAt.toISOString()
         : null,
-      plans: BILLING_PLANS,
-      portalAvailable: Boolean(
-        oneTimeSubscription.stripeCustomerId || legacyTeamBilling?.stripeCustomerId
-      ),
-    };
+      Boolean(oneTimeSubscription.stripeCustomerId || legacyTeamBilling?.stripeCustomerId)
+    );
   }
 
   return buildFreeSnapshot(allReportIds);
@@ -521,6 +556,7 @@ export async function getBillingSnapshotFromEntitlements(userId: number): Promis
     db
       .select({
         planType: billingEntitlements.planType,
+        priceId: billingEntitlements.priceId,
         status: billingEntitlements.status,
         reportCredits: billingEntitlements.reportCredits,
         unlockedReportIds: billingEntitlements.unlockedReportIds,

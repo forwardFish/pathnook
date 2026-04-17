@@ -1,14 +1,31 @@
-import { BILLING_PLANS, type BillingPlanType } from './catalog';
+import {
+  BILLING_ADD_ONS,
+  BILLING_PLANS,
+  getBillingPlanByPriceId,
+  isAnnualBillingMode,
+  isRecurringPlanType,
+  type BillingMode,
+  type BillingPlan,
+  type BillingPlanType,
+} from './catalog';
 
 export type BillingSnapshot = {
   activePlanType: 'free' | BillingPlanType;
+  activePlanCode: BillingPlanType | null;
+  billingMode: BillingMode | null;
   planName: string | null;
   subscriptionStatus: string;
   reportCredits: number;
+  reviewCreditsRemaining: number;
+  seatLimit: number;
+  subjectSlotLimit: number;
+  reviewCreditLimit: number;
   unlockedReportIds: number[];
   accessibleReportIds: number[];
   lockedReportIds: number[];
   currentPeriodEndsAt: string | null;
+  subjectAllocationPolicy: string;
+  addOnSummary: typeof BILLING_ADD_ONS;
   plans: typeof BILLING_PLANS;
   portalAvailable: boolean;
 };
@@ -21,6 +38,7 @@ export const BILLING_COMPAT_READ_ORDER = [
 
 export type BillingProjectionRow = {
   planType: string;
+  priceId?: string;
   status: string;
   reportCredits: number;
   unlockedReportIds: number[];
@@ -38,14 +56,6 @@ function normalizeUnlockedReportIds(ids: number[]) {
   ).sort((left, right) => right - left);
 }
 
-function getPlanName(planType: 'free' | BillingPlanType) {
-  if (planType === 'free') {
-    return null;
-  }
-
-  return BILLING_PLANS.find((plan) => plan.planType === planType)?.name || null;
-}
-
 function hasRecurringAccess(status: string) {
   return status === 'active' || status === 'trialing' || status === 'scheduled_cancel';
 }
@@ -58,18 +68,53 @@ function hasOneTimeAccess(row: BillingProjectionRow) {
   return row.reportCredits > 0 || hasRetainedHistoricalAccess(row) || row.status !== 'expired';
 }
 
-function buildFreeSnapshot(allReportIds: number[]): BillingSnapshot {
+function getPlanForProjection(row: Pick<BillingProjectionRow, 'planType' | 'priceId'>) {
+  return (
+    getBillingPlanByPriceId(row.priceId) ||
+    BILLING_PLANS.find((plan) => plan.planType === row.planType) ||
+    null
+  );
+}
+
+function getSubjectAllocationPolicy(plan: BillingPlan | null) {
+  if (!plan) {
+    return 'No active subject allocation policy yet.';
+  }
+
+  return isAnnualBillingMode(plan.billingMode)
+    ? 'Active subject slots stay managed as annual continuity capacity with a higher annual ceiling.'
+    : 'Active subject slots may be reallocated each natural month and cannot be switched infinitely inside one cycle.';
+}
+
+function buildSnapshotFromPlan(
+  plan: BillingPlan | null,
+  status: string,
+  reportCredits: number,
+  unlockedReportIds: number[],
+  accessibleReportIds: number[],
+  lockedReportIds: number[],
+  currentPeriodEndsAt: string | null,
+  portalAvailable: boolean
+): BillingSnapshot {
   return {
-    activePlanType: 'free',
-    planName: null,
-    subscriptionStatus: 'free',
-    reportCredits: 0,
-    unlockedReportIds: [],
-    accessibleReportIds: [],
-    lockedReportIds: allReportIds,
-    currentPeriodEndsAt: null,
+    activePlanType: plan?.planType || 'free',
+    activePlanCode: plan?.planCode || null,
+    billingMode: plan?.billingMode || null,
+    planName: plan?.name || null,
+    subscriptionStatus: status,
+    reportCredits,
+    reviewCreditsRemaining: reportCredits,
+    seatLimit: plan?.seatLimit || 0,
+    subjectSlotLimit: plan?.subjectSlotLimit || 0,
+    reviewCreditLimit: plan?.reviewCreditLimit || 0,
+    unlockedReportIds,
+    accessibleReportIds,
+    lockedReportIds,
+    currentPeriodEndsAt,
+    subjectAllocationPolicy: getSubjectAllocationPolicy(plan),
+    addOnSummary: BILLING_ADD_ONS,
     plans: BILLING_PLANS,
-    portalAvailable: false,
+    portalAvailable,
   };
 }
 
@@ -83,93 +128,91 @@ function getPortalAvailability(
   );
 }
 
+export function buildFreeSnapshot(allReportIds: number[]): BillingSnapshot {
+  return buildSnapshotFromPlan(
+    null,
+    'free',
+    0,
+    [],
+    [],
+    allReportIds,
+    null,
+    false
+  );
+}
+
 export function projectBillingSnapshotFromEntitlements(
   allReportIds: number[],
   entitlementRows: BillingProjectionRow[],
   providerAccounts: ProviderAccountProjection[] = []
 ): BillingSnapshot | null {
   const activeRecurring =
-    entitlementRows.find(
-      (row) =>
-        (row.planType === 'monthly' || row.planType === 'annual') &&
-        hasRecurringAccess(row.status)
-    ) || null;
+    entitlementRows.find((row) => {
+      const plan = getPlanForProjection(row);
+      return Boolean(plan && isRecurringPlanType(plan.planType) && hasRecurringAccess(row.status));
+    }) || null;
 
   if (activeRecurring) {
-    return {
-      activePlanType: activeRecurring.planType as BillingPlanType,
-      planName: getPlanName(activeRecurring.planType as BillingPlanType),
-      subscriptionStatus: activeRecurring.status,
-      reportCredits: 0,
-      unlockedReportIds: allReportIds,
-      accessibleReportIds: allReportIds,
-      lockedReportIds: [],
-      currentPeriodEndsAt: activeRecurring.currentPeriodEndsAt
+    return buildSnapshotFromPlan(
+      getPlanForProjection(activeRecurring),
+      activeRecurring.status,
+      activeRecurring.reportCredits,
+      allReportIds,
+      allReportIds,
+      [],
+      activeRecurring.currentPeriodEndsAt
         ? activeRecurring.currentPeriodEndsAt.toISOString()
         : null,
-      plans: BILLING_PLANS,
-      portalAvailable: getPortalAvailability(
-        activeRecurring.providerCustomerId,
-        providerAccounts
-      ),
-    };
+      getPortalAvailability(activeRecurring.providerCustomerId, providerAccounts)
+    );
   }
 
   const latestRecurring =
-    entitlementRows.find(
-      (row) => row.planType === 'monthly' || row.planType === 'annual'
-    ) || null;
+    entitlementRows.find((row) => {
+      const plan = getPlanForProjection(row);
+      return Boolean(plan && isRecurringPlanType(plan.planType));
+    }) || null;
 
   if (latestRecurring) {
     const unlockedReportIds = normalizeUnlockedReportIds(
       latestRecurring.unlockedReportIds || []
     ).filter((reportId) => allReportIds.includes(reportId));
 
-    return {
-      activePlanType: latestRecurring.planType as BillingPlanType,
-      planName: getPlanName(latestRecurring.planType as BillingPlanType),
-      subscriptionStatus: latestRecurring.status,
-      reportCredits: 0,
+    return buildSnapshotFromPlan(
+      getPlanForProjection(latestRecurring),
+      latestRecurring.status,
+      latestRecurring.reportCredits,
       unlockedReportIds,
-      accessibleReportIds: unlockedReportIds,
-      lockedReportIds: allReportIds.filter((reportId) => !unlockedReportIds.includes(reportId)),
-      currentPeriodEndsAt: latestRecurring.currentPeriodEndsAt
+      unlockedReportIds,
+      allReportIds.filter((reportId) => !unlockedReportIds.includes(reportId)),
+      latestRecurring.currentPeriodEndsAt
         ? latestRecurring.currentPeriodEndsAt.toISOString()
         : null,
-      plans: BILLING_PLANS,
-      portalAvailable: getPortalAvailability(
-        latestRecurring.providerCustomerId,
-        providerAccounts
-      ),
-    };
+      getPortalAvailability(latestRecurring.providerCustomerId, providerAccounts)
+    );
   }
 
-  const oneTime = entitlementRows.find(
-    (row) => row.planType === 'one_time' && hasOneTimeAccess(row)
-  );
+  const oneTime = entitlementRows.find((row) => {
+    const plan = getPlanForProjection(row);
+    return Boolean(plan && plan.planType === 'single_review' && hasOneTimeAccess(row));
+  });
 
   if (oneTime) {
     const unlockedReportIds = normalizeUnlockedReportIds(oneTime.unlockedReportIds || []).filter(
       (reportId) => allReportIds.includes(reportId)
     );
 
-    return {
-      activePlanType: 'one_time',
-      planName: getPlanName('one_time'),
-      subscriptionStatus: oneTime.status,
-      reportCredits: oneTime.reportCredits,
+    return buildSnapshotFromPlan(
+      getPlanForProjection(oneTime),
+      oneTime.status,
+      oneTime.reportCredits,
       unlockedReportIds,
-      accessibleReportIds: unlockedReportIds,
-      lockedReportIds: allReportIds.filter((reportId) => !unlockedReportIds.includes(reportId)),
-      currentPeriodEndsAt: oneTime.currentPeriodEndsAt
-        ? oneTime.currentPeriodEndsAt.toISOString()
-        : null,
-      plans: BILLING_PLANS,
-      portalAvailable: getPortalAvailability(oneTime.providerCustomerId, providerAccounts),
-    };
+      unlockedReportIds,
+      allReportIds.filter((reportId) => !unlockedReportIds.includes(reportId)),
+      oneTime.currentPeriodEndsAt ? oneTime.currentPeriodEndsAt.toISOString() : null,
+      getPortalAvailability(oneTime.providerCustomerId, providerAccounts)
+    );
   }
 
   return null;
 }
-
-export { buildFreeSnapshot };

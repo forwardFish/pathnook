@@ -1,8 +1,12 @@
 import Link from 'next/link';
 import { checkoutAction, customerPortalAction } from '@/lib/payments/actions';
+import {
+  BILLING_ADD_ONS,
+  formatBillingInterval,
+  getPublicBillingPlanGroups,
+} from '@/lib/payments/catalog';
 import { getUser } from '@/lib/db/queries';
 import { getBillingSnapshotForUser } from '@/lib/family/billing';
-import { formatBillingInterval, isRecurringPlanType } from '@/lib/payments/catalog';
 import { getPortalSupportLabel } from '@/lib/payments/service';
 import { FREEMIUS_BILLING_ROLE_LINE, PUBLIC_CONTACT_EMAIL } from '@/lib/site/public-trust';
 import { Button } from '@/components/ui/button';
@@ -18,19 +22,23 @@ type PageProps = {
 
 function getCheckoutMessage(checkout: string | undefined, plan: string | undefined) {
   if (checkout === 'success') {
-    if (plan === 'annual') {
-      return 'Parent Annual is active. The full report path is unlocked for the year.';
+    if (plan === 'family') {
+      return 'Family is active. The household now has the highest seat, subject, and review-credit ceiling.';
     }
 
-    if (plan === 'monthly') {
-      return 'Parent Weekly is active. All current reports should now be unlocked.';
+    if (plan === 'plus') {
+      return 'Plus is active. Multi-subject tracking, tutor-ready sharing, and deeper review continuity are now unlocked.';
     }
 
-    return 'One-Time Diagnosis credit was applied. The latest locked report unlocks automatically.';
+    if (plan === 'starter') {
+      return 'Starter is active. The account now has recurring seats, active subject slots, and monthly review credits.';
+    }
+
+    return 'Single Review was applied. The next formal diagnosis path can now unlock against the available review credit.';
   }
 
   if (checkout === 'cancelled') {
-    return 'Checkout was canceled. Reports stay locked until a payment completes.';
+    return 'Checkout was canceled. Billing and local entitlements stay unchanged until a payment completes.';
   }
 
   if (checkout === 'invalid') {
@@ -53,11 +61,13 @@ export default async function BillingPage({ searchParams }: PageProps) {
 
   const snapshot = await getBillingSnapshotForUser(user.id);
   const checkoutMessage = getCheckoutMessage(params.checkout, params.plan);
-  const hasRecurringPlan = isRecurringPlanType(snapshot.activePlanType);
   const renewalLabel =
     snapshot.currentPeriodEndsAt ||
-    (hasRecurringPlan ? 'Renews in the Freemius portal' : 'Not applicable');
-  const portalCta = snapshot.portalAvailable ? getPortalSupportLabel() : 'Open Freemius billing portal';
+    (snapshot.billingMode && snapshot.billingMode !== 'one_time'
+      ? 'Renews in the Freemius billing portal'
+      : 'Not applicable');
+  const portalCta = snapshot.portalAvailable ? getPortalSupportLabel() : 'Open Freemius Billing Portal';
+  const planGroups = getPublicBillingPlanGroups();
 
   return (
     <section className="flex-1 space-y-6 p-4 lg:p-8">
@@ -66,7 +76,7 @@ export default async function BillingPage({ searchParams }: PageProps) {
           Billing
         </p>
         <h1 className="text-3xl font-semibold tracking-tight text-gray-900">
-          Billing and account management
+          Pathnook billing center
         </h1>
         <p className="mt-2 max-w-3xl text-sm text-gray-600">
           {FREEMIUS_BILLING_ROLE_LINE}
@@ -88,46 +98,62 @@ export default async function BillingPage({ searchParams }: PageProps) {
         </Card>
       ) : null}
 
-      <div className="grid gap-6 xl:grid-cols-[1.2fr,0.8fr]">
+      <div className="grid gap-6 xl:grid-cols-[1.1fr,0.9fr]">
         <Card>
           <CardHeader>
             <CardTitle>Current account snapshot</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4 text-sm text-gray-700">
-            <div className="rounded-2xl bg-gray-50 p-4">
-              <p className="font-medium text-gray-900">Current plan</p>
-              <p className="mt-1">{snapshot.planName || 'Free setup state'}</p>
-            </div>
-            <div className="rounded-2xl bg-gray-50 p-4">
-              <p className="font-medium text-gray-900">Status</p>
-              <p className="mt-1">{snapshot.subscriptionStatus}</p>
-            </div>
-            <div className="rounded-2xl bg-gray-50 p-4">
-              <p className="font-medium text-gray-900">Renewal or period end</p>
-              <p className="mt-1">{renewalLabel}</p>
-            </div>
-            <div className="rounded-2xl bg-gray-50 p-4">
-              <p className="font-medium text-gray-900">Unlocked reports</p>
-              <p className="mt-1">{snapshot.accessibleReportIds.length}</p>
-            </div>
-            <div className="rounded-2xl bg-gray-50 p-4">
-              <p className="font-medium text-gray-900">Historical access retained</p>
-              <p className="mt-1">
-                {snapshot.accessibleReportIds.length > 0
-                  ? 'Yes, previously unlocked items remain visible according to local entitlement rules.'
-                  : 'No retained reports yet.'}
-              </p>
-            </div>
-            <div className="rounded-2xl bg-gray-50 p-4">
-              <p className="font-medium text-gray-900">Locked reports</p>
-              <p className="mt-1">{snapshot.lockedReportIds.length}</p>
-            </div>
-            <div className="rounded-2xl bg-gray-50 p-4">
-              <p className="font-medium text-gray-900">One-time credits remaining</p>
-              <p className="mt-1">{snapshot.reportCredits}</p>
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="rounded-2xl bg-gray-50 p-4">
+                <p className="font-medium text-gray-900">Current plan</p>
+                <p className="mt-1">{snapshot.planName || 'Free setup state'}</p>
+              </div>
+              <div className="rounded-2xl bg-gray-50 p-4">
+                <p className="font-medium text-gray-900">Status</p>
+                <p className="mt-1">{snapshot.subscriptionStatus}</p>
+              </div>
+              <div className="rounded-2xl bg-gray-50 p-4">
+                <p className="font-medium text-gray-900">Learning seats</p>
+                <p className="mt-1">{snapshot.seatLimit}</p>
+              </div>
+              <div className="rounded-2xl bg-gray-50 p-4">
+                <p className="font-medium text-gray-900">Active subject slots</p>
+                <p className="mt-1">{snapshot.subjectSlotLimit}</p>
+              </div>
+              <div className="rounded-2xl bg-gray-50 p-4">
+                <p className="font-medium text-gray-900">Review credits remaining</p>
+                <p className="mt-1">{snapshot.reviewCreditsRemaining}</p>
+              </div>
+              <div className="rounded-2xl bg-gray-50 p-4">
+                <p className="font-medium text-gray-900">Renewal or period end</p>
+                <p className="mt-1">{renewalLabel}</p>
+              </div>
             </div>
 
-            {hasRecurringPlan ? (
+            <div className="rounded-2xl bg-gray-50 p-4">
+              <p className="font-medium text-gray-900">Subject allocation policy</p>
+              <p className="mt-1">{snapshot.subjectAllocationPolicy}</p>
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-3">
+              <div className="rounded-2xl bg-gray-50 p-4">
+                <p className="font-medium text-gray-900">Accessible reports</p>
+                <p className="mt-1">{snapshot.accessibleReportIds.length}</p>
+              </div>
+              <div className="rounded-2xl bg-gray-50 p-4">
+                <p className="font-medium text-gray-900">Historical access retained</p>
+                <p className="mt-1">
+                  {snapshot.accessibleReportIds.length > 0 ? 'Yes' : 'No retained reports yet'}
+                </p>
+              </div>
+              <div className="rounded-2xl bg-gray-50 p-4">
+                <p className="font-medium text-gray-900">Locked reports</p>
+                <p className="mt-1">{snapshot.lockedReportIds.length}</p>
+              </div>
+            </div>
+
+            {snapshot.portalAvailable ? (
               <form action={customerPortalAction}>
                 <Button type="submit" variant="outline" className="w-full">
                   {portalCta}
@@ -136,13 +162,38 @@ export default async function BillingPage({ searchParams }: PageProps) {
             ) : null}
 
             <div className="rounded-2xl border border-slate-200 bg-white p-4">
+              <p className="font-medium text-slate-950">Add-ons available inside billing</p>
+              <div className="mt-3 grid gap-3 md:grid-cols-3">
+                <div className="rounded-xl bg-slate-50 p-3">
+                  <p className="font-medium text-slate-950">
+                    Add seat
+                  </p>
+                  <p className="mt-1 text-xs leading-6 text-slate-600">
+                    +${(BILLING_ADD_ONS.seat.monthly / 100).toFixed(0)} / month or +${(BILLING_ADD_ONS.seat.annual / 100).toFixed(0)} / year
+                  </p>
+                </div>
+                <div className="rounded-xl bg-slate-50 p-3">
+                  <p className="font-medium text-slate-950">Add subject slot</p>
+                  <p className="mt-1 text-xs leading-6 text-slate-600">
+                    +${(BILLING_ADD_ONS.subjectSlot.monthly / 100).toFixed(0)} / month or +${(BILLING_ADD_ONS.subjectSlot.annual / 100).toFixed(0)} / year
+                  </p>
+                </div>
+                <div className="rounded-xl bg-slate-50 p-3">
+                  <p className="font-medium text-slate-950">Extra review credits</p>
+                  <p className="mt-1 text-xs leading-6 text-slate-600">
+                    {BILLING_ADD_ONS.extraReviewCredits.map((pack) => `$${(pack.unitAmount / 100).toFixed(0)} / ${pack.pack}`).join(' · ')}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="rounded-2xl border border-slate-200 bg-white p-4">
               <p className="font-medium text-slate-950">Cancellation and support</p>
               <p className="mt-2 text-sm leading-7 text-slate-600">
-                This page is Pathnook billing management. Review local access and
-                entitlements here, then open the Freemius billing portal when you
-                need invoices, payment-method updates, renewals, or cancellation.
-                For refund review, entitlement questions, or access mismatches,
-                contact Pathnook directly.
+                Review local entitlements here, then open the Freemius billing portal
+                when you need invoices, payment-method updates, renewals, or cancellation.
+                For refund review, entitlement questions, or access mismatches, contact
+                Pathnook directly.
               </p>
               <div className="mt-4 flex flex-wrap gap-3">
                 <Button asChild variant="outline" size="sm">
@@ -165,43 +216,68 @@ export default async function BillingPage({ searchParams }: PageProps) {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm leading-7 text-slate-600">
-              <p className="font-medium text-slate-950">Freemius billing portal</p>
+              <p className="font-medium text-slate-950">Pathnook pricing ladder</p>
               <p className="mt-2">
-                Renewals, invoices, payment methods, and subscription
-                cancellation are handled through Freemius. Pathnook keeps your
-                report access, billing history, and plan effects in sync locally
-                after payment events arrive.
+                Billing now scales by learner seats, active subject slots, and formal
+                review credits. Add-ons expand capacity after a household is already on
+                a recurring plan.
               </p>
             </div>
 
-            {snapshot.plans.map((plan) => (
-              <div key={plan.priceId} className="rounded-2xl border border-gray-200 p-4">
+            {planGroups.map((group) => (
+              <div key={group.planCode} className="rounded-2xl border border-gray-200 p-4">
                 <div className="flex items-start justify-between gap-4">
                   <div>
-                    <p className="text-sm font-medium text-gray-900">{plan.name}</p>
-                    <p className="mt-1 text-sm text-gray-600">{plan.description}</p>
+                    <p className="text-sm font-medium text-gray-900">{group.name}</p>
+                    <p className="mt-1 text-sm text-gray-600">{group.summaryLine}</p>
                   </div>
-                  {plan.badge ? (
+                  {group.badge ? (
                     <span className="rounded-full bg-orange-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-orange-700">
-                      {plan.badge}
+                      {group.badge}
                     </span>
                   ) : null}
                 </div>
-                <p className="mt-3 text-sm text-gray-700">
-                  ${plan.unitAmount / 100}{' '}
-                  <span className="text-gray-500">{formatBillingInterval(plan.interval)}</span>
-                </p>
-                <form action={checkoutAction} className="mt-4">
-                  <input type="hidden" name="priceId" value={plan.priceId} />
-                  <Button type="submit" className="w-full">
-                    {plan.ctaLabel}
-                  </Button>
-                </form>
+
+                {group.oneTime ? (
+                  <form action={checkoutAction} className="mt-4 rounded-xl border border-slate-200 p-3">
+                    <p className="text-sm font-medium text-slate-950">
+                      ${group.oneTime.unitAmount / 100} {formatBillingInterval(group.oneTime.interval)}
+                    </p>
+                    <input type="hidden" name="priceId" value={group.oneTime.priceId} />
+                    <Button type="submit" className="mt-3 w-full">
+                      {group.oneTime.ctaLabel}
+                    </Button>
+                  </form>
+                ) : null}
+
+                {group.monthly ? (
+                  <form action={checkoutAction} className="mt-4 rounded-xl border border-slate-200 p-3">
+                    <p className="text-sm font-medium text-slate-950">
+                      ${group.monthly.unitAmount / 100} {formatBillingInterval(group.monthly.interval)}
+                    </p>
+                    <input type="hidden" name="priceId" value={group.monthly.priceId} />
+                    <Button type="submit" className="mt-3 w-full">
+                      {group.monthly.ctaLabel}
+                    </Button>
+                  </form>
+                ) : null}
+
+                {group.annual ? (
+                  <form action={checkoutAction} className="mt-3 rounded-xl border border-slate-200 bg-slate-50 p-3">
+                    <p className="text-sm font-medium text-slate-950">
+                      ${group.annual.unitAmount / 100} {formatBillingInterval(group.annual.interval)}
+                    </p>
+                    <input type="hidden" name="priceId" value={group.annual.priceId} />
+                    <Button type="submit" variant="outline" className="mt-3 w-full">
+                      {group.annual.ctaLabel}
+                    </Button>
+                  </form>
+                ) : null}
               </div>
             ))}
 
             <Button asChild variant="outline" className="w-full">
-              <Link href="/pricing">View Public Pricing</Link>
+              <Link href="/pricing">View public pricing</Link>
             </Button>
           </CardContent>
         </Card>

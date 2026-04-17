@@ -16,8 +16,11 @@ import type {
   StoredSubscription,
 } from '@/lib/family/types';
 import {
+  BILLING_ADD_ONS,
   BILLING_PLANS,
   getBillingPlanByPriceId,
+  getPlanNameByType,
+  isAnnualBillingMode,
   isRecurringPlanType,
   type BillingPlanType,
 } from '@/lib/payments/catalog';
@@ -110,7 +113,7 @@ function getTeamSubscriptionStatus(snapshot: BillingSnapshot) {
   if (isRecurringPlanType(snapshot.activePlanType)) {
     return snapshot.subscriptionStatus;
   }
-  if (snapshot.activePlanType === 'one_time') {
+  if (snapshot.activePlanType === 'single_review') {
     return snapshot.accessibleReportIds.length > 0 || snapshot.reportCredits > 0
       ? 'active'
       : 'expired';
@@ -119,11 +122,53 @@ function getTeamSubscriptionStatus(snapshot: BillingSnapshot) {
 }
 
 function getPlanName(planType: 'free' | BillingPlanType) {
-  if (planType === 'free') {
-    return null;
+  return getPlanNameByType(planType);
+}
+
+function getSubjectAllocationPolicy(priceId: string | null | undefined) {
+  const plan = getBillingPlanByPriceId(priceId);
+  if (!plan) {
+    return 'No active subject allocation policy yet.';
   }
 
-  return BILLING_PLANS.find((plan) => plan.planType === planType)?.name || null;
+  return isAnnualBillingMode(plan.billingMode)
+    ? 'Active subject slots stay managed as annual continuity capacity with a higher annual ceiling.'
+    : 'Active subject slots may be reallocated each natural month and cannot be switched infinitely inside one cycle.';
+}
+
+function buildBillingSnapshotFromPlan(options: {
+  activePlanType: 'free' | BillingPlanType;
+  priceId?: string | null;
+  subscriptionStatus: string;
+  reportCredits: number;
+  unlockedReportIds: number[];
+  accessibleReportIds: number[];
+  lockedReportIds: number[];
+  currentPeriodEndsAt: string | null;
+  portalAvailable: boolean;
+}): BillingSnapshot {
+  const plan = getBillingPlanByPriceId(options.priceId);
+
+  return {
+    activePlanType: options.activePlanType,
+    activePlanCode: plan?.planCode || null,
+    billingMode: plan?.billingMode || null,
+    planName: getPlanName(options.activePlanType),
+    subscriptionStatus: options.subscriptionStatus,
+    reportCredits: options.reportCredits,
+    reviewCreditsRemaining: options.reportCredits,
+    seatLimit: plan?.seatLimit || 0,
+    subjectSlotLimit: plan?.subjectSlotLimit || 0,
+    reviewCreditLimit: plan?.reviewCreditLimit || 0,
+    unlockedReportIds: options.unlockedReportIds,
+    accessibleReportIds: options.accessibleReportIds,
+    lockedReportIds: options.lockedReportIds,
+    currentPeriodEndsAt: options.currentPeriodEndsAt,
+    subjectAllocationPolicy: getSubjectAllocationPolicy(options.priceId),
+    addOnSummary: BILLING_ADD_ONS,
+    plans: BILLING_PLANS,
+    portalAvailable: options.portalAvailable,
+  };
 }
 
 function getUserReportIdsFromState(state: FamilyMockState, userId: number) {
@@ -168,7 +213,7 @@ function getRecurringPlanIdsForDb() {
 
 function applyCreditsToDemoSubscription(state: FamilyMockState, userId: number) {
   const subscription = state.subscriptions
-    .filter((item) => item.userId === userId && item.planType === 'one_time')
+    .filter((item) => item.userId === userId && item.planType === 'single_review')
     .sort((left, right) => right.updatedAt.localeCompare(left.updatedAt))[0];
 
   if (!subscription || subscription.reportCredits <= 0) {
@@ -203,18 +248,17 @@ function buildSnapshotFromDemoState(state: FamilyMockState, userId: number): Bil
   const allReportIds = getUserReportIdsFromState(state, userId);
 
   if (recurringSubscription) {
-    return {
+    return buildBillingSnapshotFromPlan({
       activePlanType: recurringSubscription.planType,
-      planName: getPlanName(recurringSubscription.planType),
+      priceId: recurringSubscription.priceId,
       subscriptionStatus: recurringSubscription.status,
-      reportCredits: 0,
+      reportCredits: recurringSubscription.reportCredits,
       unlockedReportIds: allReportIds,
       accessibleReportIds: allReportIds,
       lockedReportIds: [],
       currentPeriodEndsAt: recurringSubscription.currentPeriodEndsAt,
-      plans: BILLING_PLANS,
       portalAvailable: Boolean(recurringSubscription.stripeCustomerId),
-    };
+    });
   }
 
   const unlockedReportIds = normalizeUnlockedReportIds(
@@ -223,32 +267,29 @@ function buildSnapshotFromDemoState(state: FamilyMockState, userId: number): Bil
   const lockedReportIds = allReportIds.filter((reportId) => !unlockedReportIds.includes(reportId));
 
   if (oneTimeSubscription) {
-    return {
-      activePlanType: 'one_time',
-      planName: getPlanName('one_time'),
+    return buildBillingSnapshotFromPlan({
+      activePlanType: 'single_review',
+      priceId: oneTimeSubscription.priceId,
       subscriptionStatus: oneTimeSubscription.status,
       reportCredits: oneTimeSubscription.reportCredits,
       unlockedReportIds,
       accessibleReportIds: unlockedReportIds,
       lockedReportIds,
       currentPeriodEndsAt: oneTimeSubscription.currentPeriodEndsAt,
-      plans: BILLING_PLANS,
       portalAvailable: Boolean(oneTimeSubscription.stripeCustomerId),
-    };
+    });
   }
 
-  return {
+  return buildBillingSnapshotFromPlan({
     activePlanType: 'free',
-    planName: null,
     subscriptionStatus: 'free',
     reportCredits: 0,
     unlockedReportIds: [],
     accessibleReportIds: [],
     lockedReportIds: allReportIds,
     currentPeriodEndsAt: null,
-    plans: BILLING_PLANS,
     portalAvailable: false,
-  };
+  });
 }
 
 async function getUserTeamId(userId: number) {
@@ -264,7 +305,7 @@ async function getUserTeamId(userId: number) {
 function cancelOtherDemoRecurringSubscriptions(
   state: FamilyMockState,
   userId: number,
-  activePlanType: Extract<BillingPlanType, 'monthly' | 'annual'>
+  activePlanType: BillingPlanType
 ) {
   for (const subscription of state.subscriptions) {
     if (
@@ -297,7 +338,7 @@ async function applyCreditsToDbSubscription(userId: number) {
   const rows = await db
     .select()
     .from(subscriptions)
-    .where(and(eq(subscriptions.userId, userId), eq(subscriptions.planType, 'one_time')))
+    .where(and(eq(subscriptions.userId, userId), eq(subscriptions.planType, 'single_review')))
     .orderBy(desc(subscriptions.updatedAt))
     .limit(1);
 
@@ -352,20 +393,19 @@ async function buildSnapshotFromDb(userId: number): Promise<BillingSnapshot> {
   const allReportIds = await listUserReportIds(userId);
 
   if (recurringSubscription) {
-    return {
+    return buildBillingSnapshotFromPlan({
       activePlanType: recurringSubscription.planType as BillingPlanType,
-      planName: getPlanName(recurringSubscription.planType as BillingPlanType),
+      priceId: recurringSubscription.priceId,
       subscriptionStatus: recurringSubscription.status,
-      reportCredits: 0,
+      reportCredits: recurringSubscription.reportCredits,
       unlockedReportIds: allReportIds,
       accessibleReportIds: allReportIds,
       lockedReportIds: [],
       currentPeriodEndsAt: recurringSubscription.currentPeriodEndsAt
         ? recurringSubscription.currentPeriodEndsAt.toISOString()
         : null,
-      plans: BILLING_PLANS,
       portalAvailable: Boolean(recurringSubscription.stripeCustomerId),
-    };
+    });
   }
 
   const unlockedReportIds = normalizeUnlockedReportIds(
@@ -374,9 +414,9 @@ async function buildSnapshotFromDb(userId: number): Promise<BillingSnapshot> {
   const lockedReportIds = allReportIds.filter((reportId) => !unlockedReportIds.includes(reportId));
 
   if (oneTimeSubscription) {
-    return {
-      activePlanType: 'one_time',
-      planName: getPlanName('one_time'),
+    return buildBillingSnapshotFromPlan({
+      activePlanType: 'single_review',
+      priceId: oneTimeSubscription.priceId,
       subscriptionStatus: oneTimeSubscription.status,
       reportCredits: oneTimeSubscription.reportCredits,
       unlockedReportIds,
@@ -385,23 +425,20 @@ async function buildSnapshotFromDb(userId: number): Promise<BillingSnapshot> {
       currentPeriodEndsAt: oneTimeSubscription.currentPeriodEndsAt
         ? oneTimeSubscription.currentPeriodEndsAt.toISOString()
         : null,
-      plans: BILLING_PLANS,
       portalAvailable: Boolean(oneTimeSubscription.stripeCustomerId),
-    };
+    });
   }
 
-  return {
+  return buildBillingSnapshotFromPlan({
     activePlanType: 'free',
-    planName: null,
     subscriptionStatus: 'free',
     reportCredits: 0,
     unlockedReportIds: [],
     accessibleReportIds: [],
     lockedReportIds: allReportIds,
     currentPeriodEndsAt: null,
-    plans: BILLING_PLANS,
     portalAvailable: false,
-  };
+  });
 }
 
 export async function getBillingSnapshotForUser(userId: number): Promise<BillingSnapshot> {
@@ -445,7 +482,7 @@ function upsertDemoSubscription(
         : 'active';
     existing.currentPeriodEndsAt = input.currentPeriodEndsAt || null;
     existing.updatedAt = nowIso();
-    if (plan.planType === 'one_time') {
+    if (plan.planType === 'single_review') {
       existing.reportCredits += 1;
     }
     if (isRecurringPlanType(plan.planType)) {
@@ -468,7 +505,7 @@ function upsertDemoSubscription(
     stripeCustomerId: input.stripeCustomerId || null,
     stripeSubscriptionId: input.stripeSubscriptionId || null,
     checkoutSessionId: input.checkoutSessionId,
-    reportCredits: plan.planType === 'one_time' ? 1 : 0,
+    reportCredits: plan.planType === 'single_review' ? 1 : 0,
     unlockedReportIds: [],
     currentPeriodEndsAt: input.currentPeriodEndsAt || null,
     createdAt: nowIso(),
@@ -514,7 +551,7 @@ async function upsertDbSubscription(input: CheckoutCompletionInput) {
         stripeSubscriptionId: input.stripeSubscriptionId || existing.stripeSubscriptionId,
         checkoutSessionId: input.checkoutSessionId,
         reportCredits:
-          plan.planType === 'one_time'
+          plan.planType === 'single_review'
             ? existing.reportCredits + 1
             : existing.reportCredits,
         currentPeriodEndsAt: input.currentPeriodEndsAt
@@ -577,7 +614,7 @@ async function upsertDbSubscription(input: CheckoutCompletionInput) {
       stripeCustomerId: input.stripeCustomerId || null,
       stripeSubscriptionId: input.stripeSubscriptionId || null,
       checkoutSessionId: input.checkoutSessionId,
-      reportCredits: plan.planType === 'one_time' ? 1 : 0,
+      reportCredits: plan.planType === 'single_review' ? 1 : 0,
       unlockedReportIds: [],
       currentPeriodEndsAt: input.currentPeriodEndsAt
         ? new Date(input.currentPeriodEndsAt)
@@ -644,7 +681,7 @@ export async function applyCheckoutCompletionForUser(input: CheckoutCompletionIn
   });
   const plan = getBillingPlanByPriceId(input.priceId);
   const normalizedSubscription =
-    plan?.planType === 'one_time'
+    plan?.planType === 'single_review'
       ? await applyCreditsToDbSubscription(input.userId)
       : persistedSubscription;
 
@@ -782,7 +819,7 @@ export async function processBillingWebhookEvent(input: BillingWebhookInput) {
   });
 
   const persisted =
-    plan.planType === 'one_time'
+    plan.planType === 'single_review'
       ? await applyCreditsToDbSubscription(input.userId)
       : (
           await db

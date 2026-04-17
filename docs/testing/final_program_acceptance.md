@@ -47,6 +47,9 @@ Program-level test IDs:
 - `FP-BILL14-002`: Provider/data/entitlement foundation sweep
 - `FP-BILL14-003`: Checkout/portal/webhook/compatibility route sweep
 - `FP-BILL14-004`: Pathnook public-brand and billing-center release sweep
+- `FP-BILL155-001`: Pricing v2 ladder and public-surface consistency sweep
+- `FP-BILL155-002`: Plan mapping and entitlement snapshot sweep
+- `FP-BILL155-003`: Billing-center add-on and copy-contract sweep
 - `FP-HOME15-001`: 1.5 homepage traceability audit against `HOME15-*` requirements
 - `FP-HOME15-002`: Homepage narrative and positioning sweep
 - `FP-HOME15-003`: Homepage public-surface, FAQ, footer, and linked-route sweep
@@ -91,6 +94,11 @@ Program-level test IDs:
 - Re-run `CLICK-BILL14-001` through `CLICK-BILL14-004` from `docs/testing/click_path_matrix.md`.
 - Re-run `API-BILL14-001` through `API-BILL14-009`, `DATA-BILL14-001` through `DATA-BILL14-006`, and `NF-BILL14-001` through `NF-BILL14-003` from `docs/testing/api_data_ai_test_matrix.md`.
 - Collect checkout, portal, webhook replay, entitlement diff, public-brand, billing-center, and public-route smoke evidence for the v6 lane.
+
+### Suite I - Pricing V2 Extension
+- Re-run the pricing-v2 catalog assertions, public-copy regression assertions, and billing-center UI contract assertions.
+- Verify `Single Review / Starter / Plus / Family` renders consistently across `/pricing` and `/dashboard/billing`.
+- Verify seat limits, subject-slot limits, review-credit counts, add-on copy, and monthly-vs-annual subject ceilings are all reflected in the local billing snapshot output.
 
 ### Suite I - Homepage Display Rewrite Lane
 - Re-run `TC-HOME15-001` through `TC-HOME15-008` from `docs/testing/governance_test_matrix.md`.

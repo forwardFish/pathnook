@@ -61,6 +61,10 @@ export function isCreemRollbackEnabled() {
   );
 }
 
+export function isCreemRoutesEnabled() {
+  return readEnabledFlag('FEATURE_CREEM_ROUTES') ?? false;
+}
+
 function getBillingProviderByName(name: BillingProviderName) {
   return providers[name];
 }

@@ -14,7 +14,11 @@ import {
   Target,
   Upload,
 } from "lucide-react";
-import { BILLING_PLANS, formatBillingInterval, getAnnualSavings } from "@/lib/payments/catalog";
+import {
+  formatBillingInterval,
+  getAnnualSavings,
+  getPublicBillingPlanGroups,
+} from "@/lib/payments/catalog";
 import { Button } from "@/components/ui/button";
 
 const proofPoints = [
@@ -151,7 +155,7 @@ function SectionIntro({
 }
 
 export function FamilyLandingPage() {
-  const annualSavings = getAnnualSavings();
+  const pricingGroups = getPublicBillingPlanGroups();
 
   return (
     <main className="pn-page-shell overflow-x-clip">
@@ -346,48 +350,68 @@ export function FamilyLandingPage() {
         <SectionIntro
           eyebrow="Pricing"
           title="Simple pricing."
-          body="Start with one diagnosis or choose ongoing access. Billing and cancellation are handled through Freemius."
+          body="Start with one review or choose the recurring tier that matches your seat count, active subjects, and monthly review depth."
         />
 
-        <div className="mt-10 grid gap-6 lg:grid-cols-3">
-          {BILLING_PLANS.map((plan) => (
+        <div className="mt-10 grid gap-6 lg:grid-cols-4">
+          {pricingGroups.map((group) => {
+            const primaryPlan = group.oneTime || group.monthly || group.annual;
+            if (!primaryPlan) {
+              return null;
+            }
+
+            return (
             <article
-              key={plan.priceId}
+              key={group.planCode}
               className={`relative flex h-full flex-col rounded-[1.75rem] border bg-white p-7 shadow-[0_12px_40px_rgba(15,23,42,0.06)] ${
-                plan.featured
+                group.featured
                   ? "border-[#c4b5fd] shadow-[0_18px_48px_rgba(124,58,237,0.14)]"
                   : "border-[var(--pn-border)]"
               }`}
             >
-              {plan.badge ? (
+              {group.badge ? (
                 <span className="absolute right-0 top-0 rounded-bl-[1rem] bg-[linear-gradient(90deg,var(--pn-indigo),var(--pn-violet))] px-4 py-2 text-xs font-black uppercase tracking-[0.04em] text-white">
-                  {plan.badge}
+                  {group.badge}
                 </span>
               ) : null}
               <div className="text-2xl font-black tracking-[-0.03em] text-[#111827]">
-                {plan.name}
+                {group.name}
               </div>
-              <div className="mt-4 text-5xl font-black tracking-[-0.05em] text-[#111827]">
-                ${plan.unitAmount / 100}
-              </div>
-              <div className="mt-1 text-sm font-semibold text-[var(--pn-muted)]">
-                {formatBillingInterval(plan.interval)}
+              <div className="mt-4 space-y-2">
+                <div>
+                  <div className="text-5xl font-black tracking-[-0.05em] text-[#111827]">
+                    ${primaryPlan.unitAmount / 100}
+                  </div>
+                  <div className="mt-1 text-sm font-semibold text-[var(--pn-muted)]">
+                    {formatBillingInterval(primaryPlan.interval)}
+                  </div>
+                </div>
+                {group.monthly && group.annual ? (
+                  <div className="rounded-[1rem] bg-[var(--pn-soft-2)] px-4 py-3 text-sm text-[var(--pn-muted-2)]">
+                    <div>
+                      Monthly: ${group.monthly.unitAmount / 100} · {group.monthly.summaryLine}
+                    </div>
+                    <div className="mt-1">
+                      Annual: ${group.annual.unitAmount / 100} · {group.annual.summaryLine}
+                    </div>
+                  </div>
+                ) : null}
               </div>
               <p className="mt-4 min-h-[4.5rem] text-sm leading-7 text-[var(--pn-muted)]">
-                {plan.description}
+                {group.description}
               </p>
-              {plan.planType === "annual" ? (
+              {group.annual && group.planCode !== "single_review" ? (
                 <p className="mt-1 text-sm font-semibold text-[var(--pn-violet)]">
-                  Saves ${(annualSavings / 100).toFixed(0)} compared with 12 monthly renewals.
+                  Saves ${(getAnnualSavings(group.planCode) / 100).toFixed(0)} compared with 12 monthly renewals.
                 </p>
               ) : null}
-              {plan.planType === "one_time" ? (
+              {group.oneTime ? (
                 <p className="mt-1 text-sm text-[var(--pn-muted)]">
                   Limited early access: first review discount may apply at checkout.
                 </p>
               ) : null}
               <ul className="mt-5 grid gap-3 text-sm leading-7 text-[var(--pn-muted-2)]">
-                {plan.features.map((feature) => (
+                {primaryPlan.features.map((feature) => (
                   <li key={feature} className="flex items-start gap-3">
                     <Check className="mt-1 h-4 w-4 flex-none text-[var(--pn-violet)]" />
                     <span>{feature}</span>
@@ -397,14 +421,14 @@ export function FamilyLandingPage() {
               <div className="mt-6">
                 <Button
                   asChild
-                  variant={plan.featured ? "default" : "outline"}
+                  variant={group.featured ? "default" : "outline"}
                   className="h-12 w-full rounded-[1rem] text-base"
                 >
-                  <Link href="/pricing">{plan.ctaLabel}</Link>
+                  <Link href="/pricing">{primaryPlan.ctaLabel}</Link>
                 </Button>
               </div>
             </article>
-          ))}
+          )})}
         </div>
       </section>
 

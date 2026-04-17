@@ -4,15 +4,16 @@ import { getUser } from '@/lib/db/queries';
 import { getBillingPlanByPriceId } from '@/lib/payments/catalog';
 import {
   getBillingRedirectCompletionPayload,
+  isCreemRoutesEnabled,
   verifyBillingRedirectSignature,
 } from '@/lib/payments/service';
 
-function getDemoCurrentPeriodEnd(planType: string) {
-  if (planType === 'monthly') {
+function getDemoCurrentPeriodEnd(interval: 'once' | 'month' | 'year') {
+  if (interval === 'month') {
     return new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
   }
 
-  if (planType === 'annual') {
+  if (interval === 'year') {
     return new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString();
   }
 
@@ -20,6 +21,10 @@ function getDemoCurrentPeriodEnd(planType: string) {
 }
 
 export async function GET(request: NextRequest) {
+  if (!isCreemRoutesEnabled()) {
+    return NextResponse.json({ error: 'Creem checkout route is disabled.' }, { status: 404 });
+  }
+
   const searchParams = request.nextUrl.searchParams;
   const checkoutId = searchParams.get('checkout_id');
   const priceIdParam = searchParams.get('priceId');
@@ -47,7 +52,7 @@ export async function GET(request: NextRequest) {
       checkoutSessionId: checkoutId,
       provider: 'demo',
       status: 'active',
-      currentPeriodEndsAt: getDemoCurrentPeriodEnd(plan.planType),
+      currentPeriodEndsAt: getDemoCurrentPeriodEnd(plan.interval),
     });
 
     return NextResponse.redirect(

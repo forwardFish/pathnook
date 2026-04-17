@@ -9,6 +9,7 @@
 - `docs/需求文档_1.4.md`
 - Version: `v1.4-freemius-primary-billing`
 - Scope: Pathnook public-brand cutover, Freemius-primary billing architecture, local entitlement control, and Creem compatibility retention.
+- Extension: `docs/需求文档_1.5.5_pathnook_pricing_v2.md` now acts as the pricing-v2 overlay for the public ladder, billing-center snapshot, and plan-to-provider mapping work inside this lane.
 
 ## Sprint Overview
 
@@ -26,6 +27,7 @@
 - Existing accepted backlog roots remain immutable references; v6 may add only new stories, traceability rows, regression coverage, and continuity switches.
 - Every story keeps `execution_policy: continuous_full_sprint`, `interaction_policy: non_interactive_auto_run`, and `workflow_enforcement_policy: strict_agentsystem`.
 - Sprint 28 closes only when the public Pathnook copy, Freemius-first billing entry points, entitlement mapping, compatibility layer, and regression evidence are all green.
+- Pricing v2 is part of Sprint 28 release quality: the public ladder must reflect `Single Review / Starter / Plus / Family`, expose seat/subject/review semantics, and keep billing-center copy in sync with the same plan model.
 
 ## Inheritance Rules
 - Reuse accepted billing shell, auth shell, and report paywall behavior from `backlog_v1` as the starting point for checkout and unlock UX.

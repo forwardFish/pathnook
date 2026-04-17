@@ -1,4 +1,4 @@
-import { BILLING_CYCLE, type PurchaseData } from '@freemius/sdk';
+import { type PurchaseData } from '@freemius/sdk';
 import {
   getFreemiusClientOrThrow,
   getFreemiusPricingIdByPriceId,
@@ -7,6 +7,7 @@ import {
   isFreemiusConfigured,
   isFreemiusSandboxMode,
 } from '../freemius-client';
+import { getBillingPlanByPriceId } from '../catalog';
 import type {
   BillingProvider,
   CheckoutCompletionPayload,
@@ -73,18 +74,6 @@ function getCompletionPayloadFromPurchase(
   };
 }
 
-function getPricingCycle(planType: HostedCheckoutSession['planType']) {
-  if (planType === 'monthly') {
-    return BILLING_CYCLE.MONTHLY;
-  }
-
-  if (planType === 'annual') {
-    return BILLING_CYCLE.YEARLY;
-  }
-
-  return null;
-}
-
 export const freemiusProvider: BillingProvider = {
   name: 'freemius',
   isConfigured: isFreemiusConfigured,
@@ -98,19 +87,7 @@ export const freemiusProvider: BillingProvider = {
 
     const freemius = getFreemiusClientOrThrow();
     const pricingId = getFreemiusPricingIdByPriceId(priceId);
-    const plan = getInternalPlanFromFreemiusPurchase(
-      {
-        pricingId,
-        billingCycle: getPricingCycle(
-          priceId === 'price_fe_one_time'
-            ? 'one_time'
-            : priceId === 'price_fe_monthly'
-              ? 'monthly'
-              : 'annual'
-        ),
-      } as PurchaseData,
-      priceId
-    );
+    const plan = getBillingPlanByPriceId(priceId);
 
     if (!pricingId || !plan) {
       throw new Error(`Freemius pricing is not mapped for ${priceId}.`);
@@ -153,7 +130,7 @@ export const freemiusProvider: BillingProvider = {
     );
 
     if (!portal?.link) {
-      throw new Error('Freemius customer portal is unavailable for this account.');
+      throw new Error('Freemius billing portal is unavailable for this account.');
     }
 
     return {

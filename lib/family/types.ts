@@ -287,7 +287,7 @@ export type StoredShareLink = {
   revokedAt: string | null;
 };
 
-export type BillingPlanType = 'one_time' | 'monthly' | 'annual';
+export type BillingPlanType = 'single_review' | 'starter' | 'plus' | 'family';
 
 export type StoredSubscription = {
   id: number;

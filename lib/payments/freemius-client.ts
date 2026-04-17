@@ -1,5 +1,10 @@
 import { BILLING_CYCLE, Freemius, type PurchaseData } from '@freemius/sdk';
-import { getBillingPlanByPriceId, type BillingPlan, type BillingPlanType } from './catalog';
+import {
+  getBillingPlanByPriceId,
+  type BillingMode,
+  type BillingPlan,
+  type BillingPlanCode,
+} from './catalog';
 
 function readRequiredEnv(name: string) {
   const value = process.env[name];
@@ -13,6 +18,19 @@ function readBooleanEnv(name: string) {
   }
 
   return ['1', 'true', 'yes', 'on'].includes(value.trim().toLowerCase());
+}
+
+function readPricingEnv(planCode: BillingPlanCode, billingMode: BillingMode) {
+  if (planCode === 'single_review') {
+    return (
+      readRequiredEnv('FREEMIUS_PRICING_SINGLE_REVIEW_ID') ||
+      readRequiredEnv('FREEMIUS_PRICING_ONE_TIME_ID')
+    );
+  }
+
+  const prefix = `FREEMIUS_PRICING_${planCode.toUpperCase()}`;
+  const cadence = billingMode === 'monthly' ? 'MONTHLY' : 'ANNUAL';
+  return readRequiredEnv(`${prefix}_${cadence}_ID`);
 }
 
 export function isFreemiusConfigured() {
@@ -48,21 +66,8 @@ export function isFreemiusSandboxMode() {
   return readBooleanEnv('FREEMIUS_SANDBOX_MODE');
 }
 
-function getPricingIdFromEnv(planType: BillingPlanType) {
-  switch (planType) {
-    case 'one_time':
-      return readRequiredEnv('FREEMIUS_PRICING_ONE_TIME_ID');
-    case 'monthly':
-      return readRequiredEnv('FREEMIUS_PRICING_MONTHLY_ID');
-    case 'annual':
-      return readRequiredEnv('FREEMIUS_PRICING_ANNUAL_ID');
-    default:
-      return null;
-  }
-}
-
 export function getFreemiusPricingIdForPlan(plan: BillingPlan) {
-  return getPricingIdFromEnv(plan.planType);
+  return readPricingEnv(plan.planCode, plan.billingMode);
 }
 
 export function getFreemiusPricingIdByPriceId(priceId: string) {
@@ -80,22 +85,28 @@ export function getInternalPlanByFreemiusPricingId(pricingId: string | null | un
   }
 
   return (
-    (['one_time', 'monthly', 'annual'] as BillingPlanType[])
-      .map((planType) => {
-        const internalPlan = getBillingPlanByPriceId(
-          planType === 'one_time'
-            ? 'price_fe_one_time'
-            : planType === 'monthly'
-              ? 'price_fe_monthly'
-              : 'price_fe_annual'
-        );
-
-        return internalPlan && getFreemiusPricingIdForPlan(internalPlan) === pricingId
-          ? internalPlan
-          : null;
-      })
-      .find(Boolean) || null
+    BILLING_PLANS.find((plan) => getFreemiusPricingIdForPlan(plan) === pricingId) || null
   );
+}
+
+function inferPlanFromBillingCycle(purchase: Pick<PurchaseData, 'billingCycle'>) {
+  if (purchase.billingCycle === BILLING_CYCLE.MONTHLY) {
+    return (
+      getBillingPlanByPriceId('price_pathnook_starter_monthly') ||
+      getBillingPlanByPriceId('price_pathnook_plus_monthly') ||
+      getBillingPlanByPriceId('price_pathnook_family_monthly')
+    );
+  }
+
+  if (purchase.billingCycle === BILLING_CYCLE.YEARLY) {
+    return (
+      getBillingPlanByPriceId('price_pathnook_starter_annual') ||
+      getBillingPlanByPriceId('price_pathnook_plus_annual') ||
+      getBillingPlanByPriceId('price_pathnook_family_annual')
+    );
+  }
+
+  return getBillingPlanByPriceId('price_pathnook_single_review');
 }
 
 export function getInternalPlanFromFreemiusPurchase(
@@ -112,13 +123,15 @@ export function getInternalPlanFromFreemiusPurchase(
     return fallbackPlan;
   }
 
-  if (purchase.billingCycle === BILLING_CYCLE.MONTHLY) {
-    return getBillingPlanByPriceId('price_fe_monthly');
-  }
-
-  if (purchase.billingCycle === BILLING_CYCLE.YEARLY) {
-    return getBillingPlanByPriceId('price_fe_annual');
-  }
-
-  return getBillingPlanByPriceId('price_fe_one_time');
+  return inferPlanFromBillingCycle(purchase);
 }
+
+export const BILLING_PLANS = [
+  getBillingPlanByPriceId('price_pathnook_single_review'),
+  getBillingPlanByPriceId('price_pathnook_starter_monthly'),
+  getBillingPlanByPriceId('price_pathnook_starter_annual'),
+  getBillingPlanByPriceId('price_pathnook_plus_monthly'),
+  getBillingPlanByPriceId('price_pathnook_plus_annual'),
+  getBillingPlanByPriceId('price_pathnook_family_monthly'),
+  getBillingPlanByPriceId('price_pathnook_family_annual'),
+].filter((plan): plan is BillingPlan => Boolean(plan));

@@ -14,14 +14,15 @@ test('Compat read order stays provider-neutral first and legacy last', () => {
   ]);
 });
 
-test('Active recurring plans unlock all current reports', () => {
+test('Active recurring plans project seat, subject, and review limits', () => {
   const snapshot = projectBillingSnapshotFromEntitlements(
     [31, 22, 11],
     [
       {
-        planType: 'monthly',
+        planType: 'starter',
+        priceId: 'price_pathnook_starter_monthly',
         status: 'active',
-        reportCredits: 0,
+        reportCredits: 4,
         unlockedReportIds: [],
         currentPeriodEndsAt: new Date('2026-05-01T00:00:00.000Z'),
         providerCustomerId: 'cus_active',
@@ -29,35 +30,43 @@ test('Active recurring plans unlock all current reports', () => {
     ]
   );
 
-  assert.equal(snapshot?.activePlanType, 'monthly');
+  assert.equal(snapshot?.activePlanType, 'starter');
+  assert.equal(snapshot?.billingMode, 'monthly');
+  assert.equal(snapshot?.seatLimit, 2);
+  assert.equal(snapshot?.subjectSlotLimit, 3);
+  assert.equal(snapshot?.reviewCreditsRemaining, 4);
   assert.deepEqual(snapshot?.accessibleReportIds, [31, 22, 11]);
   assert.equal(snapshot?.portalAvailable, true);
 });
 
-test('Annual upgrade wins when it is the newest active recurring entitlement', () => {
+test('Higher recurring tier wins when it is the newest active entitlement', () => {
   const snapshot = projectBillingSnapshotFromEntitlements(
     [18, 9],
     [
       {
-        planType: 'annual',
+        planType: 'family',
+        priceId: 'price_pathnook_family_annual',
         status: 'active',
-        reportCredits: 0,
+        reportCredits: 16,
         unlockedReportIds: [18, 9],
         currentPeriodEndsAt: new Date('2027-01-01T00:00:00.000Z'),
-        providerCustomerId: 'cus_annual',
+        providerCustomerId: 'cus_family',
       },
       {
-        planType: 'monthly',
+        planType: 'starter',
+        priceId: 'price_pathnook_starter_monthly',
         status: 'canceled',
-        reportCredits: 0,
+        reportCredits: 4,
         unlockedReportIds: [18],
         currentPeriodEndsAt: new Date('2026-04-20T00:00:00.000Z'),
-        providerCustomerId: 'cus_monthly',
+        providerCustomerId: 'cus_starter',
       },
     ]
   );
 
-  assert.equal(snapshot?.activePlanType, 'annual');
+  assert.equal(snapshot?.activePlanType, 'family');
+  assert.equal(snapshot?.billingMode, 'annual');
+  assert.equal(snapshot?.subjectSlotLimit, 24);
   assert.equal(snapshot?.subscriptionStatus, 'active');
   assert.deepEqual(snapshot?.accessibleReportIds, [18, 9]);
 });
@@ -67,9 +76,10 @@ test('Expired recurring entitlement keeps historical unlocked reports only', () 
     [101, 88, 77],
     [
       {
-        planType: 'monthly',
+        planType: 'plus',
+        priceId: 'price_pathnook_plus_monthly',
         status: 'expired',
-        reportCredits: 0,
+        reportCredits: 8,
         unlockedReportIds: [101, 77],
         currentPeriodEndsAt: new Date('2026-04-01T00:00:00.000Z'),
         providerCustomerId: null,
@@ -78,19 +88,21 @@ test('Expired recurring entitlement keeps historical unlocked reports only', () 
     [{ providerCustomerId: 'cus_portal_only' }]
   );
 
-  assert.equal(snapshot?.activePlanType, 'monthly');
+  assert.equal(snapshot?.activePlanType, 'plus');
   assert.equal(snapshot?.subscriptionStatus, 'expired');
+  assert.equal(snapshot?.seatLimit, 4);
   assert.deepEqual(snapshot?.accessibleReportIds, [101, 77]);
   assert.deepEqual(snapshot?.lockedReportIds, [88]);
   assert.equal(snapshot?.portalAvailable, true);
 });
 
-test('Expired one-time entitlement still keeps unlocked report history', () => {
+test('Single Review keeps one-time report history and no recurring entitlement', () => {
   const snapshot = projectBillingSnapshotFromEntitlements(
     [14, 7, 3],
     [
       {
-        planType: 'one_time',
+        planType: 'single_review',
+        priceId: 'price_pathnook_single_review',
         status: 'expired',
         reportCredits: 0,
         unlockedReportIds: [7, 3],
@@ -100,7 +112,10 @@ test('Expired one-time entitlement still keeps unlocked report history', () => {
     ]
   );
 
-  assert.equal(snapshot?.activePlanType, 'one_time');
+  assert.equal(snapshot?.activePlanType, 'single_review');
+  assert.equal(snapshot?.billingMode, 'one_time');
+  assert.equal(snapshot?.seatLimit, 1);
+  assert.equal(snapshot?.subjectSlotLimit, 1);
   assert.deepEqual(snapshot?.accessibleReportIds, [7, 3]);
 });
 

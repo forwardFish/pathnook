@@ -73,7 +73,7 @@ export const completeDemoCheckoutAction = withTeam(async (formData) => {
     priceId,
     checkoutSessionId: sessionId,
     provider: 'demo',
-    status: plan.planType === 'one_time' ? 'active' : 'active',
+    status: 'active',
     currentPeriodEndsAt: getCurrentPeriodEndIso(plan.interval),
   });
 
