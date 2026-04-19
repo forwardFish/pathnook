@@ -53,7 +53,7 @@ export const labeledProblemItemSchema = canonicalProblemItemSchema.extend({
 
 export const canonicalExtractionBundleSchema = z.object({
   runId: z.number().int().positive(),
-  engine: z.enum(['demo', 'openai', 'mathpix']),
+  engine: z.string().min(1),
   modelVersion: z.string().min(1),
   pages: z.array(canonicalExtractionPageSchema).min(1),
   labeledItems: z.array(labeledProblemItemSchema).min(1),

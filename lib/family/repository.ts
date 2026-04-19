@@ -17,6 +17,7 @@ import {
   recordRunCostArtifact,
   removeRunCostArtifacts,
 } from '@/lib/observability/cost-tracking';
+import { removeModelRuntimeArtifacts } from '@/lib/observability/model-runtime';
 import {
   recordRunErrorEvent,
   recordRunLifecycleEvent,
@@ -132,7 +133,8 @@ async function recordRunTelemetryTransition(args: {
 async function recordRunCompletionArtifacts(args: {
   run: StoredRun;
   bundle: CanonicalExtractionBundle;
-  engine: 'openai' | 'mathpix';
+  engine: string;
+  executionMetadata?: Record<string, unknown>;
 }) {
   await recordRunLifecycleEvent({
     runId: args.run.id,
@@ -147,6 +149,7 @@ async function recordRunCompletionArtifacts(args: {
       confidence: args.run.overallConfidence,
       reviewReason: args.run.needsReviewReason,
       engine: args.engine,
+      ...(args.executionMetadata || {}),
     },
   });
 
@@ -160,6 +163,8 @@ async function recordRunCompletionArtifacts(args: {
     metadata: {
       confidence: args.run.overallConfidence,
       reviewReason: args.run.needsReviewReason,
+      engine: args.engine,
+      ...(args.executionMetadata || {}),
     },
   });
 }
@@ -200,6 +205,7 @@ async function deleteDemoUploadCascade(state: FamilyMockState, userId: number, u
     childIds: [upload.childId],
   });
   await removeRunObservabilityArtifacts(runIds);
+  await removeModelRuntimeArtifacts(runIds);
   await removeRunCostArtifacts(runIds);
 
   logMockActivity(
@@ -515,7 +521,8 @@ async function finalizeDemoRunWithExtraction(
     }
 
   const pageRecords = state.pages.filter((page) => page.uploadId === run.uploadId);
-  const bundle = await processRunExtraction({
+  await removeModelRuntimeArtifacts([run.id]);
+  const extractionResult = await processRunExtraction({
     runId: run.id,
     pages: pageRecords.map((page) => ({
       id: page.id,
@@ -532,6 +539,7 @@ async function finalizeDemoRunWithExtraction(
     })),
     preferMathpix: options?.preferMathpix,
   });
+  const bundle = extractionResult.bundle;
 
   const reviewReason = options?.reviewOverride || bundle.reviewReason;
   run.overallConfidence = bundle.overallConfidence;
@@ -564,7 +572,13 @@ async function finalizeDemoRunWithExtraction(
       requiresReview: Boolean(reviewReason),
       reviewReason,
     },
-    engine: options?.preferMathpix ? 'mathpix' : 'openai',
+    engine: extractionResult.execution.engine,
+    executionMetadata: {
+      fallbackApplied: extractionResult.execution.fallbackApplied,
+      attemptCount: extractionResult.execution.attemptCount,
+      taskType: extractionResult.execution.taskType,
+      modelVersion: extractionResult.execution.modelVersion,
+    },
   });
 
     return {
@@ -574,6 +588,7 @@ async function finalizeDemoRunWithExtraction(
         reviewReason,
       },
       report,
+      execution: extractionResult.execution,
     };
   }
 
@@ -997,6 +1012,16 @@ export async function deleteUploadForUser(userId: number, uploadId: number) {
       : [];
   const reportIds = reportRows.map((report) => report.id);
 
+  await purgeReminderEvents({
+    userId,
+    reportIds,
+    childIds: [uploadRecord.upload.childId],
+  });
+
+  await removeRunObservabilityArtifacts(runIds);
+  await removeModelRuntimeArtifacts(runIds);
+  await removeRunCostArtifacts(runIds);
+
   if (reportIds.length > 0) {
     await db.delete(shareLinks).where(inArray(shareLinks.reportId, reportIds));
     await db.delete(reports).where(inArray(reports.id, reportIds));
@@ -1022,13 +1047,6 @@ export async function deleteUploadForUser(userId: number, uploadId: number) {
     ...uploadRecord.files.map((file) => file.storagePath),
     ...uploadRecord.pages.map((page) => page.storagePath),
   ]);
-  await purgeReminderEvents({
-    userId,
-    reportIds,
-    childIds: [uploadRecord.upload.childId],
-  });
-  await removeRunObservabilityArtifacts(runIds);
-  await removeRunCostArtifacts(runIds);
 
   return {
     uploadId,
@@ -1051,13 +1069,14 @@ export async function deleteReportForUser(userId: number, reportId: number) {
   const runId = Number((reportRecord as any).runId ?? (reportRecord as any).run?.id ?? 0);
   const childId = Number((reportRecord as any).childId ?? (reportRecord as any).run?.childId ?? 0);
 
-  await db.delete(shareLinks).where(eq(shareLinks.reportId, reportId));
-  await db.delete(reports).where(eq(reports.id, reportId));
   await purgeReminderEvents({
     userId,
     reportIds: [reportId],
     childIds: childId > 0 ? [childId] : [],
   });
+
+  await db.delete(shareLinks).where(eq(shareLinks.reportId, reportId));
+  await db.delete(reports).where(eq(reports.id, reportId));
 
   return {
     reportId,
@@ -1305,18 +1324,28 @@ export async function submitUploadForUser(userId: number, uploadId: number) {
     });
   }
 
+  const [uploadRecord] = await db
+    .select({
+      id: uploads.id,
+      childId: uploads.childId,
+      sourceType: uploads.sourceType,
+      totalPages: uploads.totalPages,
+      status: uploads.status,
+    })
+    .from(uploads)
+    .where(and(eq(uploads.id, uploadId), eq(uploads.userId, userId)))
+    .limit(1);
+
+  if (!uploadRecord) {
+    return null;
+  }
+
   const [run] = await db
     .insert(analysisRuns)
     .values({
       userId,
-      childId: (
-        await db
-          .select({ childId: uploads.childId })
-          .from(uploads)
-          .where(and(eq(uploads.id, uploadId), eq(uploads.userId, userId)))
-          .limit(1)
-      )[0].childId,
-      uploadId,
+      childId: uploadRecord.childId,
+      uploadId: uploadRecord.id,
       status: 'queued',
       stage: 'queued',
       progressPercent: 0,
@@ -1332,7 +1361,7 @@ export async function submitUploadForUser(userId: number, uploadId: number) {
       submittedAt: new Date(),
       updatedAt: new Date(),
     })
-    .where(and(eq(uploads.id, uploadId), eq(uploads.userId, userId)));
+    .where(and(eq(uploads.id, uploadRecord.id), eq(uploads.userId, userId)));
 
   await recordRunLifecycleEvent({
     runId: run.id,
@@ -1348,6 +1377,7 @@ export async function submitUploadForUser(userId: number, uploadId: number) {
 
   return {
     ...run,
+    upload: uploadRecord,
     reportId: null,
   };
 }
@@ -1448,7 +1478,7 @@ export async function processRunForUser(
         run: updatedRun,
         bundle: result.bundle,
         reportId: updatedRun?.reportId ?? result.report?.id ?? null,
-        requestedEngine,
+        requestedEngine: result.execution?.engine || requestedEngine,
       };
     });
   }
@@ -1478,7 +1508,8 @@ export async function processRunForUser(
     .limit(1);
 
   const pageRecords = await db.select().from(pages).where(eq(pages.uploadId, run.uploadId));
-  const bundle = await processRunExtraction({
+  await removeModelRuntimeArtifacts([run.id]);
+  const extractionResult = await processRunExtraction({
     runId: run.id,
     pages: pageRecords.map((page) => ({
       id: page.id,
@@ -1496,6 +1527,7 @@ export async function processRunForUser(
     preferMathpix:
       options?.preferMathpix || Boolean(upload?.notes?.toLowerCase().includes('mathpix')),
   });
+  const bundle = extractionResult.bundle;
 
   const forcedReviewReason = getForcedReviewReason(upload?.notes, pageRecords);
   const reviewReason = forcedReviewReason || bundle.reviewReason;
@@ -1636,7 +1668,14 @@ export async function processRunForUser(
       requiresReview: Boolean(reviewReason),
       reviewReason,
     },
-    engine: requestedEngine,
+    engine: extractionResult.execution.engine,
+    executionMetadata: {
+      requestedEngine,
+      fallbackApplied: extractionResult.execution.fallbackApplied,
+      attemptCount: extractionResult.execution.attemptCount,
+      taskType: extractionResult.execution.taskType,
+      modelVersion: extractionResult.execution.modelVersion,
+    },
   });
 
   const refreshedRun = await getRunForUser(userId, runId);
@@ -1648,7 +1687,7 @@ export async function processRunForUser(
       reviewReason,
     },
     reportId: refreshedRun?.reportId ?? null,
-    requestedEngine,
+    requestedEngine: extractionResult.execution.engine,
   };
 }
 
@@ -1747,20 +1786,30 @@ export async function getReportForUser(userId: number, reportId: number) {
     };
   }
 
-  const [report] = await db
-    .select()
+  const [row] = await db
+    .select({
+      report: reports,
+      run: analysisRuns,
+      child: children,
+      upload: uploads,
+    })
     .from(reports)
     .innerJoin(analysisRuns, eq(reports.runId, analysisRuns.id))
+    .innerJoin(children, eq(analysisRuns.childId, children.id))
+    .leftJoin(uploads, eq(analysisRuns.uploadId, uploads.id))
     .where(and(eq(reports.id, reportId), eq(analysisRuns.userId, userId)))
     .limit(1);
 
-  if (!report) {
+  if (!row) {
     return null;
   }
 
   const reportLinks = await listShareLinksForReport(userId, reportId);
   return {
-    ...report,
+    ...row.report,
+    run: row.run,
+    child: row.child,
+    upload: row.upload,
     shareLinks: reportLinks,
   };
 }
@@ -1776,14 +1825,30 @@ export async function getReportByRunForUser(userId: number, runId: number) {
     return report || null;
   }
 
-  const [report] = await db
-    .select()
+  const [row] = await db
+    .select({
+      report: reports,
+      run: analysisRuns,
+      child: children,
+      upload: uploads,
+    })
     .from(reports)
     .innerJoin(analysisRuns, eq(reports.runId, analysisRuns.id))
+    .innerJoin(children, eq(analysisRuns.childId, children.id))
+    .leftJoin(uploads, eq(analysisRuns.uploadId, uploads.id))
     .where(and(eq(reports.runId, runId), eq(analysisRuns.userId, userId)))
     .limit(1);
 
-  return report || null;
+  if (!row) {
+    return null;
+  }
+
+  return {
+    ...row.report,
+    run: row.run,
+    child: row.child,
+    upload: row.upload,
+  };
 }
 
 export async function updateReportPlanProgressForUser(
@@ -1925,7 +1990,7 @@ function extractTopFinding(report: StoredReport | Record<string, unknown>) {
   const primaryGroup = evidenceGroups[0] || null;
 
   return {
-    title: typeof primaryFinding?.title === 'string' ? primaryFinding.title : 'No diagnosis yet',
+    title: typeof primaryFinding?.title === 'string' ? primaryFinding.title : null,
     count:
       typeof primaryGroup?.count === 'number'
         ? primaryGroup.count
@@ -1981,10 +2046,16 @@ export async function listReportsForChild(userId: number, childId: number, limit
         id: currentReport.id,
         runId: currentReport.runId,
         createdAt: currentReport.createdAt,
-        summary: String(currentReport.parentReportJson.summary || ''),
+        summary:
+          typeof currentReport.parentReportJson.summary === 'string'
+            ? currentReport.parentReportJson.summary
+            : null,
         topFinding: extractTopFinding(currentReport).title,
         compareSummary: buildReportCompareSummary(currentReport, previousReport),
-        parentNote: String(currentReport.parentReportJson.parentNote || ''),
+        parentNote:
+          typeof currentReport.parentReportJson.parentNote === 'string'
+            ? currentReport.parentReportJson.parentNote
+            : null,
         completedDays: Array.isArray(currentReport.parentReportJson.completedDays)
           ? (currentReport.parentReportJson.completedDays as number[])
           : [],
@@ -2007,16 +2078,126 @@ export async function listReportsForChild(userId: number, childId: number, limit
     id: entry.report.id,
     runId: entry.runId,
     createdAt: entry.report.createdAt,
-    summary: String((entry.report.parentReportJson as any)?.summary || ''),
+    summary:
+      typeof (entry.report.parentReportJson as any)?.summary === 'string'
+        ? ((entry.report.parentReportJson as any).summary as string)
+        : null,
     topFinding: extractTopFinding(entry.report).title,
     compareSummary: buildReportCompareSummary(
       entry.report,
       rows[index + 1]?.report || null
     ),
-    parentNote: String((entry.report.parentReportJson as any)?.parentNote || ''),
+    parentNote:
+      typeof (entry.report.parentReportJson as any)?.parentNote === 'string'
+        ? ((entry.report.parentReportJson as any).parentNote as string)
+        : null,
     completedDays: Array.isArray((entry.report.parentReportJson as any)?.completedDays)
       ? ((entry.report.parentReportJson as any).completedDays as number[])
       : [],
+  }));
+}
+
+export async function listReportsForUser(userId: number, limit = 24) {
+  if (FAMILY_EDU_DEMO_MODE) {
+    const state = await readFamilyMockState();
+    const userRuns = state.runs
+      .filter((run) => run.userId === userId)
+      .sort((left, right) => right.createdAt.localeCompare(left.createdAt));
+
+    return userRuns
+      .map((run) => {
+        const report = state.reports.find((item) => item.runId === run.id);
+        if (!report) {
+          return null;
+        }
+        const child = state.children.find((item) => item.id === run.childId) || null;
+        return {
+          id: report.id,
+          runId: run.id,
+          childId: run.childId,
+          childNickname: child?.nickname || null,
+          childGrade: child?.grade || null,
+          createdAt: report.createdAt,
+          releaseStatus:
+            typeof report.parentReportJson.releaseStatus === 'string'
+              ? report.parentReportJson.releaseStatus
+              : null,
+          sourceType: run.uploadId
+            ? state.uploads.find((item) => item.id === run.uploadId)?.sourceType || null
+            : null,
+          summary:
+            typeof report.parentReportJson.summary === 'string'
+              ? report.parentReportJson.summary
+              : null,
+          topFinding: extractTopFinding(report).title,
+          compareSummary: '',
+          completedDays: Array.isArray(report.parentReportJson.completedDays)
+            ? (report.parentReportJson.completedDays as number[])
+            : [],
+          confidence:
+            typeof report.parentReportJson.confidence === 'number'
+              ? (report.parentReportJson.confidence as number)
+              : null,
+        };
+      })
+      .filter((entry): entry is NonNullable<typeof entry> => Boolean(entry))
+      .slice(0, limit)
+      .map((entry, index, collection) => ({
+        ...entry,
+        compareSummary: buildReportCompareSummary(
+          state.reports.find((report) => report.id === entry.id) as StoredReport,
+          collection[index + 1]
+            ? (state.reports.find((report) => report.id === collection[index + 1].id) as StoredReport)
+            : null
+        ),
+      }));
+  }
+
+  const rows = await db
+    .select({
+      report: reports,
+      runId: analysisRuns.id,
+      childId: analysisRuns.childId,
+      sourceType: uploads.sourceType,
+      childNickname: children.nickname,
+      childGrade: children.grade,
+    })
+    .from(reports)
+    .innerJoin(analysisRuns, eq(reports.runId, analysisRuns.id))
+    .innerJoin(children, eq(analysisRuns.childId, children.id))
+    .leftJoin(uploads, eq(analysisRuns.uploadId, uploads.id))
+    .where(eq(analysisRuns.userId, userId))
+    .orderBy(desc(reports.createdAt))
+    .limit(limit);
+
+  return rows.map((entry, index) => ({
+    id: entry.report.id,
+    runId: entry.runId,
+    childId: entry.childId,
+    childNickname: entry.childNickname,
+    childGrade: entry.childGrade || null,
+    createdAt: entry.report.createdAt,
+    releaseStatus:
+      typeof (entry.report.parentReportJson as any)?.releaseStatus === 'string'
+        ? ((entry.report.parentReportJson as any).releaseStatus as string)
+        : null,
+    sourceType: entry.sourceType || null,
+    summary:
+      typeof (entry.report.parentReportJson as any)?.summary === 'string'
+        ? ((entry.report.parentReportJson as any).summary as string)
+        : null,
+    topFinding: extractTopFinding(entry.report).title,
+    compareSummary: buildReportCompareSummary(
+      entry.report,
+      rows[index + 1]?.report || null
+    ),
+    completedDays: Array.isArray((entry.report.parentReportJson as any)?.completedDays)
+      ? ((entry.report.parentReportJson as any).completedDays as number[])
+      : [],
+    confidence:
+      typeof (entry.report.parentReportJson as any)?.confidence === 'number'
+        ? ((entry.report.parentReportJson as any).confidence as number)
+        : null,
   }));
 }
 

@@ -584,6 +584,69 @@ export const runCostArtifacts = pgTable('run_cost_artifacts', {
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
 });
 
+export const modelProviderConfigs = pgTable('model_provider_configs', {
+  id: serial('id').primaryKey(),
+  providerName: varchar('provider_name', { length: 40 }).notNull().unique(),
+  isEnabled: boolean('is_enabled').notNull().default(true),
+  defaultModel: varchar('default_model', { length: 160 }).notNull(),
+  baseUrl: text('base_url').notNull(),
+  timeoutMs: integer('timeout_ms').notNull().default(30000),
+  maxRetries: integer('max_retries').notNull().default(1),
+  supportsJsonSchema: boolean('supports_json_schema').notNull().default(true),
+  supportsReasoning: boolean('supports_reasoning').notNull().default(false),
+  supportsTools: boolean('supports_tools').notNull().default(false),
+  metadata: jsonb('metadata')
+    .$type<Record<string, unknown>>()
+    .notNull()
+    .default(sql`'{}'::jsonb`),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+});
+
+export const analysisRunModels = pgTable('analysis_run_models', {
+  id: varchar('id', { length: 80 }).primaryKey(),
+  runId: integer('run_id')
+    .notNull()
+    .references(() => analysisRuns.id),
+  providerConfigId: integer('provider_config_id').references(() => modelProviderConfigs.id),
+  taskType: varchar('task_type', { length: 40 }).notNull(),
+  attemptIndex: integer('attempt_index').notNull().default(0),
+  providerName: varchar('provider_name', { length: 40 }).notNull(),
+  modelName: varchar('model_name', { length: 160 }).notNull(),
+  status: varchar('status', { length: 30 }).notNull(),
+  finishReason: varchar('finish_reason', { length: 40 }),
+  latencyMs: integer('latency_ms'),
+  inputTokens: integer('input_tokens'),
+  outputTokens: integer('output_tokens'),
+  reasoningTokens: integer('reasoning_tokens'),
+  totalTokens: integer('total_tokens'),
+  metadata: jsonb('metadata')
+    .$type<Record<string, unknown>>()
+    .notNull()
+    .default(sql`'{}'::jsonb`),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+});
+
+export const modelCallFailovers = pgTable('model_call_failovers', {
+  id: varchar('id', { length: 80 }).primaryKey(),
+  runId: integer('run_id')
+    .notNull()
+    .references(() => analysisRuns.id),
+  taskType: varchar('task_type', { length: 40 }).notNull(),
+  fromRunModelId: varchar('from_run_model_id', { length: 80 }).references(() => analysisRunModels.id),
+  fromProviderName: varchar('from_provider_name', { length: 40 }).notNull(),
+  fromModelName: varchar('from_model_name', { length: 160 }).notNull(),
+  toProviderName: varchar('to_provider_name', { length: 40 }).notNull(),
+  toModelName: varchar('to_model_name', { length: 160 }).notNull(),
+  errorType: varchar('error_type', { length: 80 }),
+  errorMessage: text('error_message'),
+  metadata: jsonb('metadata')
+    .$type<Record<string, unknown>>()
+    .notNull()
+    .default(sql`'{}'::jsonb`),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+});
+
 export const teamsRelations = relations(teams, ({ many }) => ({
   teamMembers: many(teamMembers),
   activityLogs: many(activityLogs),
@@ -877,6 +940,12 @@ export type RunErrorEventRecord = typeof runErrorEvents.$inferSelect;
 export type NewRunErrorEventRecord = typeof runErrorEvents.$inferInsert;
 export type RunCostArtifactRecord = typeof runCostArtifacts.$inferSelect;
 export type NewRunCostArtifactRecord = typeof runCostArtifacts.$inferInsert;
+export type ModelProviderConfigRecord = typeof modelProviderConfigs.$inferSelect;
+export type NewModelProviderConfigRecord = typeof modelProviderConfigs.$inferInsert;
+export type AnalysisRunModelRecord = typeof analysisRunModels.$inferSelect;
+export type NewAnalysisRunModelRecord = typeof analysisRunModels.$inferInsert;
+export type ModelCallFailoverRecord = typeof modelCallFailovers.$inferSelect;
+export type NewModelCallFailoverRecord = typeof modelCallFailovers.$inferInsert;
 export type TeamDataWithMembers = Team & {
   teamMembers: (TeamMember & {
     user: Pick<User, 'id' | 'name' | 'email'>;

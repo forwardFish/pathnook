@@ -34,77 +34,82 @@ const pageDraftSchema = z.object({
 });
 
 export async function POST(request: Request) {
-  const user = await getUser();
-
-  if (!user) {
-    return Response.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
-  const formData = await request.formData();
-  const childId = Number(formData.get('childId'));
-  const sourceType = sourceTypeSchema.safeParse(formData.get('sourceType'));
-  const notes = String(formData.get('notes') || '').trim();
-  const draftPayload = String(formData.get('pageDrafts') || '[]');
-  const files = formData.getAll('files').filter((entry): entry is File => entry instanceof File);
-
-  if (!Number.isInteger(childId) || childId <= 0) {
-    return Response.json({ error: 'A valid child is required.' }, { status: 400 });
-  }
-
-  if (!sourceType.success) {
-    return Response.json({ error: 'A valid source type is required.' }, { status: 400 });
-  }
-
-  if (files.length === 0) {
-    return Response.json({ error: 'Upload at least one file.' }, { status: 400 });
-  }
-
-  const child = await getChildForUser(user.id, childId);
-  if (!child) {
-    return Response.json({ error: 'Child not found.' }, { status: 404 });
-  }
-
-  let pageDrafts: z.infer<typeof pageDraftSchema>[];
   try {
-    const parsed = JSON.parse(draftPayload);
-    const result = z.array(pageDraftSchema).safeParse(parsed);
-    if (!result.success) {
+    const user = await getUser();
+
+    if (!user) {
+      return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const formData = await request.formData();
+    const childId = Number(formData.get('childId'));
+    const sourceType = sourceTypeSchema.safeParse(formData.get('sourceType'));
+    const notes = String(formData.get('notes') || '').trim();
+    const draftPayload = String(formData.get('pageDrafts') || '[]');
+    const files = formData.getAll('files').filter((entry): entry is File => entry instanceof File);
+
+    if (!Number.isInteger(childId) || childId <= 0) {
+      return Response.json({ error: 'A valid child is required.' }, { status: 400 });
+    }
+
+    if (!sourceType.success) {
+      return Response.json({ error: 'A valid source type is required.' }, { status: 400 });
+    }
+
+    if (files.length === 0) {
+      return Response.json({ error: 'Upload at least one file.' }, { status: 400 });
+    }
+
+    const child = await getChildForUser(user.id, childId);
+    if (!child) {
+      return Response.json({ error: 'Child not found.' }, { status: 404 });
+    }
+
+    let pageDrafts: z.infer<typeof pageDraftSchema>[];
+    try {
+      const parsed = JSON.parse(draftPayload);
+      const result = z.array(pageDraftSchema).safeParse(parsed);
+      if (!result.success) {
+        return Response.json({ error: 'Upload draft metadata is invalid.' }, { status: 400 });
+      }
+      pageDrafts = result.data;
+    } catch {
       return Response.json({ error: 'Upload draft metadata is invalid.' }, { status: 400 });
     }
-    pageDrafts = result.data;
-  } catch {
-    return Response.json({ error: 'Upload draft metadata is invalid.' }, { status: 400 });
-  }
 
-  const persistedFiles = await persistUploadFiles(files, pageDrafts);
-  const totalPages = persistedFiles.reduce((sum, file) => sum + file.pageCount, 0);
+    const persistedFiles = await persistUploadFiles(files, pageDrafts);
+    const totalPages = persistedFiles.reduce((sum, file) => sum + file.pageCount, 0);
 
-  if (totalPages < 5) {
+    if (totalPages < 5) {
+      return Response.json(
+        { error: 'At least 5 pages are required before generating a diagnosis.' },
+        { status: 400 }
+      );
+    }
+
+    if (totalPages > 10) {
+      return Response.json(
+        { error: 'Uploads currently accept up to 10 pages at a time.' },
+        { status: 400 }
+      );
+    }
+
+    const result = await createUploadForUser(user.id, {
+      childId,
+      sourceType: sourceType.data,
+      notes,
+      files: persistedFiles,
+    });
+
     return Response.json(
-      { error: 'At least 5 pages are required before generating a diagnosis.' },
-      { status: 400 }
+      {
+        upload: result.upload,
+        pages: result.pages,
+      },
+      { status: 201 }
     );
+  } catch (error) {
+    console.error('[api/uploads] failed to create upload', error);
+    return Response.json({ error: 'Internal Server Error' }, { status: 500 });
   }
-
-  if (totalPages > 10) {
-    return Response.json(
-      { error: 'This MVP only accepts up to 10 pages per upload.' },
-      { status: 400 }
-    );
-  }
-
-  const result = await createUploadForUser(user.id, {
-    childId,
-    sourceType: sourceType.data,
-    notes,
-    files: persistedFiles,
-  });
-
-  return Response.json(
-    {
-      upload: result.upload,
-      pages: result.pages,
-    },
-    { status: 201 }
-  );
 }

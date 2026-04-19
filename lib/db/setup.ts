@@ -211,7 +211,7 @@ async function writeEnvFile(lines: string[]) {
 async function main() {
   const databaseConfig = await resolveDatabaseConfig();
   const defaultBaseUrl = databaseConfig.usingLegacyLocalFallback
-    ? 'http://127.0.0.1:3000'
+    ? 'http://localhost:3000'
     : 'https://www.pathnook.com';
   const baseUrl = await questionWithDefault('Step 2: Enter BASE_URL', defaultBaseUrl);
   const storageConfig = await collectBlobConfig(
@@ -248,14 +248,21 @@ async function main() {
     'DEFAULT_LOCALE=en-US',
     'DEFAULT_COUNTRY=US',
     'DEFAULT_TIMEZONE=America/Los_Angeles',
+    'MODEL_PROVIDER=openai',
+    'MODEL_DEFAULT=',
     'OPENAI_API_KEY=',
     'OPENAI_MODEL_VISION=',
+    'OPENAI_BASE_URL=',
+    'MOONSHOT_API_KEY=',
+    'MOONSHOT_BASE_URL=https://api.moonshot.cn/v1',
+    'MOONSHOT_MODEL=kimi-k2.5',
     'MATHPIX_APP_ID=',
     'MATHPIX_APP_KEY=',
     'GOOGLE_APPLICATION_CREDENTIALS=',
     'DATA_RETENTION_DAYS=30',
-    `FAMILY_EDU_DEMO_MODE=${databaseConfig.usingLegacyLocalFallback ? '1' : '0'}`,
+    'FAMILY_EDU_DEMO_MODE=0',
     'FAMILY_EDU_DEMO_AUTO_AUTH=0',
+    'FAMILY_EDU_RUNTIME_ROOT=',
     `FILE_STORAGE_BACKEND=${storageConfig.fileStorageBackend}`,
     `BLOB_READ_WRITE_TOKEN=${storageConfig.blobToken}`,
     'NODE_USE_ENV_PROXY=1',

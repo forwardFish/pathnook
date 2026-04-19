@@ -78,6 +78,13 @@
       "when": 1776009600000,
       "tag": "0010_curious_freemius_foundation",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1776534000000,
+      "tag": "0011_silent_model_runtime",
+      "breakpoints": true
     }
   ]
 }

@@ -1,5 +1,3 @@
-import 'server-only';
-
 import type { CanonicalExtractionBundle } from '@/lib/ai/extraction-schema';
 import { isFamilyEduDemoMode } from '@/lib/family/config';
 

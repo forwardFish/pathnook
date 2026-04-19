@@ -1,5 +1,3 @@
-import 'server-only';
-
 import { calculateOverallConfidence, getReviewDecision } from '@/lib/ai/confidence';
 import { generateDemoExtractionPages, generateDemoLabels } from '@/lib/ai/demo-engine';
 import {
@@ -7,7 +5,7 @@ import {
   type CanonicalExtractionBundle,
 } from '@/lib/ai/extraction-schema';
 import { extractWithMathpixFallback } from '@/lib/ai/mathpix';
-import { extractWithOpenAIVision } from '@/lib/ai/openai-vision';
+import { runExtractItemsTask } from '@/lib/ai/task-runner';
 
 type PageInput = {
   id: number;
@@ -45,25 +43,55 @@ async function buildDemoBundle(
   });
 }
 
+export type ProcessRunExtractionResult = {
+  bundle: CanonicalExtractionBundle;
+  execution: {
+    engine: string;
+    modelVersion: string;
+    fallbackApplied: boolean;
+    attemptCount: number;
+    taskType: 'extract-items' | 'mathpix-fallback';
+  };
+};
+
 export async function processRunExtraction(args: {
   runId: number;
   pages: PageInput[];
   preferMathpix?: boolean;
-}) {
+}): Promise<ProcessRunExtractionResult> {
   const modelVersion = process.env.OPENAI_MODEL_VISION || 'gpt-4.1-mini';
   const fallback = () => buildDemoBundle(args.runId, modelVersion, args.pages);
 
-  const bundle = args.preferMathpix
-    ? await extractWithMathpixFallback({
+  if (args.preferMathpix) {
+    const bundle = await extractWithMathpixFallback({
         runId: args.runId,
         fallback,
       })
-    : await extractWithOpenAIVision({
-        runId: args.runId,
-        modelVersion,
-        pages: args.pages,
-        fallback,
-      });
+    return {
+      bundle: canonicalExtractionBundleSchema.parse(bundle),
+      execution: {
+        engine: bundle.engine,
+        modelVersion: bundle.modelVersion,
+        fallbackApplied: false,
+        attemptCount: 1,
+        taskType: 'mathpix-fallback',
+      },
+    };
+  }
 
-  return canonicalExtractionBundleSchema.parse(bundle);
+  const taskResult = await runExtractItemsTask({
+    runId: args.runId,
+    pages: args.pages,
+  });
+
+  return {
+    bundle: canonicalExtractionBundleSchema.parse(taskResult.bundle),
+    execution: {
+      engine: taskResult.bundle.engine,
+      modelVersion: taskResult.bundle.modelVersion,
+      fallbackApplied: taskResult.trace.fallbackApplied,
+      attemptCount: taskResult.trace.attempts.length,
+      taskType: 'extract-items',
+    },
+  };
 }

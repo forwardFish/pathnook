@@ -5,7 +5,7 @@ import path from 'node:path';
 import { desc, eq, inArray } from 'drizzle-orm';
 import { db } from '@/lib/db/drizzle';
 import { runErrorEvents, runLifecycleEvents } from '@/lib/db/schema';
-import { isFamilyEduDemoMode } from '@/lib/family/config';
+import { getFamilyEduRuntimeRoot, isFamilyEduDemoMode } from '@/lib/family/config';
 
 export type RunLifecycleEvent = {
   id: string;
@@ -38,7 +38,7 @@ export type RunErrorEvent = {
 };
 
 const FAMILY_EDU_DEMO_MODE = isFamilyEduDemoMode();
-const runtimeRoot = path.join(process.cwd(), 'tasks', 'runtime', 'observability');
+const runtimeRoot = path.join(getFamilyEduRuntimeRoot(), 'observability');
 const lifecyclePath = path.join(runtimeRoot, 'run_lifecycle_events.json');
 const errorPath = path.join(runtimeRoot, 'error_events.json');
 

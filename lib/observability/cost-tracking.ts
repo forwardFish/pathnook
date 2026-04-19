@@ -5,14 +5,14 @@ import path from 'node:path';
 import { eq, inArray } from 'drizzle-orm';
 import { db } from '@/lib/db/drizzle';
 import { runCostArtifacts } from '@/lib/db/schema';
-import { isFamilyEduDemoMode } from '@/lib/family/config';
+import { getFamilyEduRuntimeRoot, isFamilyEduDemoMode } from '@/lib/family/config';
 import { deleteFamilyArtifact, putFamilyArtifact } from '@/lib/family/storage';
 
 export type RunCostArtifact = {
   id: string;
   runId: number;
   userId: number;
-  engine: 'openai' | 'mathpix';
+  engine: string;
   pageCount: number;
   labeledItemCount: number;
   estimatedInputTokens: number;
@@ -24,7 +24,7 @@ export type RunCostArtifact = {
 };
 
 const FAMILY_EDU_DEMO_MODE = isFamilyEduDemoMode();
-const runtimeRoot = path.join(process.cwd(), 'tasks', 'runtime', 'observability');
+const runtimeRoot = path.join(getFamilyEduRuntimeRoot(), 'observability');
 const costPath = path.join(runtimeRoot, 'cost_artifacts.json');
 const runArtifactDir = path.join(runtimeRoot, 'run_artifacts');
 
@@ -82,7 +82,7 @@ function toRunCostArtifact(row: typeof runCostArtifacts.$inferSelect): RunCostAr
 }
 
 export function estimateRunCost(input: {
-  engine: 'openai' | 'mathpix';
+  engine: string;
   pageCount: number;
   labeledItemCount: number;
 }) {
