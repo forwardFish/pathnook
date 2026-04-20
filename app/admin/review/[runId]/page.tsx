@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { getUser } from '@/lib/db/queries';
 import { getAdminReviewDetail } from '@/lib/family/admin-review';
 import { canAccessAdminReview } from '@/lib/family/admin-review-auth';
+import { buildDeepResearchReportViewModel } from '@/lib/family/report-read-model';
 import { localizeParentReport } from '@/lib/reports/localize';
 
 type PageProps = {
@@ -49,6 +50,21 @@ export default async function AdminReviewDetailPage({ params }: PageProps) {
     (detail.report?.parentReportJson || {}) as any,
     user.locale || 'en-US'
   );
+  const reportViewModel = buildDeepResearchReportViewModel({
+    reportId: detail.run.reportId || detail.run.id,
+    parentReport,
+    labels: parentReport.labels,
+    structured: {
+      diagnosisOutline: null,
+      shortestPath: null,
+      outputGates: [],
+      sevenDayPlans: [],
+      compareSnapshot: null,
+      shareArtifact: null,
+      reviewSnapshot: null,
+    },
+    completedDays: parentReport.completedDays,
+  });
 
   return (
     <section className="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-6 p-4 lg:p-8">
@@ -246,12 +262,12 @@ export default async function AdminReviewDetailPage({ params }: PageProps) {
 
           <Card>
             <CardHeader>
-              <CardTitle>Draft report preview</CardTitle>
+            <CardTitle>Draft report preview</CardTitle>
             </CardHeader>
             <CardContent>
               <ReportTabsClient
-                reportId={detail.run.reportId || detail.run.id}
-                parentReport={parentReport}
+                reportViewModel={reportViewModel}
+                activeTab="diagnosis"
               />
             </CardContent>
           </Card>

@@ -206,6 +206,132 @@ export const reports = pgTable('reports', {
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
 });
 
+export const reportDiagnosisOutlines = pgTable('report_diagnosis_outlines', {
+  id: serial('id').primaryKey(),
+  reportId: integer('report_id')
+    .notNull()
+    .references(() => reports.id)
+    .unique(),
+  summary: text('summary').notNull(),
+  primaryIssue: text('primary_issue').notNull(),
+  secondaryIssue: text('secondary_issue').notNull(),
+  doThisWeek: text('do_this_week').notNull(),
+  notNow: text('not_now').notNull(),
+  guardrail: text('guardrail').notNull(),
+  confidence: real('confidence').notNull(),
+  locale: varchar('locale', { length: 20 }).notNull().default('en-US'),
+  sourceMetaJson: jsonb('source_meta_json')
+    .$type<Record<string, unknown>>()
+    .notNull()
+    .default(sql`'{}'::jsonb`),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+});
+
+export const reportShortestPaths = pgTable('report_shortest_paths', {
+  id: serial('id').primaryKey(),
+  reportId: integer('report_id')
+    .notNull()
+    .references(() => reports.id)
+    .unique(),
+  currentNode: text('current_node').notNull(),
+  nextNode: text('next_node').notNull(),
+  laterNodesJson: jsonb('later_nodes_json')
+    .$type<Record<string, unknown>[]>()
+    .notNull()
+    .default(sql`'[]'::jsonb`),
+  whyFirst: text('why_first').notNull(),
+  whatThisSolves: text('what_this_solves').notNull(),
+  whatWaits: text('what_waits').notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+});
+
+export const reportOutputGates = pgTable('report_output_gates', {
+  id: serial('id').primaryKey(),
+  reportId: integer('report_id')
+    .notNull()
+    .references(() => reports.id),
+  gateCode: varchar('gate_code', { length: 80 }).notNull(),
+  title: text('title').notNull(),
+  status: varchar('status', { length: 40 }).notNull(),
+  body: text('body').notNull(),
+  whatThisVerifies: text('what_this_verifies').notNull(),
+  howToCheck: text('how_to_check').notNull(),
+  sortOrder: integer('sort_order').notNull().default(0),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+});
+
+export const reportSevenDayPlans = pgTable('report_seven_day_plans', {
+  id: serial('id').primaryKey(),
+  reportId: integer('report_id')
+    .notNull()
+    .references(() => reports.id),
+  dayNumber: integer('day_number').notNull(),
+  goal: text('goal').notNull(),
+  practice: text('practice').notNull(),
+  parentPrompt: text('parent_prompt').notNull(),
+  successSignal: text('success_signal').notNull(),
+  sortOrder: integer('sort_order').notNull().default(0),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+});
+
+export const reportCompareSnapshots = pgTable('report_compare_snapshots', {
+  id: serial('id').primaryKey(),
+  reportId: integer('report_id')
+    .notNull()
+    .references(() => reports.id)
+    .unique(),
+  improved: text('improved').notNull(),
+  stillUneven: text('still_uneven').notNull(),
+  needsSupport: text('needs_support').notNull(),
+  trendPointsJson: jsonb('trend_points_json')
+    .$type<number[]>()
+    .notNull()
+    .default(sql`'[]'::jsonb`),
+  resumeDecision: text('resume_decision').notNull(),
+  nextSuggestedFocus: text('next_suggested_focus').notNull(),
+  compareSummary: text('compare_summary').notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+});
+
+export const reportShareArtifacts = pgTable('report_share_artifacts', {
+  id: serial('id').primaryKey(),
+  reportId: integer('report_id')
+    .notNull()
+    .references(() => reports.id)
+    .unique(),
+  shareSummary: text('share_summary').notNull(),
+  tutorSummary: text('tutor_summary').notNull(),
+  resumeCallToAction: text('resume_call_to_action').notNull(),
+  artifactJson: jsonb('artifact_json')
+    .$type<Record<string, unknown>>()
+    .notNull()
+    .default(sql`'{}'::jsonb`),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+});
+
+export const reportReviewSnapshots = pgTable('report_review_snapshots', {
+  id: serial('id').primaryKey(),
+  reportId: integer('report_id')
+    .notNull()
+    .references(() => reports.id)
+    .unique(),
+  releaseStatus: varchar('release_status', { length: 40 }).notNull(),
+  reviewReason: text('review_reason'),
+  reviewBanner: text('review_banner'),
+  qualityFlagsJson: jsonb('quality_flags_json')
+    .$type<Record<string, unknown>>()
+    .notNull()
+    .default(sql`'{}'::jsonb`),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+});
+
 export const diagnosisDecks = pgTable('diagnosis_decks', {
   id: serial('id').primaryKey(),
   runId: integer('run_id')
@@ -763,6 +889,83 @@ export const reportsRelations = relations(reports, ({ one, many }) => ({
   shareLinks: many(shareLinks),
   diagnosisDecks: many(diagnosisDecks),
   deckShareSettings: many(deckShareSettings),
+  diagnosisOutline: one(reportDiagnosisOutlines, {
+    fields: [reports.id],
+    references: [reportDiagnosisOutlines.reportId],
+  }),
+  shortestPath: one(reportShortestPaths, {
+    fields: [reports.id],
+    references: [reportShortestPaths.reportId],
+  }),
+  outputGates: many(reportOutputGates),
+  sevenDayPlans: many(reportSevenDayPlans),
+  compareSnapshot: one(reportCompareSnapshots, {
+    fields: [reports.id],
+    references: [reportCompareSnapshots.reportId],
+  }),
+  shareArtifact: one(reportShareArtifacts, {
+    fields: [reports.id],
+    references: [reportShareArtifacts.reportId],
+  }),
+  reviewSnapshot: one(reportReviewSnapshots, {
+    fields: [reports.id],
+    references: [reportReviewSnapshots.reportId],
+  }),
+}));
+
+export const reportDiagnosisOutlinesRelations = relations(
+  reportDiagnosisOutlines,
+  ({ one }) => ({
+    report: one(reports, {
+      fields: [reportDiagnosisOutlines.reportId],
+      references: [reports.id],
+    }),
+  })
+);
+
+export const reportShortestPathsRelations = relations(reportShortestPaths, ({ one }) => ({
+  report: one(reports, {
+    fields: [reportShortestPaths.reportId],
+    references: [reports.id],
+  }),
+}));
+
+export const reportOutputGatesRelations = relations(reportOutputGates, ({ one }) => ({
+  report: one(reports, {
+    fields: [reportOutputGates.reportId],
+    references: [reports.id],
+  }),
+}));
+
+export const reportSevenDayPlansRelations = relations(reportSevenDayPlans, ({ one }) => ({
+  report: one(reports, {
+    fields: [reportSevenDayPlans.reportId],
+    references: [reports.id],
+  }),
+}));
+
+export const reportCompareSnapshotsRelations = relations(
+  reportCompareSnapshots,
+  ({ one }) => ({
+    report: one(reports, {
+      fields: [reportCompareSnapshots.reportId],
+      references: [reports.id],
+    }),
+  })
+);
+
+export const reportShareArtifactsRelations = relations(reportShareArtifacts, ({ one }) => ({
+  report: one(reports, {
+    fields: [reportShareArtifacts.reportId],
+    references: [reports.id],
+  }),
+}));
+
+export const reportReviewSnapshotsRelations = relations(reportReviewSnapshots, ({ one }) => ({
+  report: one(reports, {
+    fields: [reportReviewSnapshots.reportId],
+    references: [reports.id],
+  }),
 }));
 
 export const diagnosisDecksRelations = relations(diagnosisDecks, ({ one, many }) => ({
@@ -902,6 +1105,20 @@ export type AnalysisRun = typeof analysisRuns.$inferSelect;
 export type NewAnalysisRun = typeof analysisRuns.$inferInsert;
 export type Report = typeof reports.$inferSelect;
 export type NewReport = typeof reports.$inferInsert;
+export type ReportDiagnosisOutline = typeof reportDiagnosisOutlines.$inferSelect;
+export type NewReportDiagnosisOutline = typeof reportDiagnosisOutlines.$inferInsert;
+export type ReportShortestPath = typeof reportShortestPaths.$inferSelect;
+export type NewReportShortestPath = typeof reportShortestPaths.$inferInsert;
+export type ReportOutputGate = typeof reportOutputGates.$inferSelect;
+export type NewReportOutputGate = typeof reportOutputGates.$inferInsert;
+export type ReportSevenDayPlan = typeof reportSevenDayPlans.$inferSelect;
+export type NewReportSevenDayPlan = typeof reportSevenDayPlans.$inferInsert;
+export type ReportCompareSnapshot = typeof reportCompareSnapshots.$inferSelect;
+export type NewReportCompareSnapshot = typeof reportCompareSnapshots.$inferInsert;
+export type ReportShareArtifact = typeof reportShareArtifacts.$inferSelect;
+export type NewReportShareArtifact = typeof reportShareArtifacts.$inferInsert;
+export type ReportReviewSnapshot = typeof reportReviewSnapshots.$inferSelect;
+export type NewReportReviewSnapshot = typeof reportReviewSnapshots.$inferInsert;
 export type DiagnosisDeck = typeof diagnosisDecks.$inferSelect;
 export type NewDiagnosisDeck = typeof diagnosisDecks.$inferInsert;
 export type DiagnosisSlide = typeof diagnosisSlides.$inferSelect;

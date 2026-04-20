@@ -1,77 +1,52 @@
-'use client';
-
-import { useState } from 'react';
 import { AlertTriangle } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
+import { CompareResumeTab } from '@/components/reports/CompareResumeTab';
 import { DiagnosisTab } from '@/components/reports/DiagnosisTab';
-import { EvidenceTab } from '@/components/reports/EvidenceTab';
+import { OutputGatesTab } from '@/components/reports/OutputGatesTab';
 import { PlanTab } from '@/components/reports/PlanTab';
-import type { ParentReport } from '@/components/reports/report-types';
+import { ShortestPathTab } from '@/components/reports/ShortestPathTab';
+import type { DeepResearchReportViewModel } from '@/components/reports/report-types';
 
 type Props = {
-  reportId: number;
-  parentReport: ParentReport;
+  reportViewModel: DeepResearchReportViewModel;
+  activeTab: 'diagnosis' | 'shortest-path' | 'plan' | 'output-gates' | 'compare';
 };
 
-const tabs = [
-  { id: 'diagnosis', label: 'Diagnosis' },
-  { id: 'evidence', label: 'Evidence' },
-  { id: 'plan', label: '7-Day Plan' },
-] as const;
-
-export function ReportTabsClient({ reportId, parentReport }: Props) {
-  const [activeTab, setActiveTab] = useState<(typeof tabs)[number]['id']>('diagnosis');
-  const labels = parentReport.labels || {};
-  const localizedTabs = [
-    { id: 'diagnosis', label: labels.diagnosis || 'Diagnosis' },
-    { id: 'evidence', label: labels.evidence || 'Evidence' },
-    { id: 'plan', label: labels.sevenDayPlan || '7-Day Plan' },
-  ] as const;
+export function ReportTabsClient({ reportViewModel, activeTab }: Props) {
+  const labels = reportViewModel.labels || {};
+  const reviewBanner = reportViewModel.review.reviewBanner;
 
   return (
     <div className="space-y-6">
-      {parentReport.reviewBanner ? (
-        <Card className="border-amber-200 bg-amber-50">
-          <CardContent className="flex items-start gap-3 p-6 text-sm text-amber-900">
+      {reviewBanner ? (
+        <section className="panel pad">
+          <div className="flex items-start gap-3 text-sm text-amber-950">
             <AlertTriangle className="mt-0.5 h-4 w-4" />
             <div className="space-y-2">
               <p className="font-medium">{labels.draftReportOnly || 'Draft report only'}</p>
-              <p>{parentReport.reviewBanner}</p>
+              <p>{reviewBanner}</p>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </section>
       ) : null}
 
-      <div className="flex flex-wrap gap-2">
-        {localizedTabs.map((tab) => (
-          <button
-            key={tab.id}
-            type="button"
-            onClick={() => setActiveTab(tab.id)}
-            className={`rounded-full border px-4 py-2 text-sm font-medium transition ${
-              activeTab === tab.id
-                ? 'border-orange-300 bg-orange-100 text-orange-900'
-                : 'border-gray-200 bg-white text-gray-600 hover:border-orange-200 hover:text-gray-900'
-            }`}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
-
-      {activeTab === 'diagnosis' ? <DiagnosisTab parentReport={parentReport} /> : null}
-      {activeTab === 'evidence' ? (
-        <EvidenceTab evidenceGroups={parentReport.evidenceGroups || []} labels={labels} />
-      ) : null}
+      {activeTab === 'diagnosis' ? <DiagnosisTab reportViewModel={reportViewModel} /> : null}
+      {activeTab === 'shortest-path' ? <ShortestPathTab reportViewModel={reportViewModel} /> : null}
       {activeTab === 'plan' ? (
         <PlanTab
-          reportId={reportId}
-          sevenDayPlan={parentReport.sevenDayPlan || []}
-          guardrail={parentReport.guardrail}
-          initialCompletedDays={parentReport.completedDays || []}
+          reportId={reportViewModel.reportId}
+          sevenDayPlan={reportViewModel.plan.days || []}
+          guardrail={reportViewModel.plan.guardrail}
+          initialCompletedDays={reportViewModel.plan.completedDays || []}
           labels={labels}
         />
       ) : null}
+      {activeTab === 'output-gates' ? (
+        <OutputGatesTab
+          reportViewModel={reportViewModel}
+          labels={labels}
+        />
+      ) : null}
+      {activeTab === 'compare' ? <CompareResumeTab reportViewModel={reportViewModel} /> : null}
     </div>
   );
 }

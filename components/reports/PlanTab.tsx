@@ -1,9 +1,7 @@
 'use client';
 
 import { useState, useTransition } from 'react';
-import { CheckCircle2, Loader2, NotebookPen } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Loader2 } from 'lucide-react';
 import type { DayPlan } from '@/components/reports/report-types';
 
 type Props = {
@@ -43,77 +41,86 @@ export function PlanTab({
         return;
       }
 
-      setCompletedDays(payload.parentReportJson?.completedDays || nextCompletedDays);
+      setCompletedDays(
+        payload.reportViewModel?.plan?.completedDays ||
+          payload.parentReportJson?.completedDays ||
+          nextCompletedDays
+      );
       setSaveError('');
     });
   }
 
   return (
-    <div className="space-y-4">
-      <Card>
-        <CardHeader>
-          <CardTitle>{labels.sevenDayPlan || '7-Day Plan'}</CardTitle>
-        </CardHeader>
-        <CardContent className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+    <div className="space-y-6">
+      <section className="panel pad">
+        <h3>This week&apos;s action grid</h3>
+        <div className="status-banner">
+          This week&apos;s goal: rebuild the concept, stabilize the process, then test it through
+          one small output checkpoint.
+        </div>
+        <div className="day-list" style={{ marginTop: 18 }}>
           {sevenDayPlan.map((day) => {
             const isDone = typeof day.day === 'number' && completedDays.includes(day.day);
             return (
-              <div key={day.day} className="rounded-2xl border border-gray-200 p-4">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="text-sm font-medium uppercase tracking-[0.14em] text-orange-600">
-                      {labels.day || 'Day'} {day.day}
-                    </p>
-                    <p className="mt-2 text-base font-medium text-gray-900">{day.goal}</p>
-                  </div>
-                  <Button
-                    type="button"
-                    size="sm"
-                    variant={isDone ? 'default' : 'outline'}
-                    onClick={() => typeof day.day === 'number' && toggleDay(day.day)}
-                    disabled={isPending || typeof day.day !== 'number'}
-                  >
-                    {isPending ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : isDone ? (
-                      <>
-                        <CheckCircle2 className="mr-2 h-4 w-4" />
-                        {labels.done || 'Done'}
-                      </>
-                    ) : (
-                      labels.markDone || 'Mark Done'
-                    )}
-                  </Button>
+              <div key={day.day} className="day-row">
+                <div className="day-badge">
+                  {labels.day || 'Day'} {day.day}
                 </div>
-                <p className="mt-2 text-sm text-gray-700">{day.practice}</p>
-                <p className="mt-3 text-xs text-gray-500">
-                  {labels.parentPromptLabel || 'Parent prompt'}: {day.parentPrompt}
-                </p>
-                <p className="mt-2 text-xs text-gray-500">
-                  {labels.successSignalLabel || 'Success signal'}: {day.successSignal}
-                </p>
+                <div>
+                  <div className="title">{day.goal}</div>
+                  <div className="sub">{day.practice}</div>
+                </div>
+                <button
+                  type="button"
+                  className="mini-note"
+                  onClick={() => typeof day.day === 'number' && toggleDay(day.day)}
+                  disabled={isPending || typeof day.day !== 'number'}
+                >
+                  {isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : isDone ? 'Done' : 'Mark done'}
+                </button>
               </div>
             );
           })}
-        </CardContent>
-      </Card>
+        </div>
+      </section>
 
       {saveError ? (
-        <Card className="border-red-200">
-          <CardContent className="p-4 text-sm text-red-700">{saveError}</CardContent>
-        </Card>
+        <section className="panel pad">
+          <p className="subhead" style={{ color: '#dc2626' }}>
+            {saveError}
+          </p>
+        </section>
       ) : null}
 
-      <Card>
-        <CardContent className="flex items-start gap-3 p-6 text-sm text-gray-700">
-          <NotebookPen className="mt-0.5 h-4 w-4 text-orange-600" />
-          <p>
+      <section className="panel pad">
+        <h3>Why this schedule works</h3>
+        <div className="note-grid">
+          <div className="callout">
+            <strong>Early week</strong>
+            <div className="sub" style={{ marginTop: 0 }}>
+              Rebuild the concept and get the child naming the structure before solving.
+            </div>
+          </div>
+          <div className="callout">
+            <strong>Late week</strong>
+            <div className="sub" style={{ marginTop: 0 }}>
+              Add only a small transfer check. Keep the load light and controlled.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="panel pad">
+        <h3>Parent reminder</h3>
+        <div className="callout">
+          <strong>Guardrail</strong>
+          <div className="sub" style={{ marginTop: 0 }}>
             {guardrail ||
               labels.practiceCoachingGuardrail ||
               'Use the plan for practice coaching, not direct homework answers.'}
-          </p>
-        </CardContent>
-      </Card>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }

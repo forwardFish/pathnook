@@ -7,7 +7,10 @@ import { processRunExtraction } from '@/lib/ai/pipeline';
 import type { CanonicalExtractionBundle } from '@/lib/ai/extraction-schema';
 import { TAXONOMY } from '@/lib/ai/taxonomy';
 import { isFamilyEduDemoMode } from '@/lib/family/config';
+import { composeDeepResearchReport, buildReportCompareSummaryFromData } from '@/lib/family/report-composer';
 import { deleteFamilyArtifact } from '@/lib/family/storage';
+import { buildDeepResearchReportViewModel, type StructuredReportReadModel } from '@/lib/family/report-read-model';
+import { deleteReportsForRun, deleteStructuredReportReadModel, upsertReportReadModel } from '@/lib/family/report-persistence';
 import {
   readFamilyMockState,
   updateFamilyMockState,
@@ -37,7 +40,7 @@ import type {
   StoredShareLink,
   StoredUpload,
 } from '@/lib/family/types';
-import { buildReportsFromExtraction } from '@/lib/family/reporting';
+import type { DeepResearchReportViewModel, ParentReport } from '@/components/reports/report-types';
 import {
   activityLogs,
   analysisRuns,
@@ -46,6 +49,13 @@ import {
   itemErrors,
   pages,
   problemItems,
+  reportCompareSnapshots,
+  reportDiagnosisOutlines,
+  reportOutputGates,
+  reportReviewSnapshots,
+  reportSevenDayPlans,
+  reportShareArtifacts,
+  reportShortestPaths,
   reports,
   shareLinks,
   uploadFiles,
@@ -72,6 +82,24 @@ function cloneQualityFlags(flags: PageQualityFlags): PageQualityFlags {
 function summarizeQuality(flags: PageQualityFlags) {
   const issues = [flags.blurry, flags.rotated, flags.dark, flags.lowContrast].filter(Boolean).length;
   return Math.max(35, 100 - issues * 18);
+}
+
+function extractParentReportJson(input: StoredReport | Record<string, unknown>) {
+  return (
+    'parentReportJson' in input ? input.parentReportJson : input
+  ) as ParentReport;
+}
+
+function buildLegacyStructuredReadModel(parentReport: ParentReport): StructuredReportReadModel {
+  return {
+    diagnosisOutline: null,
+    shortestPath: null,
+    outputGates: [],
+    sevenDayPlans: [],
+    compareSnapshot: null,
+    shareArtifact: null,
+    reviewSnapshot: null,
+  };
 }
 
 function logMockActivity(state: FamilyMockState, userId: number, action: string, detail: string) {
@@ -476,18 +504,31 @@ async function persistDemoExtractionBundle(
     return null;
   }
 
-  const reportPayload = buildReportsFromExtraction({
+  const previousReport =
+    state.reports
+      .filter((item) => item.runId !== run.id)
+      .map((item) => ({
+        report: item,
+        siblingRun: state.runs.find((candidate) => candidate.id === item.runId) || null,
+      }))
+      .filter((entry) => entry.siblingRun?.childId === run.childId)
+      .sort((left, right) => (right.report.createdAt || '').localeCompare(left.report.createdAt || ''))[0]
+      ?.report || null;
+
+  const composedReport = composeDeepResearchReport({
     bundle,
     child,
     upload,
+    previousReport,
   });
 
   const report: StoredReport = {
     id: state.meta.nextIds.report++,
     runId: run.id,
-    parentReportJson: reportPayload.parentReportJson,
-    studentReportJson: reportPayload.studentReportJson,
-    tutorReportJson: reportPayload.tutorReportJson,
+    parentReportJson: composedReport.parentReportJson,
+    studentReportJson: composedReport.studentReportJson,
+    tutorReportJson: composedReport.tutorReportJson,
+    deepResearchReportJson: composedReport.structured as unknown as Record<string, unknown>,
     deckId: null,
     deckStatus: 'idle',
     deckTier: 'pending',
@@ -1075,6 +1116,7 @@ export async function deleteReportForUser(userId: number, reportId: number) {
     childIds: childId > 0 ? [childId] : [],
   });
 
+  await deleteStructuredReportReadModel(reportId);
   await db.delete(shareLinks).where(eq(shareLinks.reportId, reportId));
   await db.delete(reports).where(eq(reports.id, reportId));
 
@@ -1532,9 +1574,7 @@ export async function processRunForUser(
   const forcedReviewReason = getForcedReviewReason(upload?.notes, pageRecords);
   const reviewReason = forcedReviewReason || bundle.reviewReason;
 
-  await db
-    .delete(reports)
-    .where(eq(reports.runId, run.id));
+  await deleteReportsForRun(run.id);
 
   const existingItems = await db
     .select({ id: problemItems.id })
@@ -1615,7 +1655,20 @@ export async function processRunForUser(
     .limit(1);
 
   if (child && upload) {
-    const reportPayload = buildReportsFromExtraction({
+    const previousReportRows = await db
+      .select({
+        report: reports,
+        run: analysisRuns,
+      })
+      .from(reports)
+      .innerJoin(analysisRuns, eq(reports.runId, analysisRuns.id))
+      .where(and(eq(analysisRuns.userId, userId), eq(analysisRuns.childId, run.childId)))
+      .orderBy(desc(reports.createdAt))
+      .limit(2);
+    const previousReport =
+      previousReportRows.find((entry) => entry.report.runId !== run.id)?.report || null;
+
+    const reportPayload = composeDeepResearchReport({
       bundle: {
         ...bundle,
         requiresReview: Boolean(reviewReason),
@@ -1623,13 +1676,19 @@ export async function processRunForUser(
       },
       child,
       upload,
+      previousReport,
     });
 
-    await db.insert(reports).values({
+    const [createdReport] = await db.insert(reports).values({
       runId: run.id,
       parentReportJson: reportPayload.parentReportJson,
       studentReportJson: reportPayload.studentReportJson,
       tutorReportJson: reportPayload.tutorReportJson,
+    }).returning();
+
+    await upsertReportReadModel({
+      reportId: createdReport.id,
+      payload: reportPayload,
     });
   }
 
@@ -1811,6 +1870,102 @@ export async function getReportForUser(userId: number, reportId: number) {
     child: row.child,
     upload: row.upload,
     shareLinks: reportLinks,
+  };
+}
+
+export async function getDeepResearchReportForUser(
+  userId: number,
+  reportId: number
+): Promise<{
+  report: Awaited<ReturnType<typeof getReportForUser>>;
+  structured: StructuredReportReadModel;
+  reportViewModel: DeepResearchReportViewModel;
+} | null> {
+  const reportRecord = await getReportForUser(userId, reportId);
+  if (!reportRecord) {
+    return null;
+  }
+
+  const parentReport = ((reportRecord as any).parentReportJson || {}) as ParentReport;
+  let structured: StructuredReportReadModel = buildLegacyStructuredReadModel(parentReport);
+
+  if (FAMILY_EDU_DEMO_MODE) {
+    const demoStructured = ((reportRecord as StoredReport).deepResearchReportJson || null) as
+      | Record<string, unknown>
+      | null;
+    if (demoStructured) {
+      structured = {
+        diagnosisOutline: (demoStructured.diagnosisOutline as StructuredReportReadModel['diagnosisOutline']) || null,
+        shortestPath: (demoStructured.shortestPath as StructuredReportReadModel['shortestPath']) || null,
+        outputGates: Array.isArray(demoStructured.outputGates)
+          ? (demoStructured.outputGates as StructuredReportReadModel['outputGates'])
+          : [],
+        sevenDayPlans: Array.isArray(demoStructured.sevenDayPlans)
+          ? (demoStructured.sevenDayPlans as StructuredReportReadModel['sevenDayPlans'])
+          : [],
+        compareSnapshot: (demoStructured.compareSnapshot as StructuredReportReadModel['compareSnapshot']) || null,
+        shareArtifact: (demoStructured.shareArtifact as StructuredReportReadModel['shareArtifact']) || null,
+        reviewSnapshot: (demoStructured.reviewSnapshot as StructuredReportReadModel['reviewSnapshot']) || null,
+      };
+    }
+  } else {
+    const [diagnosisOutline] = await db
+      .select()
+      .from(reportDiagnosisOutlines)
+      .where(eq(reportDiagnosisOutlines.reportId, reportId))
+      .limit(1);
+    const [shortestPath] = await db
+      .select()
+      .from(reportShortestPaths)
+      .where(eq(reportShortestPaths.reportId, reportId))
+      .limit(1);
+    const outputGates = await db
+      .select()
+      .from(reportOutputGates)
+      .where(eq(reportOutputGates.reportId, reportId));
+    const sevenDayPlans = await db
+      .select()
+      .from(reportSevenDayPlans)
+      .where(eq(reportSevenDayPlans.reportId, reportId));
+    const [compareSnapshot] = await db
+      .select()
+      .from(reportCompareSnapshots)
+      .where(eq(reportCompareSnapshots.reportId, reportId))
+      .limit(1);
+    const [shareArtifact] = await db
+      .select()
+      .from(reportShareArtifacts)
+      .where(eq(reportShareArtifacts.reportId, reportId))
+      .limit(1);
+    const [reviewSnapshot] = await db
+      .select()
+      .from(reportReviewSnapshots)
+      .where(eq(reportReviewSnapshots.reportId, reportId))
+      .limit(1);
+
+    structured = {
+      diagnosisOutline: diagnosisOutline || null,
+      shortestPath: shortestPath || null,
+      outputGates: outputGates.sort((left, right) => left.sortOrder - right.sortOrder),
+      sevenDayPlans: sevenDayPlans.sort((left, right) => left.sortOrder - right.sortOrder),
+      compareSnapshot: compareSnapshot || null,
+      shareArtifact: shareArtifact || null,
+      reviewSnapshot: reviewSnapshot || null,
+    };
+  }
+
+  const reportViewModel = buildDeepResearchReportViewModel({
+    reportId,
+    parentReport,
+    labels: parentReport.labels,
+    structured,
+    completedDays: parentReport.completedDays,
+  });
+
+  return {
+    report: reportRecord,
+    structured,
+    reportViewModel,
   };
 }
 
@@ -2004,24 +2159,15 @@ function buildReportCompareSummary(
   currentReport: StoredReport | Record<string, unknown>,
   previousReport: StoredReport | Record<string, unknown> | null
 ) {
-  if (!previousReport) {
-    return 'First report for this child. Use this as the baseline for next week.';
-  }
-
   const currentFinding = extractTopFinding(currentReport);
-  const previousFinding = extractTopFinding(previousReport);
+  const previousFinding = previousReport ? extractTopFinding(previousReport) : null;
 
-  if (currentFinding.title === previousFinding.title) {
-    if (currentFinding.count < previousFinding.count) {
-      return `Improving: ${currentFinding.title} appears in fewer anchored examples than the previous report.`;
-    }
-    if (currentFinding.count > previousFinding.count) {
-      return `Still sticky: ${currentFinding.title} appears in more anchored examples than the previous report.`;
-    }
-    return `Steady pattern: ${currentFinding.title} is still the main focus compared with the previous report.`;
-  }
-
-  return `Focus shifted from ${previousFinding.title} to ${currentFinding.title}.`;
+  return buildReportCompareSummaryFromData({
+    currentTitle: currentFinding.title,
+    currentCount: currentFinding.count,
+    previousTitle: previousFinding?.title,
+    previousCount: previousFinding?.count,
+  });
 }
 
 export async function listReportsForChild(userId: number, childId: number, limit = 5) {
@@ -2097,7 +2243,15 @@ export async function listReportsForChild(userId: number, childId: number, limit
   }));
 }
 
-export async function listReportsForUser(userId: number, limit = 24) {
+export async function listReportsDashboardForUser(
+  userId: number,
+  limit = 24,
+  _filters?: {
+    childId?: number;
+    status?: string;
+    sourceType?: string;
+  }
+) {
   if (FAMILY_EDU_DEMO_MODE) {
     const state = await readFamilyMockState();
     const userRuns = state.runs
@@ -2130,7 +2284,14 @@ export async function listReportsForUser(userId: number, limit = 24) {
               ? report.parentReportJson.summary
               : null,
           topFinding: extractTopFinding(report).title,
-          compareSummary: '',
+          compareSummary:
+            typeof report.deepResearchReportJson?.compareSnapshot === 'object' &&
+            report.deepResearchReportJson?.compareSnapshot &&
+            typeof (report.deepResearchReportJson.compareSnapshot as Record<string, unknown>)
+              .compareSummary === 'string'
+              ? ((report.deepResearchReportJson.compareSnapshot as Record<string, unknown>)
+                  .compareSummary as string)
+              : '',
           completedDays: Array.isArray(report.parentReportJson.completedDays)
             ? (report.parentReportJson.completedDays as number[])
             : [],
@@ -2144,12 +2305,14 @@ export async function listReportsForUser(userId: number, limit = 24) {
       .slice(0, limit)
       .map((entry, index, collection) => ({
         ...entry,
-        compareSummary: buildReportCompareSummary(
-          state.reports.find((report) => report.id === entry.id) as StoredReport,
-          collection[index + 1]
-            ? (state.reports.find((report) => report.id === collection[index + 1].id) as StoredReport)
-            : null
-        ),
+        compareSummary:
+          entry.compareSummary ||
+          buildReportCompareSummary(
+            state.reports.find((report) => report.id === entry.id) as StoredReport,
+            collection[index + 1]
+              ? (state.reports.find((report) => report.id === collection[index + 1].id) as StoredReport)
+              : null
+          ),
       }));
   }
 
@@ -2170,6 +2333,14 @@ export async function listReportsForUser(userId: number, limit = 24) {
     .orderBy(desc(reports.createdAt))
     .limit(limit);
 
+  const compareRows = rows.length
+    ? await db
+        .select()
+        .from(reportCompareSnapshots)
+        .where(inArray(reportCompareSnapshots.reportId, rows.map((entry) => entry.report.id)))
+    : [];
+  const compareByReportId = new Map(compareRows.map((entry) => [entry.reportId, entry] as const));
+
   return rows.map((entry, index) => ({
     id: entry.report.id,
     runId: entry.runId,
@@ -2187,10 +2358,9 @@ export async function listReportsForUser(userId: number, limit = 24) {
         ? ((entry.report.parentReportJson as any).summary as string)
         : null,
     topFinding: extractTopFinding(entry.report).title,
-    compareSummary: buildReportCompareSummary(
-      entry.report,
-      rows[index + 1]?.report || null
-    ),
+    compareSummary:
+      compareByReportId.get(entry.report.id)?.compareSummary ||
+      buildReportCompareSummary(entry.report, rows[index + 1]?.report || null),
     completedDays: Array.isArray((entry.report.parentReportJson as any)?.completedDays)
       ? ((entry.report.parentReportJson as any).completedDays as number[])
       : [],
@@ -2199,6 +2369,10 @@ export async function listReportsForUser(userId: number, limit = 24) {
         ? ((entry.report.parentReportJson as any).confidence as number)
         : null,
   }));
+}
+
+export async function listReportsForUser(userId: number, limit = 24) {
+  return listReportsDashboardForUser(userId, limit);
 }
 
 export async function listShareLinksForReport(userId: number, reportId: number) {

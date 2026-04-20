@@ -144,6 +144,7 @@ export type StoredReport = {
   parentReportJson: Record<string, unknown>;
   studentReportJson: Record<string, unknown>;
   tutorReportJson: Record<string, unknown>;
+  deepResearchReportJson?: Record<string, unknown>;
   deckId: number | null;
   deckStatus: DeckStatus | 'idle';
   deckTier: DeckTier;
