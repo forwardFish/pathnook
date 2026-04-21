@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import {
   FREEMIUS_BILLING_ROLE_LINE,
@@ -5,6 +6,15 @@ import {
   PUBLIC_CONTACT_EMAIL,
   SUBSCRIPTION_REFUND_WINDOW_DAYS,
 } from '@/lib/site/public-trust';
+
+export const metadata: Metadata = {
+  title: 'Pathnook Help',
+  description:
+    'Find Pathnook help for billing, access, refunds, privacy, and trust-related requests.',
+  alternates: {
+    canonical: '/help'
+  }
+};
 
 const helpCards = [
   {

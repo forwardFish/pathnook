@@ -14,70 +14,9 @@ export const NOINDEX_ROBOTS = {
   follow: false
 } as const;
 
-export const MARKETING_EXACT_ROUTES = [
-  '/',
-  '/pricing',
-  '/sample-report',
-  '/contact',
-  '/help',
-  '/faq',
-  '/data-deletion',
-  '/how-it-works',
-  '/for-parents',
-  '/for-tutors',
-  '/guides'
-] as const;
-
-export const MARKETING_PREFIX_ROUTES = ['/features/', '/guides/', '/legal/'] as const;
-
-export const FEATURE_LINKS = [
-  { href: '/features/diagnosis', label: 'Diagnosis' },
-  { href: '/features/evidence', label: 'Evidence' },
-  { href: '/features/7-day-plan', label: '7-Day Plan' },
-  { href: '/features/share-with-tutor', label: 'Share with Tutor' },
-  { href: '/features/weekly-review', label: 'Weekly Review' }
-] as const;
-
-export const GUIDE_LINKS = [
-  { href: '/guides/math-homework-diagnosis', label: 'Math Homework Diagnosis' },
-  { href: '/guides/weekly-learning-review', label: 'Weekly Learning Review' },
-  { href: '/guides/repeated-learning-mistakes', label: 'Repeated Learning Mistakes' },
-  { href: '/guides/share-with-a-tutor', label: 'Share with a Tutor' }
-] as const;
-
-export const FOOTER_LINKS = [
-  { href: '/pricing', label: 'Pricing' },
-  { href: '/sample-report', label: 'Sample Report' },
-  { href: '/how-it-works', label: 'How It Works' },
-  { href: '/for-parents', label: 'For Parents' },
-  { href: '/for-tutors', label: 'For Tutors' },
-  { href: '/guides', label: 'Guides' },
-  { href: '/faq', label: 'FAQ' },
-  { href: '/help', label: 'Help' },
-  { href: '/contact', label: 'Contact' },
-  { href: '/legal/privacy', label: 'Privacy' },
-  { href: '/legal/terms', label: 'Terms' },
-  { href: '/legal/refunds', label: 'Refunds' },
-  { href: '/data-deletion', label: 'Data Deletion' }
-] as const;
-
 export const PUBLIC_ROUTES = [
   '/',
   '/pricing',
-  '/sample-report',
-  '/how-it-works',
-  '/for-parents',
-  '/for-tutors',
-  '/features/diagnosis',
-  '/features/evidence',
-  '/features/7-day-plan',
-  '/features/share-with-tutor',
-  '/features/weekly-review',
-  '/guides',
-  '/guides/math-homework-diagnosis',
-  '/guides/weekly-learning-review',
-  '/guides/repeated-learning-mistakes',
-  '/guides/share-with-a-tutor',
   '/faq',
   '/help',
   '/contact',
@@ -89,12 +28,4 @@ export const PUBLIC_ROUTES = [
 
 export function absoluteUrl(path: string) {
   return `${SITE_URL}${path.startsWith('/') ? path : `/${path}`}`;
-}
-
-export function isMarketingPathname(pathname: string) {
-  return (
-    MARKETING_EXACT_ROUTES.includes(
-      pathname as (typeof MARKETING_EXACT_ROUTES)[number]
-    ) || MARKETING_PREFIX_ROUTES.some((prefix) => pathname.startsWith(prefix))
-  );
 }

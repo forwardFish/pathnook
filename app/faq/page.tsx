@@ -1,7 +1,18 @@
+import type { Metadata } from 'next';
 import {
   ONE_TIME_REFUND_WINDOW_DAYS,
   SUBSCRIPTION_REFUND_WINDOW_DAYS,
 } from '@/lib/site/public-trust';
+import { JsonLd } from '@/components/seo/JsonLd';
+
+export const metadata: Metadata = {
+  title: 'Pathnook FAQ',
+  description:
+    'Read common Pathnook questions about billing, diagnosis workflows, refunds, and tutor sharing.',
+  alternates: {
+    canonical: '/faq'
+  }
+};
 
 const faqItems = [
   {
@@ -40,6 +51,20 @@ export default function FaqPage() {
   return (
     <main className="pn-doc-shell">
       <section className="pn-doc-card">
+        <JsonLd
+          data={{
+            '@context': 'https://schema.org',
+            '@type': 'FAQPage',
+            mainEntity: faqItems.map((item) => ({
+              '@type': 'Question',
+              name: item.question,
+              acceptedAnswer: {
+                '@type': 'Answer',
+                text: item.answer
+              }
+            }))
+          }}
+        />
         <p className="pn-kicker">FAQ</p>
         <h1 className="mt-4 text-4xl font-black tracking-tight text-[#111827]">
           Common Pathnook questions

@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import {
   FREEMIUS_BILLING_ROLE_LINE,
@@ -5,6 +6,15 @@ import {
   PUBLIC_OPERATOR_LINE,
   PUBLIC_OPERATOR_SHORT,
 } from '@/lib/site/public-trust';
+
+export const metadata: Metadata = {
+  title: 'Contact Pathnook',
+  description:
+    'Contact Pathnook for support, billing help, privacy requests, and legal inquiries.',
+  alternates: {
+    canonical: '/contact'
+  }
+};
 
 export default function ContactPage() {
   return (

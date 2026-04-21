@@ -9,12 +9,6 @@ export default function robots(): MetadataRoute.Robots {
         allow: [
           '/',
           '/pricing',
-          '/sample-report',
-          '/how-it-works',
-          '/for-parents',
-          '/for-tutors',
-          '/features/',
-          '/guides/',
           '/faq',
           '/help',
           '/contact',
@@ -26,6 +20,7 @@ export default function robots(): MetadataRoute.Robots {
           '/admin/',
           '/api/',
           '/share/',
+          '/sample-report',
           '/sign-in',
           '/sign-up',
           '/webhook/'

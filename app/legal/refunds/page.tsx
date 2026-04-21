@@ -1,8 +1,18 @@
+import type { Metadata } from 'next';
 import {
   ONE_TIME_REFUND_WINDOW_DAYS,
   PUBLIC_CONTACT_EMAIL,
   SUBSCRIPTION_REFUND_WINDOW_DAYS,
 } from '@/lib/site/public-trust';
+
+export const metadata: Metadata = {
+  title: 'Pathnook Refund Policy',
+  description:
+    'Read the Pathnook refund policy for one-time diagnosis purchases, recurring plans, and billing review.',
+  alternates: {
+    canonical: '/legal/refunds'
+  }
+};
 
 export default function RefundsPage() {
   return (

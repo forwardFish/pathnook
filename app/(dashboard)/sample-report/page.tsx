@@ -1,88 +1,11 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
-import { PageShell } from '@/components/marketing/PageShell';
-import { JsonLd, breadcrumbJsonLd } from '@/components/seo/JsonLd';
-import { absoluteUrl } from '@/lib/seo/site';
+import { redirect } from 'next/navigation';
+import { NOINDEX_ROBOTS } from '@/lib/seo/site';
 
 export const metadata: Metadata = {
-  title: 'Sample Report',
-  description:
-    'Preview the public shape of a Pathnook diagnosis report, including evidence, weekly focus, and tutor-ready handoff.',
-  alternates: {
-    canonical: '/sample-report'
-  }
+  robots: NOINDEX_ROBOTS
 };
 
 export default function SampleReportPage() {
-  return (
-    <PageShell
-      eyebrow="Sample Report"
-      title="Preview the shape of a Pathnook report"
-      description="Pathnook reports are designed to help families see the main issue, the supporting evidence, and the most useful next step for the current week."
-    >
-      <JsonLd
-        data={breadcrumbJsonLd([
-          { name: 'Home', item: absoluteUrl('/') },
-          { name: 'Sample Report', item: absoluteUrl('/sample-report') }
-        ])}
-      />
-
-      <section className="rounded-[1.75rem] border border-[var(--pn-border)] bg-white p-6">
-        <h2 className="text-2xl font-black text-[#111827]">
-          What families should expect to see
-        </h2>
-        <p className="mt-3 text-base leading-8 text-[var(--pn-muted)]">
-          The report starts with the main learning issue, the repeated pattern
-          behind it, and the evidence that supports that judgment. It is built
-          to reduce guesswork, not to flood parents with extra output.
-        </p>
-        <div className="mt-4 flex flex-wrap gap-3">
-          <Link href="/features/diagnosis" className="inline-flex items-center rounded-full border border-[var(--pn-border)] px-4 py-2 text-sm font-semibold text-[var(--pn-violet)] transition hover:border-[var(--pn-violet)]">
-            See diagnosis
-          </Link>
-          <Link href="/features/evidence" className="inline-flex items-center rounded-full border border-[var(--pn-border)] px-4 py-2 text-sm font-semibold text-[var(--pn-violet)] transition hover:border-[var(--pn-violet)]">
-            Review the evidence layer
-          </Link>
-        </div>
-      </section>
-
-      <section className="rounded-[1.75rem] border border-[var(--pn-border)] bg-white p-6">
-        <h2 className="text-2xl font-black text-[#111827]">
-          How the report connects to weekly action
-        </h2>
-        <p className="mt-3 text-base leading-8 text-[var(--pn-muted)]">
-          A useful report does not stop at diagnosis. It points to the shortest
-          next path, keeps the weekly focus visible, and helps the family decide
-          what to do first.
-        </p>
-        <div className="mt-4 flex flex-wrap gap-3">
-          <Link href="/features/7-day-plan" className="inline-flex items-center rounded-full border border-[var(--pn-border)] px-4 py-2 text-sm font-semibold text-[var(--pn-violet)] transition hover:border-[var(--pn-violet)]">
-            See the 7-day plan
-          </Link>
-          <Link href="/features/weekly-review" className="inline-flex items-center rounded-full border border-[var(--pn-border)] px-4 py-2 text-sm font-semibold text-[var(--pn-violet)] transition hover:border-[var(--pn-violet)]">
-            See weekly review
-          </Link>
-        </div>
-      </section>
-
-      <section className="rounded-[1.75rem] border border-[var(--pn-border)] bg-white p-6">
-        <h2 className="text-2xl font-black text-[#111827]">
-          Tutor handoff stays anchored in the same signal
-        </h2>
-        <p className="mt-3 text-base leading-8 text-[var(--pn-muted)]">
-          When a tutor needs context, the report can support a tutor-ready
-          handoff without losing the evidence, focus, and family framing behind
-          the review.
-        </p>
-        <div className="mt-4 flex flex-wrap gap-3">
-          <Link href="/features/share-with-tutor" className="inline-flex items-center rounded-full border border-[var(--pn-border)] px-4 py-2 text-sm font-semibold text-[var(--pn-violet)] transition hover:border-[var(--pn-violet)]">
-            See tutor sharing
-          </Link>
-          <Link href="/pricing" className="inline-flex items-center rounded-full border border-[var(--pn-border)] px-4 py-2 text-sm font-semibold text-[var(--pn-violet)] transition hover:border-[var(--pn-violet)]">
-            View pricing
-          </Link>
-        </div>
-      </section>
-    </PageShell>
-  );
+  redirect('/');
 }

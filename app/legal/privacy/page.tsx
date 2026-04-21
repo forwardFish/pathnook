@@ -1,7 +1,17 @@
+import type { Metadata } from 'next';
 import {
   PUBLIC_CONTACT_EMAIL,
   PUBLIC_OPERATOR_LINE,
 } from '@/lib/site/public-trust';
+
+export const metadata: Metadata = {
+  title: 'Pathnook Privacy Policy',
+  description:
+    'Read the Pathnook Privacy Policy for account data, uploaded learning materials, cookies, and data handling.',
+  alternates: {
+    canonical: '/legal/privacy'
+  }
+};
 
 export default function PrivacyPage() {
   return (

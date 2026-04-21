@@ -1,4 +1,14 @@
+import type { Metadata } from 'next';
 import { PUBLIC_CONTACT_EMAIL } from '@/lib/site/public-trust';
+
+export const metadata: Metadata = {
+  title: 'Pathnook Data Deletion',
+  description:
+    'Learn how to request account deletion, data deletion, export, or correction for Pathnook.',
+  alternates: {
+    canonical: '/data-deletion'
+  }
+};
 
 export default function DataDeletionPage() {
   return (

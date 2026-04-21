@@ -1,6 +1,16 @@
+import type { Metadata } from 'next';
 import {
   PUBLIC_CONTACT_EMAIL,
 } from '@/lib/site/public-trust';
+
+export const metadata: Metadata = {
+  title: 'Pathnook Terms of Service',
+  description:
+    'Read the Pathnook Terms of Service covering account eligibility, uploads, AI limitations, and acceptable use.',
+  alternates: {
+    canonical: '/legal/terms'
+  }
+};
 
 export default function TermsPage() {
   return (
