@@ -19,7 +19,13 @@ import {
   getAnnualSavings,
   getPublicBillingPlanGroups,
 } from "@/lib/payments/catalog";
+import {
+  JsonLd,
+  organizationJsonLd,
+  websiteJsonLd,
+} from "@/components/seo/JsonLd";
 import { Button } from "@/components/ui/button";
+import { SITE_URL } from "@/lib/seo/site";
 
 const proofPoints = [
   "See the real bottleneck",
@@ -132,6 +138,34 @@ const faqItems = [
   },
 ] as const;
 
+const seoExploreCards = [
+  {
+    title: "How Pathnook works",
+    body: "See the public workflow from upload to diagnosis, evidence, and weekly follow-through.",
+    href: "/how-it-works",
+  },
+  {
+    title: "For parents",
+    body: "Understand how Pathnook helps parents turn raw pages into clearer weekly decisions.",
+    href: "/for-parents",
+  },
+  {
+    title: "For tutors",
+    body: "See how tutor-ready sharing and evidence-backed review make handoff easier.",
+    href: "/for-tutors",
+  },
+  {
+    title: "Guides and feature paths",
+    body: "Browse focused guides and feature pages that strengthen Pathnook's public information architecture.",
+    href: "/guides",
+  },
+  {
+    title: "Sample report",
+    body: "Preview the public shape of a Pathnook report before starting your first review.",
+    href: "/sample-report",
+  },
+] as const;
+
 function SectionIntro({
   eyebrow,
   title,
@@ -159,6 +193,7 @@ export function FamilyLandingPage() {
 
   return (
     <main className="pn-page-shell overflow-x-clip">
+      <JsonLd data={[websiteJsonLd(SITE_URL), organizationJsonLd(SITE_URL)]} />
       <section className="mx-auto max-w-[1180px] px-4 pb-20 pt-24 sm:px-6 sm:pt-28 lg:px-8">
         <div className="hero mx-auto max-w-[1180px] text-center">
           <div className="inline-flex items-center gap-2 rounded-full border border-[var(--pn-soft-border)] bg-[var(--pn-soft)] px-5 py-3 text-sm font-extrabold text-[var(--pn-violet)] shadow-[0_12px_30px_rgba(124,58,237,0.12)]">
@@ -343,6 +378,30 @@ export function FamilyLandingPage() {
               decisions, better next steps, and steadier progress over time.
             </p>
           </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-[1180px] px-4 py-10 sm:px-6 lg:px-8">
+        <SectionIntro
+          eyebrow="Explore"
+          title="Learn more about Pathnook's public workflow."
+          body="These public pages make the product easier to understand for families, tutors, and search engines without forcing everything through the homepage."
+        />
+        <div className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+          {seoExploreCards.map((card) => (
+            <Link
+              key={card.href}
+              href={card.href}
+              className="rounded-[1.6rem] border border-[var(--pn-border)] bg-white p-6 shadow-[0_12px_36px_rgba(15,23,42,0.05)] transition hover:-translate-y-1 hover:border-[var(--pn-violet)]"
+            >
+              <h3 className="text-2xl font-black tracking-[-0.03em] text-[#111827]">
+                {card.title}
+              </h3>
+              <p className="mt-3 text-base leading-8 text-[var(--pn-muted)]">
+                {card.body}
+              </p>
+            </Link>
+          ))}
         </div>
       </section>
 

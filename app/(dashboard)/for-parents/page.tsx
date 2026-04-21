@@ -5,78 +5,75 @@ import { JsonLd, breadcrumbJsonLd } from '@/components/seo/JsonLd';
 import { absoluteUrl } from '@/lib/seo/site';
 
 export const metadata: Metadata = {
-  title: 'Sample Report',
+  title: 'For Parents',
   description:
-    'Preview the public shape of a Pathnook diagnosis report, including evidence, weekly focus, and tutor-ready handoff.',
+    'Pathnook helps parents turn recent learning evidence into diagnosis, evidence, and a 7-day action plan they can actually use.',
   alternates: {
-    canonical: '/sample-report'
+    canonical: '/for-parents'
   }
 };
 
-export default function SampleReportPage() {
+export default function ForParentsPage() {
   return (
     <PageShell
-      eyebrow="Sample Report"
-      title="Preview the shape of a Pathnook report"
-      description="Pathnook reports are designed to help families see the main issue, the supporting evidence, and the most useful next step for the current week."
+      title="Pathnook for parents"
+      description="Built for parents who need clearer judgment, less guessing, and a practical next step after homework, quizzes, and corrections."
     >
       <JsonLd
         data={breadcrumbJsonLd([
           { name: 'Home', item: absoluteUrl('/') },
-          { name: 'Sample Report', item: absoluteUrl('/sample-report') }
+          { name: 'For Parents', item: absoluteUrl('/for-parents') }
         ])}
       />
 
       <section className="rounded-[1.75rem] border border-[var(--pn-border)] bg-white p-6">
         <h2 className="text-2xl font-black text-[#111827]">
-          What families should expect to see
+          See the real problem, not just the wrong answer
         </h2>
         <p className="mt-3 text-base leading-8 text-[var(--pn-muted)]">
-          The report starts with the main learning issue, the repeated pattern
-          behind it, and the evidence that supports that judgment. It is built
-          to reduce guesswork, not to flood parents with extra output.
+          Pathnook focuses on repeated learning patterns, weekly focus, and what
+          not to overreact to, so parents can stop guessing what matters most.
         </p>
         <div className="mt-4 flex flex-wrap gap-3">
           <Link href="/features/diagnosis" className="inline-flex items-center rounded-full border border-[var(--pn-border)] px-4 py-2 text-sm font-semibold text-[var(--pn-violet)] transition hover:border-[var(--pn-violet)]">
             See diagnosis
           </Link>
           <Link href="/features/evidence" className="inline-flex items-center rounded-full border border-[var(--pn-border)] px-4 py-2 text-sm font-semibold text-[var(--pn-violet)] transition hover:border-[var(--pn-violet)]">
-            Review the evidence layer
+            See evidence
           </Link>
         </div>
       </section>
 
       <section className="rounded-[1.75rem] border border-[var(--pn-border)] bg-white p-6">
         <h2 className="text-2xl font-black text-[#111827]">
-          How the report connects to weekly action
+          Get a plan you can actually use this week
         </h2>
         <p className="mt-3 text-base leading-8 text-[var(--pn-muted)]">
-          A useful report does not stop at diagnosis. It points to the shortest
-          next path, keeps the weekly focus visible, and helps the family decide
-          what to do first.
+          The plan layer is designed for follow-through: parent prompts, success
+          checks, and guidance on what not to push first this week.
         </p>
         <div className="mt-4 flex flex-wrap gap-3">
           <Link href="/features/7-day-plan" className="inline-flex items-center rounded-full border border-[var(--pn-border)] px-4 py-2 text-sm font-semibold text-[var(--pn-violet)] transition hover:border-[var(--pn-violet)]">
             See the 7-day plan
           </Link>
-          <Link href="/features/weekly-review" className="inline-flex items-center rounded-full border border-[var(--pn-border)] px-4 py-2 text-sm font-semibold text-[var(--pn-violet)] transition hover:border-[var(--pn-violet)]">
-            See weekly review
+          <Link href="/guides/weekly-learning-review" className="inline-flex items-center rounded-full border border-[var(--pn-border)] px-4 py-2 text-sm font-semibold text-[var(--pn-violet)] transition hover:border-[var(--pn-violet)]">
+            Read the weekly review guide
           </Link>
         </div>
       </section>
 
       <section className="rounded-[1.75rem] border border-[var(--pn-border)] bg-white p-6">
         <h2 className="text-2xl font-black text-[#111827]">
-          Tutor handoff stays anchored in the same signal
+          Keep continuity week after week
         </h2>
         <p className="mt-3 text-base leading-8 text-[var(--pn-muted)]">
-          When a tutor needs context, the report can support a tutor-ready
-          handoff without losing the evidence, focus, and family framing behind
-          the review.
+          Parents come back because the system keeps continuity visible: weekly
+          review, compare, and a current focus instead of a fresh restart every
+          time.
         </p>
         <div className="mt-4 flex flex-wrap gap-3">
-          <Link href="/features/share-with-tutor" className="inline-flex items-center rounded-full border border-[var(--pn-border)] px-4 py-2 text-sm font-semibold text-[var(--pn-violet)] transition hover:border-[var(--pn-violet)]">
-            See tutor sharing
+          <Link href="/features/weekly-review" className="inline-flex items-center rounded-full border border-[var(--pn-border)] px-4 py-2 text-sm font-semibold text-[var(--pn-violet)] transition hover:border-[var(--pn-violet)]">
+            See weekly review
           </Link>
           <Link href="/pricing" className="inline-flex items-center rounded-full border border-[var(--pn-border)] px-4 py-2 text-sm font-semibold text-[var(--pn-violet)] transition hover:border-[var(--pn-violet)]">
             View pricing
