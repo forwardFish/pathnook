@@ -166,7 +166,7 @@ export function FamilyLandingPage() {
   return (
     <main className="pn-page-shell overflow-x-clip">
       <JsonLd data={[websiteJsonLd(SITE_URL), organizationJsonLd(SITE_URL)]} />
-      <section className="mx-auto max-w-[1180px] px-4 pb-20 pt-24 sm:px-6 sm:pt-28 lg:px-8">
+      <section className="mx-auto max-w-[1180px] px-4 pb-20 pt-14 sm:px-6 sm:pt-18 lg:px-8">
         <div className="hero mx-auto max-w-[1180px] text-center">
           <div className="inline-flex items-center gap-2 rounded-full border border-[var(--pn-soft-border)] bg-[var(--pn-soft)] px-5 py-3 text-sm font-extrabold text-[var(--pn-violet)] shadow-[0_12px_30px_rgba(124,58,237,0.12)]">
             <Sparkles className="h-4 w-4" />
