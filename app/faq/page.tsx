@@ -50,7 +50,7 @@ const faqItems = [
 export default function FaqPage() {
   return (
     <main className="pn-doc-shell">
-      <section className="pn-doc-card">
+      <section className="pn-doc-card overflow-hidden">
         <JsonLd
           data={{
             '@context': 'https://schema.org',
@@ -66,14 +66,25 @@ export default function FaqPage() {
           }}
         />
         <p className="pn-kicker">FAQ</p>
-        <h1 className="mt-4 text-4xl font-black tracking-tight text-[#111827]">
+        <h1 className="mt-4 max-w-4xl text-5xl font-black tracking-[-0.04em] text-[#111827] sm:text-6xl">
           Common Pathnook questions
         </h1>
-        <div className="mt-8 space-y-4">
+        <p className="mt-5 max-w-3xl text-lg leading-8 text-[var(--pn-muted-2)] sm:text-xl">
+          Straight answers about access, billing, refunds, and how Pathnook fits
+          into a family&apos;s weekly learning rhythm.
+        </p>
+        <div className="mt-10 grid gap-5 lg:grid-cols-2">
           {faqItems.map((item) => (
-            <article key={item.question} className="rounded-[1.4rem] border border-[var(--pn-border)] bg-[linear-gradient(180deg,var(--pn-soft-2)_0%,white_100%)] p-5">
-              <h2 className="text-xl font-semibold text-[#111827]">{item.question}</h2>
-              <p className="mt-2 text-base leading-8 text-[var(--pn-muted)]">{item.answer}</p>
+            <article
+              key={item.question}
+              className="rounded-[1.75rem] border border-[var(--pn-border)] bg-[linear-gradient(180deg,var(--pn-soft-2)_0%,white_100%)] p-6 shadow-[0_18px_50px_rgba(15,23,42,0.05)] sm:p-7"
+            >
+              <h2 className="max-w-[22ch] text-[1.65rem] font-black leading-tight tracking-[-0.03em] text-[#111827]">
+                {item.question}
+              </h2>
+              <p className="mt-3 text-[1.05rem] leading-8 text-[var(--pn-muted)] sm:text-[1.1rem]">
+                {item.answer}
+              </p>
             </article>
           ))}
         </div>

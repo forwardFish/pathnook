@@ -31,17 +31,17 @@ export function LandingHeader() {
           : "bg-white/72 backdrop-blur-md"
       )}
     >
-      <div className="mx-auto flex max-w-[1180px] items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
+      <div className="mx-auto flex max-w-[1380px] items-center justify-between gap-5 px-5 py-5 sm:px-8 lg:px-10">
         <Link href="/" aria-label="Pathnook home">
-          <FamilyLogo size="md" showSubtitle={false} textClassName="text-[#2f3455]" />
+          <FamilyLogo size="lg" showSubtitle={false} textClassName="text-[#202643]" />
         </Link>
 
-        <nav className="hidden flex-1 items-center justify-center gap-2 px-6 lg:flex xl:gap-3">
+        <nav className="hidden flex-1 items-center justify-center gap-3 px-8 lg:flex xl:gap-4">
           {landingNavItems.map((item) => (
             <Link
               key={item.href}
               href={item.href}
-              className="pn-link-chip whitespace-nowrap xl:px-5"
+              className="pn-link-chip whitespace-nowrap xl:px-6"
             >
               {item.label}
             </Link>
@@ -49,10 +49,17 @@ export function LandingHeader() {
         </nav>
 
         <div className="hidden items-center gap-3 lg:flex">
-          <Button asChild variant="outline" className="rounded-[1rem] px-5">
+          <Button
+            asChild
+            variant="outline"
+            className="h-12 rounded-[1rem] border-[var(--pn-border)] bg-white/90 px-6 text-[15px] font-semibold text-[var(--pn-text)] shadow-[0_14px_34px_rgba(15,23,42,0.05)]"
+          >
             <Link href="/sign-in">Log in</Link>
           </Button>
-          <Button asChild className="rounded-[1rem] px-5">
+          <Button
+            asChild
+            className="h-12 rounded-[1rem] px-6 text-[15px] font-semibold shadow-[0_18px_44px_rgba(124,58,237,0.28)]"
+          >
             <Link href="/sign-up?redirect=dashboard">
               Get Started
               <ArrowRight className="h-4 w-4" />

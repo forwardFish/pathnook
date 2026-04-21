@@ -42,7 +42,7 @@ export function LandingFooter() {
 
   return (
     <footer className="mt-20 bg-[var(--pn-dark)] text-white" data-testid="landing-footer">
-      <div className="mx-auto max-w-[1180px] px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-[1380px] px-5 sm:px-8 lg:px-10">
         <div className="grid gap-10 border-b border-white/10 py-16 md:grid-cols-2 xl:grid-cols-[1.2fr,1fr,1fr,1fr]">
           <div>
             <div className="flex flex-wrap items-center gap-4">

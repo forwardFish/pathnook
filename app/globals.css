@@ -235,7 +235,7 @@
   }
 
   .pn-link-chip {
-    @apply rounded-full px-4 py-2 text-sm font-semibold transition;
+    @apply rounded-full px-5 py-2.5 text-[15px] font-semibold tracking-[-0.01em] transition;
     color: var(--pn-muted-2);
   }
 
@@ -245,11 +245,11 @@
   }
 
   .pn-doc-shell {
-    @apply mx-auto max-w-5xl px-4 py-16 sm:px-6 lg:px-8;
+    @apply mx-auto max-w-[1320px] px-5 py-20 sm:px-8 lg:px-10;
   }
 
   .pn-doc-card {
-    @apply rounded-[2rem] p-8 sm:p-10;
+    @apply rounded-[2.25rem] p-7 sm:p-10 lg:p-12;
     background: rgba(255, 255, 255, 0.94);
     border: 1px solid var(--pn-soft-border);
     box-shadow: var(--pn-shadow);
@@ -257,7 +257,7 @@
 
   .pn-doc-prose {
     color: var(--pn-muted-2);
-    @apply text-base leading-8;
+    @apply text-[1.05rem] leading-8 lg:text-[1.1rem] lg:leading-9;
   }
 
   .pn-doc-prose h2 {

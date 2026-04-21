@@ -26,8 +26,8 @@ const sizeMap = {
     gap: "gap-3",
   },
   lg: {
-    mark: 52,
-    title: "text-[1.9rem]",
+    mark: 56,
+    title: "text-[2.05rem]",
     subtitle: "text-lg",
     gap: "gap-4",
   },
@@ -64,7 +64,7 @@ function LogoInner({
         <span
           className={cn(
             current.title,
-            "font-semibold tracking-tight text-slate-950",
+            "font-bold tracking-[-0.03em] text-slate-950",
             textClassName
           )}
         >
