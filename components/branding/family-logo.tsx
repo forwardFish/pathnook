@@ -47,7 +47,7 @@ function LogoInner({
     <span className={cn("inline-flex items-center", current.gap, className)}>
       <span
         className={cn(
-          "relative inline-flex shrink-0 overflow-hidden rounded-[1.1rem] shadow-[0_18px_50px_rgba(37,99,235,0.22)]",
+          "relative inline-flex shrink-0 overflow-hidden rounded-[0.9rem] bg-transparent",
           markClassName
         )}
         style={{ width: current.mark, height: current.mark }}
@@ -57,7 +57,7 @@ function LogoInner({
           alt="Pathnook logo mark"
           width={current.mark}
           height={current.mark}
-          className="h-full w-full object-cover"
+          className="h-full w-full object-contain"
           priority
         />
       </span>
