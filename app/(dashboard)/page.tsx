@@ -1,4 +1,6 @@
 import type { Metadata } from 'next';
+import { redirect } from 'next/navigation';
+import { cookies } from 'next/headers';
 import { FamilyLandingPage } from "@/components/landing/family-landing-page";
 
 export const metadata: Metadata = {
@@ -10,6 +12,10 @@ export const metadata: Metadata = {
   }
 };
 
-export default function HomePage() {
+export default async function HomePage() {
+  const cookieStore = await cookies();
+  if (cookieStore.get('session')) {
+    redirect('/dashboard');
+  }
   return <FamilyLandingPage />;
 }

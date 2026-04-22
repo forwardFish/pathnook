@@ -24,6 +24,20 @@ async function createDemoUser() {
   return toDemoUser(await getStoredDemoParentProfile());
 }
 
+function isDatabaseConnectionError(error: unknown) {
+  if (!(error instanceof Error)) {
+    return false;
+  }
+
+  const message = error.message.toLowerCase();
+  return (
+    message.includes('fetch failed') ||
+    message.includes('connection') ||
+    message.includes('network') ||
+    message.includes('neon')
+  );
+}
+
 export async function getUser() {
   const sessionCookie = (await cookies()).get('session');
   if (!sessionCookie || !sessionCookie.value) {
@@ -63,6 +77,10 @@ export async function getUser() {
   } catch (error) {
     if (FAMILY_EDU_DEMO_MODE) {
       return createDemoUser();
+    }
+    if (isDatabaseConnectionError(error)) {
+      console.error('Database unavailable while loading current user:', error);
+      return null;
     }
     throw error;
   }

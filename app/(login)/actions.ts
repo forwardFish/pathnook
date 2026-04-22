@@ -327,14 +327,19 @@ export const signUp = validatedAction(signUpSchema, async (data, formData) => {
 });
 
 export async function signOut() {
-  const user = (await getUser()) as User;
+  const user = (await getUser()) as User | null;
   if (FAMILY_EDU_DEMO_MODE) {
     (await cookies()).delete('session');
-    return;
+    redirect('/');
   }
-  const userWithTeam = await getUserWithTeam(user.id);
-  await logActivity(userWithTeam?.teamId, user.id, ActivityType.SIGN_OUT);
+
+  if (user) {
+    const userWithTeam = await getUserWithTeam(user.id);
+    await logActivity(userWithTeam?.teamId, user.id, ActivityType.SIGN_OUT);
+  }
+
   (await cookies()).delete('session');
+  redirect('/');
 }
 
 const updatePasswordSchema = z.object({

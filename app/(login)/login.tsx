@@ -10,7 +10,7 @@ import { Loader2 } from 'lucide-react';
 import { signIn, signUp } from './actions';
 import { ActionState } from '@/lib/auth/middleware';
 import { countryOptions } from '@/lib/family/options';
-import { FAMILY_EDU_SUPPORT_EMAIL } from '@/lib/family/config';
+import { PUBLIC_CONTACT_EMAIL } from '@/lib/site/public-trust';
 
 function getOauthErrorMessage(errorCode?: string) {
   switch (errorCode) {
@@ -276,7 +276,7 @@ export function Login({
                 {mode === 'signin' ? (
                   <div className="text-center text-sm text-[var(--pn-muted)]">
                     <a
-                      href={`mailto:${FAMILY_EDU_SUPPORT_EMAIL}?subject=Pathnook password recovery`}
+                      href={`mailto:${PUBLIC_CONTACT_EMAIL}?subject=Pathnook password recovery`}
                       className="font-semibold text-[var(--pn-violet)] underline-offset-4 hover:underline"
                     >
                       Need help recovering your password?

@@ -15,14 +15,14 @@ export function LandingHeader() {
     <header className="border-b border-[color:color-mix(in_srgb,var(--pn-border)_82%,white)] bg-white/88 backdrop-blur-lg">
       <div className="mx-auto max-w-[1440px]">
         <div className="flex items-center justify-between gap-6 px-5 py-4 sm:px-7 sm:py-5 lg:px-10">
-          <Link href="/" aria-label="Pathnook home" className="shrink-0">
-            <FamilyLogo
-              size="lg"
-              showSubtitle={true}
-              textClassName="text-[#202643]"
-              subtitleClassName="hidden text-[0.98rem] font-medium tracking-[-0.01em] text-[#6b7280] xl:block"
-            />
-          </Link>
+          <FamilyLogo
+            href="/"
+            size="lg"
+            showSubtitle={true}
+            className="shrink-0"
+            textClassName="text-[#202643]"
+            subtitleClassName="hidden text-[0.98rem] font-medium tracking-[-0.01em] text-[#6b7280] xl:block"
+          />
 
           <nav className="hidden flex-1 items-center justify-center gap-3 px-8 lg:flex xl:gap-4">
             {landingNavItems.map((item) => (

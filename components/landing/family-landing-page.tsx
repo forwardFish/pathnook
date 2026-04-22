@@ -24,6 +24,7 @@ import {
   organizationJsonLd,
   websiteJsonLd,
 } from "@/components/seo/JsonLd";
+import { HeroIntakeComposer } from "@/components/landing/hero-intake-composer";
 import { Button } from "@/components/ui/button";
 import { SITE_URL } from "@/lib/seo/site";
 
@@ -168,14 +169,9 @@ export function FamilyLandingPage() {
       <JsonLd data={[websiteJsonLd(SITE_URL), organizationJsonLd(SITE_URL)]} />
       <section className="mx-auto max-w-[1180px] px-4 pb-20 pt-14 sm:px-6 sm:pt-18 lg:px-8">
         <div className="hero mx-auto max-w-[1180px] text-center">
-          <div className="inline-flex items-center gap-2 rounded-full border border-[var(--pn-soft-border)] bg-[var(--pn-soft)] px-5 py-3 text-sm font-extrabold text-[var(--pn-violet)] shadow-[0_12px_30px_rgba(124,58,237,0.12)]">
-            <Sparkles className="h-4 w-4" />
-            Family-first AI learning guidance
-          </div>
-          <h1 className="mt-5 text-4xl font-black leading-[1.02] tracking-[-0.06em] text-[#111827] sm:text-5xl lg:text-[3.9rem]">
-            Pathnook is an AI learning and growth
-            <span className="pn-gradient-text mt-2 block">
-              system
+          <h1 className="mt-5 text-[clamp(1.95rem,4.1vw,3.35rem)] font-black leading-[1.06] tracking-[-0.05em] text-[#2f3d62]">
+            <span className="inline-block whitespace-nowrap">
+              Pathnook is an AI learning and growth system
             </span>
           </h1>
           <p className="pn-gradient-text mx-auto mt-5 max-w-5xl text-3xl font-black leading-[1.08] tracking-[-0.05em] sm:text-4xl lg:text-[3.25rem]">
@@ -203,7 +199,8 @@ export function FamilyLandingPage() {
         <div className="mx-auto mt-10 max-w-[1160px]">
           <div className="rounded-[2.35rem] border border-white/80 bg-white/82 p-5 shadow-[0_30px_100px_rgba(124,58,237,0.15)] backdrop-blur">
             <div className="rounded-[2rem] border border-[#d9dee7] bg-white p-5 sm:p-7">
-              <div className="rounded-[1.7rem] border border-[#dfe4ec] bg-[#fcfcfe] px-6 py-7 sm:px-8 sm:py-8">
+              <HeroIntakeComposer />
+              <div className="hidden rounded-[1.7rem] border border-[#dfe4ec] bg-[#fcfcfe] px-6 py-7 sm:px-8 sm:py-8">
                 <div className="font-mono text-[1rem] leading-[2.2] tracking-[0.01em] text-[#334155] sm:text-[1.1rem]">
                   My child understands the ideas in class, but still breaks down
                   on mixed schoolwork. I want to know the real bottleneck and
